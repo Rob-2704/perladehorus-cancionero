@@ -368,7 +368,6 @@
             }
         }
     </style>
-    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
     <div class="container">
@@ -530,10 +529,6 @@
                 // 1. Procesamiento e inyección de la letra y acordes interactivos
                 letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
                 inicializarModalAcordes('caja-acorde');
-
-                // 2. LLAMADA MODULAR AL REPRODUCTOR
-                const datosContexto = { nombreC: data.nombreC };
-                inyectarReproductor('.wrapper-iframe', data.ytID, datosContexto);
 
                 // 3. Inicializar autoscroll
                 inicializarAutoscroll('btn-play-scroll', 'slider-velocidad');
