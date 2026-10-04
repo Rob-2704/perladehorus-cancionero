@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
-    <!-- Google Material Symbols CDN -->
+    <!-- Google Material Symbols CDN con soporte para el eje FILL -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="style.css" rel="stylesheet">
     <title>Visor de Letra y Acordes</title>
@@ -69,6 +69,7 @@
             flex-shrink: 0;
             transition: transform 0.1s, filter 0.15s;
             user-select: none;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
         .btn-audio-ctrl:hover {
@@ -291,6 +292,7 @@
             width: 36px; 
             height: 36px; 
             user-select: none;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         
         .btn-scroll.activo { 
@@ -418,7 +420,7 @@
             <h2 id="nombre-artista"></h2>
         </div>
 
-        <!-- Reproductor de Audio con Controles e Iconos de Google -->
+        <!-- Reproductor de Audio con Controles e Iconos Rellenos de Google -->
         <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
             <audio id="reproductor-audio" preload="metadata"></audio>
             <button id="btn-audio-play" class="btn-audio-ctrl material-symbols-outlined" title="Reproducir/Pausar">play_arrow</button>
