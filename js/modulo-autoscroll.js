@@ -32,7 +32,7 @@ export function iniciarAutoscroll(btnPlay, slider) {
         if (!estaScrolleando) return;
 
         const velocidadSlider = parseInt(slider.value);
-        const delay = 110 - (velocidadSlider * 10); 
+        const delay = 200 - (velocidadSlider * 10); 
 
         window.scrollBy(0, 1);
 
