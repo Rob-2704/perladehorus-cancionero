@@ -375,16 +375,6 @@
     <div class="container">
         <a id="link-regreso" href="." class="btn-volver">← Volver al cancionero</a>
 
-        <!-- Reproductor de audio de la grabación -->
-        <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
-            <div class="audio-header">
-                <span>🎵 Grabación</span>
-            </div>
-            <audio id="reproductor-audio" controls preload="metadata">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
-        </div>
-
         <div class="info-cabecera">
             <div class="titulo-row">
                 <h1 id="titulo-cancion">Cargando...</h1>
@@ -407,8 +397,17 @@
         </div>
     </div>
 
+    <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
+        <div class="audio-header">
+            <span>🎵 Grabación</span>
+        </div>
+        <audio id="reproductor-audio" controls preload="metadata">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+    </div>
+
     <div id="caja-acorde" class="caja-acorde-emergente">
-       <h4 id="acorde-titulo">C</h4>
+       <h4 id="acorde-titulo"></h4>
        <span id="origen-acorde-modal" style="font-size:10px; opacity:0.6; display:block; margin-bottom:4px;"></span>
        <div id="wrapper-render"></div> 
     </div>
