@@ -471,7 +471,7 @@
             const nombreEncoded = encodeURIComponent(nombreLimpio);
 
             for (const formato of FORMATOS_AUDIO) {
-                const rutaArchivo = `grabaciones/${nombreEncoded}.${formato.ext}`;
+                const rutaArchivo = `Grabaciones/${nombreEncoded}.${formato.ext}`;
                 try {
                     const respuesta = await fetch(rutaArchivo, { method: 'HEAD' });
                     if (respuesta.ok) {
