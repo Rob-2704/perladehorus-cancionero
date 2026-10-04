@@ -40,33 +40,27 @@
         
         /* Contenedor del Reproductor de Audio Superior */
         .contenedor-audio {
-            display: flex;
-            align-items: center;
             background: #1e1e24;
             border: 1px solid #333;
             border-radius: 50px;
-            padding: 12px 18px;
+            padding: 6px 12px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .audio-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .contenedor-audio audio {
             width: 100%;
             height: 40px;
-            border-radius: 6px;
+            border-radius: 30px;
             outline: none;
+            color-scheme: dark; /* Fuerza a Chrome, Edge y Android a renderizar los controles nativos en modo oscuro */
+        }
+
+        /* Estilo para navegadores basasdos en WebKit/Blink (Chrome, Edge, Opera, Android) */
+        audio::-webkit-media-controls-panel {
+            background-color: #1e1e24;
         }
 
         .info-cabecera {
@@ -345,7 +339,7 @@
             }
 
             .contenedor-audio {
-                padding: 10px 14px;
+                padding: 4px 8px;
             }
         }
         
@@ -370,6 +364,7 @@
             }
         }
     </style>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
     <div class="container">
@@ -517,12 +512,15 @@
                     }
 
                     // Borrar las primeras 2 líneas para ocultar la indicación
-                    const lineas = contenidoProcesar.split(/\r?\n/);
+                    const lineas = contenidoProcesar.split(/?
+/);
                     if (lineas.length > 0 && /Capo:/i.test(lineas[0])) {
                         lineas.splice(0, Math.min(2, lineas.length));
-                        contenidoProcesar = lineas.join('\n');
+                        contenidoProcesar = lineas.join('
+');
                     } else {
-                        contenidoProcesar = contenidoProcesar.replace(/^.*Capo:\s*#?\s*\d+.*(?:\r?\n)?/im, '');
+                        contenidoProcesar = contenidoProcesar.replace(/^.*Capo:\s*#?\s*\d+.*(?:?
+)?/im, '');
                     }
                 } else {
                     if (badgeCapo) badgeCapo.style.display = 'none';
@@ -531,6 +529,10 @@
                 // 1. Procesamiento e inyección de la letra y acordes interactivos
                 letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
                 inicializarModalAcordes('caja-acorde');
+
+                // 2. LLAMADA MODULAR AL REPRODUCTOR
+                const datosContexto = { nombreC: data.nombreC };
+                inyectarReproductor('.wrapper-iframe', data.ytID, datosContexto);
 
                 // 3. Inicializar autoscroll
                 inicializarAutoscroll('btn-play-scroll', 'slider-velocidad');
