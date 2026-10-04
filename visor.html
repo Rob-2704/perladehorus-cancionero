@@ -48,6 +48,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
         .contenedor-audio audio {
@@ -55,7 +56,10 @@
             height: 40px;
             border-radius: 30px;
             outline: none;
-            color-scheme: dark; /* Fuerza a Chrome, Edge y Android a renderizar los controles nativos en modo oscuro */
+            margin: 0;
+            display: block;
+            color-scheme: dark; /* Fuerza tema oscuro en Edge, Chrome, Safari y Android */
+            accent-color: var(--accent); /* Aplica el color de acento a la barra de progreso en Firefox, Edge y Chrome */
         }
 
         /* Estilo para navegadores basados en WebKit/Blink (Chrome, Edge, Opera, Android) */
