@@ -511,15 +511,12 @@
                     }
 
                     // Borrar las primeras 2 líneas para ocultar la indicación
-                    const lineas = contenidoProcesar.split(/?
-/);
+                    const lineas = contenidoProcesar.split(/\r?\n/);
                     if (lineas.length > 0 && /Capo:/i.test(lineas[0])) {
                         lineas.splice(0, Math.min(2, lineas.length));
-                        contenidoProcesar = lineas.join('
-');
+                        contenidoProcesar = lineas.join('\n');
                     } else {
-                        contenidoProcesar = contenidoProcesar.replace(/^.*Capo:\s*#?\s*\d+.*(?:?
-)?/im, '');
+                        contenidoProcesar = contenidoProcesar.replace(/^.*Capo:\s*#?\s*\d+.*(?:\r?\n)?/im, '');
                     }
                 } else {
                     if (badgeCapo) badgeCapo.style.display = 'none';
