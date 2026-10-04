@@ -38,33 +38,57 @@
             color: var(--accent); 
         }
         
-        /* Contenedor del Reproductor de Audio Superior */
+        /* Contenedor del Reproductor de Audio Superior Personalizado */
         .contenedor-audio {
             background: #1e1e24;
             border: 1px solid #333;
             border-radius: 50px;
-            padding: 6px 12px;
-            margin-bottom: 10px;
+            padding: 8px 18px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .contenedor-audio audio {
+            gap: 12px;
             width: 100%;
-            height: 40px;
-            border-radius: 30px;
-            outline: none;
-            margin: 0;
-            display: block;
-            color-scheme: dark; /* Fuerza tema oscuro en Edge, Chrome, Safari y Android */
-            accent-color: var(--accent); /* Aplica el color de acento a la barra de progreso en Firefox, Edge y Chrome */
         }
 
-        /* Estilo para navegadores basados en WebKit/Blink (Chrome, Edge, Opera, Android) */
-        audio::-webkit-media-controls-panel {
-            background-color: #1e1e24;
+        .btn-audio-ctrl {
+            background: var(--accent);
+            color: #111;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            font-weight: bold;
+            transition: transform 0.1s, background 0.15s;
+        }
+
+        .btn-audio-ctrl:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .audio-slider {
+            flex: 1;
+            height: 6px;
+            accent-color: var(--accent); /* Funciona al 100% en Firefox, Edge, Chrome y móviles */
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .audio-time {
+            font-family: 'Sono', monospace;
+            font-size: 12px;
+            color: #aaa;
+            white-space: nowrap;
+            user-select: none;
         }
 
         .info-cabecera {
@@ -343,7 +367,12 @@
             }
 
             .contenedor-audio {
-                padding: 4px 8px;
+                padding: 6px 12px;
+                gap: 8px;
+            }
+
+            .audio-time {
+                font-size: 10px;
             }
         }
         
@@ -388,10 +417,14 @@
             <h2 id="nombre-artista"></h2>
         </div>
 
+        <!-- Reproductor de Audio con Controles Personalizados estilizados con var(--accent) -->
         <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
-            <audio id="reproductor-audio" controls preload="metadata">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
+            <audio id="reproductor-audio" preload="metadata"></audio>
+            <button id="btn-audio-play" class="btn-audio-ctrl" title="Reproducir/Pausar">▶</button>
+            <span id="audio-tiempo-actual" class="audio-time">0:00</span>
+            <input type="range" id="audio-progress" class="audio-slider" min="0" max="100" value="0">
+            <span id="audio-tiempo-total" class="audio-time">0:00</span>
+            <button id="btn-audio-mute" class="btn-audio-ctrl" title="Silenciar">🔊</button>
         </div>
 
         <div class="workspace">
@@ -451,6 +484,66 @@
             { ext: 'webm', mime: 'audio/webm' }
         ];
 
+        function formatearTiempo(segundos) {
+            if (isNaN(segundos) || segundos < 0) return "0:00";
+            const mins = Math.floor(segundos / 60);
+            const segs = Math.floor(segundos % 60);
+            return `${mins}:${segs < 10 ? '0' : ''}${segs}`;
+        }
+
+        function inicializarControladorAudio() {
+            const reproductorAudio = document.getElementById('reproductor-audio');
+            const btnPlay = document.getElementById('btn-audio-play');
+            const btnMute = document.getElementById('btn-audio-mute');
+            const sliderProgress = document.getElementById('audio-progress');
+            const txtActual = document.getElementById('audio-tiempo-actual');
+            const txtTotal = document.getElementById('audio-tiempo-total');
+
+            if (!reproductorAudio || !btnPlay) return;
+
+            btnPlay.addEventListener('click', () => {
+                if (reproductorAudio.paused) {
+                    reproductorAudio.play().then(() => {
+                        btnPlay.textContent = '⏸';
+                    }).catch(e => console.log('Error de reproducción:', e));
+                } else {
+                    reproductorAudio.pause();
+                    btnPlay.textContent = '▶';
+                }
+            });
+
+            btnMute.addEventListener('click', () => {
+                reproductorAudio.muted = !reproductorAudio.muted;
+                btnMute.textContent = reproductorAudio.muted ? '🔇' : '🔊';
+            });
+
+            reproductorAudio.addEventListener('loadedmetadata', () => {
+                txtTotal.textContent = formatearTiempo(reproductorAudio.duration);
+            });
+
+            reproductorAudio.addEventListener('timeupdate', () => {
+                if (reproductorAudio.duration) {
+                    const porcentaje = (reproductorAudio.currentTime / reproductorAudio.duration) * 100;
+                    sliderProgress.value = porcentaje;
+                    txtActual.textContent = formatearTiempo(reproductorAudio.currentTime);
+                }
+            });
+
+            reproductorAudio.addEventListener('ended', () => {
+                btnPlay.textContent = '▶';
+                sliderProgress.value = 0;
+                txtActual.textContent = "0:00";
+            });
+
+            sliderProgress.addEventListener('input', () => {
+                if (reproductorAudio.duration) {
+                    const tiempoIr = (sliderProgress.value / 100) * reproductorAudio.duration;
+                    reproductorAudio.currentTime = tiempoIr;
+                    txtActual.textContent = formatearTiempo(tiempoIr);
+                }
+            });
+        }
+
         async function buscarYCarGarGrabacion(nombreCancion) {
             const contenedorAudio = document.getElementById('contenedor-audio');
             const reproductorAudio = document.getElementById('reproductor-audio');
@@ -469,9 +562,10 @@
                 try {
                     const respuesta = await fetch(rutaArchivo, { method: 'HEAD' });
                     if (respuesta.ok) {
-                        reproductorAudio.innerHTML = `<source src="${rutaArchivo}" type="${formato.mime}">Tu navegador no soporta el elemento de audio.`;
+                        reproductorAudio.src = rutaArchivo;
                         reproductorAudio.load();
-                        contenedorAudio.style.display = 'block';
+                        contenedorAudio.style.display = 'flex';
+                        inicializarControladorAudio();
                         return;
                     }
                 } catch (e) {
