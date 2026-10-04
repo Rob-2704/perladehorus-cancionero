@@ -40,7 +40,6 @@
             color: var(--accent); 
         }
         
-        /* Contenedor del Reproductor de Audio Superior Personalizado */
         .contenedor-audio {
             background: #1e1e24;
             border: 1px solid #333;
@@ -70,11 +69,6 @@
             transition: transform 0.1s, filter 0.15s;
             user-select: none;
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-
-        .btn-audio-ctrl:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
         }
 
         .audio-slider {
@@ -201,12 +195,7 @@
             border-radius: 3px;
             transition: background 0.1s;
         }
-        
-        .acorde-link:hover { 
-            background-color: #e1e4e8; 
-            color: #004499; 
-        }
-        
+                
         .barra-compas { 
             color: #3a3a3a; 
             font-weight: bold; 
@@ -295,11 +284,6 @@
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         
-        .btn-scroll.activo { 
-            background: #ff3333; 
-            color: #fff;
-        }
-        
         .btn-transponer {
             background: #fff;
             color: #111;
@@ -314,10 +298,6 @@
             background: var(--accent);
         }
         
-        .btn-transponer:hover {
-            background: #ddd;
-        }
-
         .btn-toggle-transponer {
             background: rgba(20, 20, 20, 0.95); 
             border: 1px solid #333; 
@@ -517,7 +497,7 @@
 
             btnMute.addEventListener('click', () => {
                 reproductorAudio.muted = !reproductorAudio.muted;
-                btnMute.textContent = reproductorAudio.muted ? 'volume_off' : 'volume_up';
+                btnMute.textContent = reproductorAudio.muted ? 'no_sound' : 'volume_up';
             });
 
             reproductorAudio.addEventListener('loadedmetadata', () => {

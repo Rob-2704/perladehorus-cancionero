@@ -25,7 +25,7 @@ export function inicializarAutoscroll(btnPlayId, sliderId) {
 export function iniciarAutoscroll(btnPlay, slider) {
     if (intervaloScroll) clearTimeout(intervaloScroll);
     estaScrolleando = true;
-    btnPlay.textContent = "❚❚";
+    btnPlay.textContent = "pause";
     btnPlay.classList.add('activo');
 
     function realizarScroll() {
@@ -51,7 +51,7 @@ export function detenerAutoscroll(btnPlay) {
     estaScrolleando = false;
     if (intervaloScroll) clearTimeout(intervaloScroll);
     if(btnPlay) {
-        btnPlay.textContent = "▶";
+        btnPlay.textContent = "play_arrow";
         btnPlay.classList.remove('activo');
     }
 }
