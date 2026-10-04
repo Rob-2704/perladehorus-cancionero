@@ -460,7 +460,14 @@
         async function buscarYCarGarGrabacion(nombreCancion) {
             const contenedorAudio = document.getElementById('contenedor-audio');
             const reproductorAudio = document.getElementById('reproductor-audio');
-            const nombreLimpio = nombreCancion.trim();
+            
+            // Elimina paréntesis y su contenido, elimina guiones (-), y limpia espacios sobrantes
+            const nombreLimpio = nombreCancion
+                .replace(/\(.*?\)/g, '')
+                .replace(/-/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
             const nombreEncoded = encodeURIComponent(nombreLimpio);
 
             for (const formato of FORMATOS_AUDIO) {
