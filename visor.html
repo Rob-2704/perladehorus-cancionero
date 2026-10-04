@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
     <!-- Google Material Symbols CDN -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="style.css" rel="stylesheet">
     <title>Visor de Letra y Acordes</title>
     <style>
@@ -421,11 +421,11 @@
         <!-- Reproductor de Audio con Controles e Iconos de Google -->
         <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
             <audio id="reproductor-audio" preload="metadata"></audio>
-            <button id="btn-audio-play" class="btn-audio-ctrl material-symbols" title="Reproducir/Pausar">play_arrow</button>
+            <button id="btn-audio-play" class="btn-audio-ctrl material-symbols-outlined" title="Reproducir/Pausar">play_arrow</button>
             <span id="audio-tiempo-actual" class="audio-time">0:00</span>
             <input type="range" id="audio-progress" class="audio-slider" min="0" max="100" value="0">
             <span id="audio-tiempo-total" class="audio-time">0:00</span>
-            <button id="btn-audio-mute" class="btn-audio-ctrl material-symbols" title="Silenciar">volume_up</button>
+            <button id="btn-audio-mute" class="btn-audio-ctrl material-symbols-outlined" title="Silenciar">volume_up</button>
         </div>
 
         <div class="workspace">
