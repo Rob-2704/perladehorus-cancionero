@@ -30,7 +30,7 @@
             color: #888; 
             text-decoration: none; 
             font-size: 13px;
-            margin-bottom: 25px; 
+            margin-bottom: 15px; 
             transition: color 0.2s;
         }
         
@@ -38,6 +38,36 @@
             color: var(--accent); 
         }
         
+        /* Contenedor del Reproductor de Audio Superior */
+        .contenedor-audio {
+            background: #1e1e24;
+            border: 1px solid #333;
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .audio-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contenedor-audio audio {
+            width: 100%;
+            height: 40px;
+            border-radius: 6px;
+            outline: none;
+        }
+
         .info-cabecera {
             grid-column: 1 / 3;
             margin-bottom: 10px;
@@ -312,6 +342,10 @@
                 width: 15px;
                 height: 15px;
             }
+
+            .contenedor-audio {
+                padding: 10px 14px;
+            }
         }
         
         @media (max-width: 1300px) {
@@ -340,10 +374,26 @@
 <body>
     <div class="container">
         <a id="link-regreso" href="." class="btn-volver">← Volver al cancionero</a>
+
+        <!-- Reproductor de audio de la grabación -->
+        <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
+            <div class="audio-header">
+                <span>🎵 Grabación</span>
+            </div>
+            <audio id="reproductor-audio" controls preload="metadata">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+        </div>
+
         <div class="info-cabecera">
             <div class="titulo-row">
                 <h1 id="titulo-cancion">Cargando...</h1>
                 <div id="badge-capo" class="badge-capo" style="display: none;">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="4" rx="1.5" fill="currentColor"/>
+                        <path d="M6 8v11a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V8" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M18 8v6a2 2 0 0 1-2 2h-1" stroke="currentColor" stroke-width="2" fill="none"/>
+                    </svg>
                     <span id="texto-capo"></span>
                 </div>
             </div>
@@ -395,6 +445,43 @@
 
         const letraCancionDiv = document.getElementById('letra-cancion');
 
+        // Formatos de audio soportados para búsqueda dinámica
+        const FORMATOS_AUDIO = [
+            { ext: 'mp3', mime: 'audio/mpeg' },
+            { ext: 'm4a', mime: 'audio/mp4' },
+            { ext: 'wav', mime: 'audio/wav' },
+            { ext: 'ogg', mime: 'audio/ogg' },
+            { ext: 'aac', mime: 'audio/aac' },
+            { ext: 'flac', mime: 'audio/flac' },
+            { ext: 'opus', mime: 'audio/opus' },
+            { ext: 'webm', mime: 'audio/webm' }
+        ];
+
+        async function buscarYCarGarGrabacion(nombreCancion) {
+            const contenedorAudio = document.getElementById('contenedor-audio');
+            const reproductorAudio = document.getElementById('reproductor-audio');
+            const nombreLimpio = nombreCancion.trim();
+            const nombreEncoded = encodeURIComponent(nombreLimpio);
+
+            for (const formato of FORMATOS_AUDIO) {
+                const rutaArchivo = `grabaciones/${nombreEncoded}.${formato.ext}`;
+                try {
+                    const respuesta = await fetch(rutaArchivo, { method: 'HEAD' });
+                    if (respuesta.ok) {
+                        reproductorAudio.innerHTML = `<source src="${rutaArchivo}" type="${formato.mime}">Tu navegador no soporta el elemento de audio.`;
+                        reproductorAudio.load();
+                        contenedorAudio.style.display = 'block';
+                        return;
+                    }
+                } catch (e) {
+                    // Si ocurre un error de red o de política CORS, continuar probando el siguiente formato
+                }
+            }
+
+            // Si no se encuentra ningún archivo de grabación en los formatos lista, ocultar el contenedor
+            contenedorAudio.style.display = 'none';
+        }
+
         async function cargarPlantilla() {
             if(!idC) {
                 letraCancionDiv.textContent = "Error: No se definió el identificador de la canción.";
@@ -407,6 +494,11 @@
 
                 document.getElementById('titulo-cancion').textContent = data.nombreC;
                 document.getElementById('nombre-artista').textContent = data.arreglos ? `Arreglos: ${data.arreglos}` : '';
+
+                // Búsqueda dinámica de la grabación de audio en múltiples formatos
+                if (data.nombreC) {
+                    buscarYCarGarGrabacion(data.nombreC);
+                }
 
                 // Detección y extracción del Capo
                 let contenidoProcesar = data.contenido || "";
