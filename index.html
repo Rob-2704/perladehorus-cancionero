@@ -100,11 +100,13 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: transform 0.15s;
         }
 
         .fila-cancion:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transform: scale(1.1);
         }
 
         .fila-cancion h2 {
