@@ -80,24 +80,37 @@ function transponerLinea(linea, semitonos) {
         let nuevo = transponerAcorde(acordeOriginal, semitonos);
         const diff = nuevo.length - acordeOriginal.length;
 
-        if (diff > 0) {
-            // El acorde creció: le "quitamos" esa cantidad a los espacios que le siguen
-            const restoLinea = linea.slice(m.index + acordeOriginal.length);
-            const espacios = restoLinea.match(/^ */)[0];
-            if (espacios.length >= diff) {
+        // Contamos cuántos espacios hay inmediatamente después del acorde
+        const restoLinea = linea.slice(m.index + acordeOriginal.length);
+        const matchEspacios = restoLinea.match(/^ */);
+        const numEspacios = matchEspacios ? matchEspacios[0].length : 0;
+
+        // Si están separados por exactamente 1 espacio, ignoramos la alineación de columnas
+        // y conservamos estrictamente ese espacio de 1.
+        if (numEspacios === 1) {
+            resultado += nuevo;
+            ultimoIndice = m.index + acordeOriginal.length;
+        } else if (diff > 0) {
+            // Si el acorde creció y hay más de 1 espacio, recortamos los espacios sobrantes
+            if (numEspacios >= diff) {
                 resultado += nuevo;
                 ultimoIndice = m.index + acordeOriginal.length + diff;
                 regex.lastIndex += diff;
-                continue;
+            } else {
+                resultado += nuevo;
+                ultimoIndice = m.index + acordeOriginal.length;
             }
-            // No hay suficientes espacios: la línea crecerá un poco (se resuelve con scroll horizontal)
         } else if (diff < 0) {
-            // El acorde se acortó: rellenamos con espacios para no correr lo que sigue
-            nuevo += ' '.repeat(-diff);
+            // Si el acorde se acortó y hay varios espacios, rellenamos para mantener la columna
+            if (numEspacios > 1) {
+                nuevo += ' '.repeat(-diff);
+            }
+            resultado += nuevo;
+            ultimoIndice = m.index + acordeOriginal.length;
+        } else {
+            resultado += nuevo;
+            ultimoIndice = m.index + acordeOriginal.length;
         }
-
-        resultado += nuevo;
-        ultimoIndice = m.index + acordeOriginal.length;
     }
 
     resultado += linea.slice(ultimoIndice);
