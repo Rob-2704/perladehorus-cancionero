@@ -90,10 +90,9 @@
             }
         }
 
-        @media (min-width: 1200px) {
-            .lista-canciones {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        .fila-cancion,
+        .fila-cancion * {
+            text-decoration: none;
         }
 
         .fila-cancion {
@@ -121,6 +120,8 @@
         }
 
         .fila-cancion h2 {
+            margin: 0 0 12px 0;
+            padding-bottom: 8px;
             font-size: 18px;
             font-weight: 600;
             border-bottom: 2px solid var(--accent);
