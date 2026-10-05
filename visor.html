@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
     <!-- Google Material Symbols CDN con soporte para el eje FILL -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
     <link href="style.css" rel="stylesheet">
     <title>Visor de Letra y Acordes</title>
     <style>
@@ -69,8 +69,10 @@
             transition: transform 0.1s, filter 0.15s;
             user-select: none;
             font-family: 'Material Symbols Outlined', sans-serif !important;
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+            -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
         }
 
         .audio-slider {
@@ -284,8 +286,10 @@
             height: 36px; 
             user-select: none;
             font-family: 'Material Symbols Outlined', sans-serif !important;
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+            -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
         }
         
         .btn-transponer {
@@ -458,7 +462,6 @@
 
         const letraCancionDiv = document.getElementById('letra-cancion');
 
-        // Formatos de audio soportados para búsqueda dinámica
         const FORMATOS_AUDIO = [
             { ext: 'mp3', mime: 'audio/mpeg' },
             { ext: 'm4a', mime: 'audio/mp4' },
@@ -534,7 +537,6 @@
             const contenedorAudio = document.getElementById('contenedor-audio');
             const reproductorAudio = document.getElementById('reproductor-audio');
             
-            // Elimina paréntesis y su contenido, elimina guiones (-), y limpia espacios sobrantes
             const nombreLimpio = nombreCancion
                 .replace(/\(.*?\)/g, '')
                 .replace(/-/g, '')
@@ -555,11 +557,10 @@
                         return;
                     }
                 } catch (e) {
-                    // Si ocurre un error de red o de política CORS, continuar probando el siguiente formato
+                    // Continuar con el siguiente formato
                 }
             }
 
-            // Si no se encuentra ningún archivo de grabación en la lista, ocultar el contenedor
             contenedorAudio.style.display = 'none';
         }
 
@@ -576,12 +577,10 @@
                 document.getElementById('titulo-cancion').textContent = data.nombreC;
                 document.getElementById('nombre-artista').textContent = data.arreglos ? `Arreglos: ${data.arreglos}` : '';
 
-                // Búsqueda dinámica de la grabación de audio en múltiples formatos
                 if (data.nombreC) {
                     buscarYCarGarGrabacion(data.nombreC);
                 }
 
-                // Detección y extracción del Capo
                 let contenidoProcesar = data.contenido || "";
                 const matchCapo = contenidoProcesar.match(/Capo:\s*#?\s*(\d+)/i);
                 const badgeCapo = document.getElementById('badge-capo');
@@ -594,7 +593,6 @@
                         badgeCapo.style.display = 'inline-flex';
                     }
 
-                    // Borrar las primeras 2 líneas para ocultar la indicación
                     const lineas = contenidoProcesar.split(/\r?\n/);
                     if (lineas.length > 0 && /Capo:/i.test(lineas[0])) {
                         lineas.splice(0, Math.min(2, lineas.length));
@@ -606,12 +604,9 @@
                     if (badgeCapo) badgeCapo.style.display = 'none';
                 }
 
-                // 1. Procesamiento e inyección de la letra y acordes interactivos
                 letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
                 inicializarModalAcordes('caja-acorde');
 
-                // 3. Inicializar autoscroll
-                // 3. Inicializar autoscroll con MutationObserver para adaptar iconos de Material Symbols
                 inicializarAutoscroll('btn-play-scroll', 'slider-velocidad');
                 
                 const btnScrollEl = document.getElementById('btn-play-scroll');
@@ -629,7 +624,6 @@
                     observerScroll.observe(btnScrollEl, { childList: true, characterData: true, subtree: true });
                 }
 
-                // 4. Menú de transposición
                 inicializarTransponer({
                     contenidoOriginal: contenidoProcesar,
                     onRetransponer: (texto) => {
