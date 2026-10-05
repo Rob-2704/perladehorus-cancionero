@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+    <!-- Google Material Symbols CDN con soporte para el eje FILL -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="style.css" rel="stylesheet">
     <title>Cancionero</title>
     <style>
@@ -43,7 +45,7 @@
 
         h1 {
             margin: 0;
-            font-size: 40px; /* Tamaño más grande para el título */
+            font-size: 40px;
             font-weight: 700;
             color: #fff;
             letter-spacing: -0.5px;
@@ -51,7 +53,7 @@
 
         @media (max-width: 600px) {
             h1 {
-                font-size: 32px; /* Tamaño adaptado para pantallas pequeñas */
+                font-size: 32px;
             }
         }
 
@@ -67,20 +69,18 @@
         /* Configuración de rejilla adaptativa */
         .lista-canciones {
             display: grid;
-            grid-template-columns: 1fr; /* 1 columna por defecto (celulares) */
+            grid-template-columns: 1fr;
             gap: 16px;
             max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* Pantallas medianas (tablets / laptops pequeñas): 2 columnas */
         @media (min-width: 600px) {
             .lista-canciones {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        /* Pantallas anchas (desktops): 3 columnas */
         @media (min-width: 900px) {
             .lista-canciones {
                 grid-template-columns: repeat(3, 1fr);
@@ -116,28 +116,41 @@
             justify-content: space-between;
         }
 
+        .contenedor-iconos-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icono-grabacion {
+            font-family: 'Material Symbols Outlined', sans-serif !important;
+            font-size: 20px;
+            color: var(--accent);
+            user-select: none;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
         /* Estilos para el icono de estado */
         .estado-icono {
             display: inline-block;
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            margin-left: 10px;
             flex-shrink: 0;
         }
 
         .estado-icono.terminada {
-            background-color: #2ec4b6; /* Verde / Turquesa */
+            background-color: #2ec4b6;
             box-shadow: 0 0 8px rgba(46, 196, 182, 0.5);
         }
 
         .estado-icono.revisar {
-            background-color: #f5c518; /* Amarillo */
+            background-color: #f5c518;
             box-shadow: 0 0 8px rgba(245, 197, 24, 0.5);
         }
 
         .estado-icono.pendiente {
-            background-color: #e71d36; /* Rojo */
+            background-color: #e71d36;
             box-shadow: 0 0 8px rgba(231, 29, 54, 0.5);
         }
 
@@ -154,7 +167,7 @@
             color: var(--accent);
             padding: 40px;
             font-family: 'Sono', monospace;
-            grid-column: 1 / -1; /* Ocupa todo el ancho si está cargando */
+            grid-column: 1 / -1;
         }
     </style>
 </head>
@@ -173,6 +186,29 @@
         import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
 
         const listaDiv = document.getElementById('lista-canciones');
+
+        const FORMATOS_AUDIO = [
+            { ext: 'mp3' }, { ext: 'm4a' }, { ext: 'wav' }, { ext: 'ogg' },
+            { ext: 'aac' }, { ext: 'flac' }, { ext: 'opus' }, { ext: 'webm' }
+        ];
+
+        async function tieneGrabacionAudio(nombreCancion) {
+            if (!nombreCancion) return false;
+            const nombreLimpio = nombreCancion
+                .replace(/\(.*?\)/g, '')
+                .replace(/-/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            const nombreEncoded = encodeURIComponent(nombreLimpio);
+
+            for (const formato of FORMATOS_AUDIO) {
+                try {
+                    const res = await fetch(`Grabaciones/${nombreEncoded}.${formato.ext}`, { method: 'HEAD' });
+                    if (res.ok) return true;
+                } catch (_) {}
+            }
+            return false;
+        }
 
         async function init() {
             try {
@@ -195,16 +231,14 @@
                         window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
                     };
 
-                    // La tonalidad se detecta a partir de los acordes del propio archivo
                     let tonalidad = '—';
                     try {
                         const datos = await obtenerContenidoCancion(cancion.idC);
                         if (datos.contenido) {
                             tonalidad = nombreTonalidad(detectarTonalidad(datos.contenido));
                         }
-                    } catch (_) { /* si falla, se queda en — */ }
+                    } catch (_) { }
 
-                    // Estado de la canción: terminada (verde), revisar (amarillo) o pendiente (rojo)
                     const claseEstado = cancion.estado || 'terminada';
                     const tituloEstado = {
                         terminada: 'Canción terminada',
@@ -212,10 +246,18 @@
                         pendiente: 'Canción no terminada'
                     }[claseEstado] || '';
 
+                    const tieneAudio = await tieneGrabacionAudio(cancion.nombreC);
+                    const htmlAudioIcono = tieneAudio 
+                        ? `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>` 
+                        : '';
+
                     fila.innerHTML = `
                         <h2>
                             <span>${cancion.nombreC}</span>
-                            <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
+                            <span class="contenedor-iconos-header">
+                                ${htmlAudioIcono}
+                                <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
+                            </span>
                         </h2>
                         <div class="meta">
                             <span>Arreglos: ${cancion.arreglos || '—'}</span>
