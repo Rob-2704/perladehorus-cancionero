@@ -329,14 +329,22 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const anchoCanvas = esMovil ? 110 : 140;
     const altoCanvas = esMovil ? 120 : 150;
     
-    canvas.width = anchoCanvas; 
-    canvas.height = altoCanvas;
+    // Resolución real de la pantalla: sin esto, en pantallas Retina/HiDPI
+    // (devicePixelRatio > 1) el canvas se ve borroso al dibujarse a su tamaño
+    // "lógico" pero mostrarse físicamente más grande en píxeles reales.
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = anchoCanvas * dpr;
+    canvas.height = altoCanvas * dpr;
+    canvas.style.width = anchoCanvas + "px";
+    canvas.style.height = altoCanvas + "px";
     canvas.style.display = "block";
     canvas.style.margin = "0 auto";
 
     wrapper.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr); // todo lo que sigue se dibuja en coordenadas "lógicas" de siempre
     const trastesArr = datos.strings.trim().toUpperCase().split(/\s+/);
     const trasteBase = datos.trasteInicio || 1;
 
