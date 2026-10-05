@@ -15,18 +15,18 @@
       "archivo": "--Chapala (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
-      "idC": "22",
-      "nombreC": "Cuando Yo Quería Ser Grande",
-      "arreglos": "",
-      "estado": "pendiente",
-      "archivo": "--Cuando Yo Quería Ser Grande ()"
-    },
-    {
       "idC": "4",
       "nombreC": "Serenata Huasteca",
       "arreglos": "",
       "estado": "pendiente",
       "archivo": "--Serenata Huasteca"
+    },
+    {
+      "idC": "22",
+      "nombreC": "Cuando Yo Quería Ser Grande",
+      "arreglos": "",
+      "estado": "revisar",
+      "archivo": "-Cuando Yo Quería Ser Grande ()"
     },
     {
       "idC": "7",
