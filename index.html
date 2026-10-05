@@ -193,11 +193,9 @@
 
         const listaDiv = document.getElementById('lista-canciones');
 
-        const FORMATOS_AUDIO = [
-            { ext: 'mp3' }, { ext: 'm4a' }, { ext: 'wav' }, { ext: 'ogg' },
-            { ext: 'aac' }, { ext: 'flac' }, { ext: 'opus' }, { ext: 'webm' }
-        ];
+        const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
 
+        // Revisa los formatos de una canción y se detiene en el primero que exista
         async function tieneGrabacionAudio(nombreCancion) {
             if (!nombreCancion) return false;
             const nombreLimpio = nombreCancion
@@ -207,9 +205,9 @@
                 .trim();
             const nombreEncoded = encodeURIComponent(nombreLimpio);
 
-            for (const formato of FORMATOS_AUDIO) {
+            for (const ext of FORMATOS_AUDIO) {
                 try {
-                    const res = await fetch(`Grabaciones/${nombreEncoded}.${formato.ext}`, { method: 'HEAD' });
+                    const res = await fetch(`Grabaciones/${nombreEncoded}.${ext}`, { method: 'HEAD' });
                     if (res.ok) return true;
                 } catch (_) {}
             }
@@ -229,6 +227,8 @@
                     return;
                 }
 
+                const fragmento = document.createDocumentFragment();
+
                 for (const cancion of canciones) {
                     const fila = document.createElement('div');
                     fila.className = "fila-cancion";
@@ -237,14 +237,6 @@
                         window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
                     };
 
-                    let tonalidad = '—';
-                    try {
-                        const datos = await obtenerContenidoCancion(cancion.idC);
-                        if (datos.contenido) {
-                            tonalidad = nombreTonalidad(detectarTonalidad(datos.contenido));
-                        }
-                    } catch (_) { }
-
                     const claseEstado = cancion.estado || 'terminada';
                     const tituloEstado = {
                         terminada: 'Canción terminada',
@@ -252,26 +244,42 @@
                         pendiente: 'Canción no terminada'
                     }[claseEstado] || '';
 
-                    const tieneAudio = await tieneGrabacionAudio(cancion.nombreC);
-                    const htmlAudioIcono = tieneAudio 
-                        ? `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>` 
-                        : '';
-
                     fila.innerHTML = `
                         <h2>
                             <span>${cancion.nombreC}</span>
                             <span class="contenedor-iconos-header">
-                                ${htmlAudioIcono}
                                 <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
                             </span>
                         </h2>
                         <div class="meta">
                             <span>Arreglos: ${cancion.arreglos || '—'}</span>
-                            <span>Tonalidad: ${tonalidad}</span>
+                            <span>Tonalidad: <span class="tonalidad-valor">…</span></span>
                         </div>
                     `;
-                    listaDiv.appendChild(fila);
+                    fragmento.appendChild(fila);
+
+                    // Tonalidad y audio se resuelven en segundo plano, todas las canciones a la vez
+                    const spanTonalidad = fila.querySelector('.tonalidad-valor');
+                    const contenedorIconos = fila.querySelector('.contenedor-iconos-header');
+
+                    obtenerContenidoCancion(cancion.idC)
+                        .then(datos => {
+                            spanTonalidad.textContent = datos.contenido
+                                ? nombreTonalidad(detectarTonalidad(datos.contenido))
+                                : '—';
+                        })
+                        .catch(() => { spanTonalidad.textContent = '—'; });
+
+                    tieneGrabacionAudio(cancion.nombreC).then(tieneAudio => {
+                        if (tieneAudio) {
+                            contenedorIconos.insertAdjacentHTML('afterbegin',
+                                `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
+                        }
+                    });
                 }
+
+                // Las tarjetas aparecen de inmediato
+                listaDiv.appendChild(fragmento);
             } catch (err) {
                 listaDiv.innerHTML = "<div class='cargando'>Error al cargar el cancionero.</div>";
             }
