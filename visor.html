@@ -333,6 +333,22 @@
             accent-color: var(--accent); 
         }
 
+        .btn-audio-ctrl,        
+        .btn-scroll,
+        .btn-transponer,
+        .btn-toggle-transponer {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: transform 0.15s;
+        }
+        
+        .btn-audio-ctrl:active,
+        .btn-scroll:active,
+        .btn-transponer:active,
+        .btn-toggle-transponer:active {
+            transform: scale(1.1);
+        }
+
         @media (max-width: 600px) {
             .caja-acorde-emergente {
                 padding: 8px 12px;
