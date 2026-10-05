@@ -22,6 +22,13 @@
       "archivo": "--Serenata Huasteca"
     },
     {
+      "idC": "25",
+      "nombreC": "Ansiedad",
+      "arreglos": "Ciro Vega González",
+      "estado": "revisar",
+      "archivo": "-Ansiedad (Ciro Vega González)"
+    },
+    {
       "idC": "22",
       "nombreC": "Cuando Yo Quería Ser Grande",
       "arreglos": "",
@@ -41,6 +48,13 @@
       "arreglos": "Osvaldo Daniel Barrera, Emmanuel León Apolinar",
       "estado": "revisar",
       "archivo": "-Granada (Osvaldo Daniel Barrera, Emmanuel León Apolinar)"
+    },
+    {
+      "idC": "26",
+      "nombreC": "La Flor De La Canela",
+      "arreglos": "Ciro Vega González, Emmanuel León Apolinar",
+      "estado": "revisar",
+      "archivo": "-La Flor De La Canela (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
       "idC": "9",
