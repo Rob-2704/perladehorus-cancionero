@@ -28,11 +28,11 @@
         
         /* Encabezados y Botón Volver */
         .btn-volver { 
-            display: inline-block; 
-            color: #888; 
-            text-decoration: none; 
+            display: inline-block;
+            color: #888;
+            text-decoration: none;
             font-size: 13px;
-            margin-bottom: 15px; 
+            margin-bottom: 15px;
             transition: color 0.2s;
         }
         
@@ -53,7 +53,7 @@
             gap: 12px;
             width: 100%;
         }
-
+        
         .btn-audio-ctrl {
             background: var(--accent);
             color: #111;
@@ -66,13 +66,16 @@
             justify-content: center;
             cursor: pointer;
             flex-shrink: 0;
-            transition: transform 0.1s, filter 0.15s;
             user-select: none;
             font-family: 'Material Symbols Outlined', sans-serif !important;
             font-weight: normal !important;
             font-style: normal !important;
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
             -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        }
+
+        .btn-audio-ctrl:hover {
+            transform: scale(2);
         }
 
         .audio-slider {
