@@ -125,7 +125,7 @@
         }
 
         .icono-grabacion {
-            font-family: 'Material Symbols Outlined', sans-serif !important;
+            font-family: 'Material Symbols Outlined' !important;
             font-size: 20px;
             color: var(--accent);
             user-select: none;
@@ -206,17 +206,13 @@
                 .trim();
             const nombreEncoded = encodeURIComponent(nombreLimpio);
 
-            // Peticiones concurrentes en paralelo para no bloquear el hilo principal
-            const peticiones = FORMATOS_AUDIO.map(formato =>
-                fetch(`Grabaciones/${nombreEncoded}.${formato.ext}`, { method: 'HEAD' })
-                    .then(res => res.ok ? true : Promise.reject())
-            );
-
-            try {
-                return await Promise.any(peticiones);
-            } catch (_) {
-                return false;
+            for (const formato of FORMATOS_AUDIO) {
+                try {
+                    const res = await fetch(`Grabaciones/${nombreEncoded}.${formato.ext}`, { method: 'HEAD' });
+                    if (res.ok) return true;
+                } catch (_) {}
             }
+            return false;
         }
 
         async function init() {
@@ -232,7 +228,6 @@
                     return;
                 }
 
-                // 1. Renderizar e inyectar todas las tarjetas en el DOM de forma inmediata
                 for (const cancion of canciones) {
                     const fila = document.createElement('div');
                     fila.className = "fila-cancion";
@@ -241,6 +236,14 @@
                         window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
                     };
 
+                    let tonalidad = '—';
+                    try {
+                        const datos = await obtenerContenidoCancion(cancion.idC);
+                        if (datos.contenido) {
+                            tonalidad = nombreTonalidad(detectarTonalidad(datos.contenido));
+                        }
+                    } catch (_) { }
+
                     const claseEstado = cancion.estado || 'terminada';
                     const tituloEstado = {
                         terminada: 'Canción terminada',
@@ -248,42 +251,25 @@
                         pendiente: 'Canción no terminada'
                     }[claseEstado] || '';
 
+                    const tieneAudio = await tieneGrabacionAudio(cancion.nombreC);
+                    const htmlAudioIcono = tieneAudio 
+                        ? `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>` 
+                        : '';
+
                     fila.innerHTML = `
                         <h2>
                             <span>${cancion.nombreC}</span>
                             <span class="contenedor-iconos-header">
-                                <span class="slot-audio"></span>
+                                ${htmlAudioIcono}
                                 <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
                             </span>
                         </h2>
                         <div class="meta">
                             <span>Arreglos: ${cancion.arreglos || '—'}</span>
-                            <span class="slot-tonalidad">Tonalidad: —</span>
+                            <span>Tonalidad: ${tonalidad}</span>
                         </div>
                     `;
                     listaDiv.appendChild(fila);
-
-                    // 2. Carga en segundo plano de la tonalidad
-                    (async () => {
-                        try {
-                            const datos = await obtenerContenidoCancion(cancion.idC);
-                            if (datos.contenido) {
-                                const tonalidad = nombreTonalidad(detectarTonalidad(datos.contenido));
-                                const elTonalidad = fila.querySelector('.slot-tonalidad');
-                                if (elTonalidad) elTonalidad.textContent = `Tonalidad: ${tonalidad}`;
-                            }
-                        } catch (_) {}
-                    })();
-
-                    // 3. Carga en segundo plano del icono de grabación
-                    (async () => {
-                        if (await tieneGrabacionAudio(cancion.nombreC)) {
-                            const elSlotAudio = fila.querySelector('.slot-audio');
-                            if (elSlotAudio) {
-                                elSlotAudio.innerHTML = `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`;
-                            }
-                        }
-                    })();
                 }
             } catch (err) {
                 listaDiv.innerHTML = "<div class='cargando'>Error al cargar el cancionero.</div>";
