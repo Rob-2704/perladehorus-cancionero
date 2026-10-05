@@ -35,5 +35,33 @@ Ven, ven, ven
 Ven a hacerme olvidar
         RE7      SOL-MIm
 Con tus besos lo mucho
-         LAm-RE7    SOL
+         LAm-RE7    SOL-MIm-LAm-RE7
 Que he sufrido por amor
+
+SOL-MIm-LAm-RE7
+SOL-MIm-LAm-RE7
+SOL-MIm-LAm-RE7
+
+SOL-DOm-SOL
+
+(Solo)
+DOm
+Tú
+               SOL
+Serás como una rosa
+                   LA7
+Que hará brotar en mí
+          LAm7-DOm7-RE-RE7
+Nueva esperanza
+
+SOL  MIm  LAm
+Ven, ven, ven
+        RE7       SOL-MIm-LAm
+Ven a hacerme olvidar
+        RE7      SOL-MIm
+Con tus besos lo mucho
+         LAm-RE7    SOL DOm
+Que he sufrido por amor
+
+SOL
+Ven

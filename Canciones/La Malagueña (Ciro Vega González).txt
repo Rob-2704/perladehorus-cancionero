@@ -19,6 +19,7 @@ Pero si tú no los dejas
 LA#              LA7
 Ni siquiera parpadear
 
+(Solo)
     LA7       REm
 Malagueña salerosa
                     DO
@@ -57,6 +58,7 @@ Te ofrezco mi corazón
 LA#              LA7
 A cambio de mi pobreza
 
+(Solo)
     LA7       REm
 Malagueña salerosa
                     DO
@@ -74,5 +76,6 @@ Que eres linda y hechicera
 Que eres linda y hechicera
         LA#           LA7
 Como el candor de una rosa
-                           REm LA7 REm-LA7-REm
 Como el candor de una rosa
+
+REm LA7 REm-LA7-REm
