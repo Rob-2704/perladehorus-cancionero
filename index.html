@@ -39,13 +39,17 @@
             z-index: 0;
         }
 
-        header, main {
+        /* Aislamiento de capas para evitar que las animaciones 3D de las tarjetas sobrepasen el encabezado */
+        header {
             position: relative;
-            z-index: 1;
+            z-index: 100;
+            isolation: isolate;
+            margin: 0 auto 30px auto;
         }
 
-        header {
-            margin: 0 auto 30px auto;
+        main {
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
@@ -77,12 +81,15 @@
             gap: 12px;
             align-items: center;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
         }
 
         .contenedor-busqueda {
             position: relative;
             flex: 1;
             min-width: 200px;
+            z-index: 101;
         }
 
         .select-categoria,
@@ -117,7 +124,7 @@
             opacity: 0.7;
         }
 
-        /* Menú flotante de sugerencias */
+        /* Menú flotante de sugerencias superpuesto */
         .lista-sugerencias {
             position: absolute;
             top: calc(100% + 6px);
@@ -126,8 +133,8 @@
             background-color: var(--card-bg);
             border: 2px solid var(--accent);
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            z-index: 9999;
             max-height: 240px;
             overflow-y: auto;
             display: none;
