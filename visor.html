@@ -24,19 +24,85 @@
         body { 
             padding-bottom: 120px; 
         }
-        
+
+        /* Animaciones elásticas estilo Nintendo 3DS / Wii U */
+        @keyframes popWiiU {
+            0% {
+                opacity: 0;
+                transform: translate(-10px, -10px) scale(0.85);
+            }
+            75% {
+                opacity: 1;
+                transform: translate(2px, 2px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpFlotante {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 25px) scale(0.9);
+            }
+            75% {
+                opacity: 1;
+                transform: translate(-50%, -2px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+        }
+
+        @keyframes popIconoPlay {
+            0% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         .container { 
             max-width: 90%;
             margin: 0 auto;
         }
         
-        /* Encabezados y Botón Volver */
+        /* Encabezados y Botón Volver con animación de entrada */
         .btn-volver { 
             display: inline-block;
             color: var(--text-sec);
             text-decoration: none;
             font-size: 13px;
             margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInDown 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .info-cabecera {
+            grid-column: 1 / 3;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeInDown 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) 0.04s forwards;
         }
         
         .contenedor-audio {
@@ -50,6 +116,10 @@
             justify-content: center;
             gap: 12px;
             width: 100%;
+
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
         
         .btn-audio-ctrl {
@@ -89,11 +159,6 @@
             user-select: none;
         }
 
-        .info-cabecera {
-            grid-column: 1 / 3;
-            margin-bottom: 10px;
-        }
-
         .titulo-row {
             display: flex;
             justify-content: space-between;
@@ -120,6 +185,8 @@
             font-weight: 600;
             white-space: nowrap;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s forwards;
         }
         
         .info-cabecera h2 {
@@ -138,7 +205,7 @@
             align-items: start;
         }
         
-        /* Contenedor de la Letra */
+        /* Contenedor de la Letra animado */
         .letra-contenedor {
             position: relative;
             background: var(--text-main);
@@ -148,6 +215,10 @@
             width: 100%;
             overflow: hidden;
             z-index: 1;
+
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popWiiU 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
         }
 
         .letra-contenedor::before {
@@ -223,6 +294,7 @@
             margin: 5px 0 0 0;
         }
         
+        /* Panel Flotante Animado desde Abajo */
         #panel-flotante-wrapper {
             position: fixed;
             bottom: 25px;
@@ -233,6 +305,10 @@
             align-items: center;
             gap: 12px;
             z-index: 999;
+
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: slideUpFlotante 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) 0.16s forwards;
         }
         
         .fila-inferior,
@@ -577,8 +653,10 @@
                 const data = await obtenerContenidoCancion(idC);
                 if (data.error) { letraCancionDiv.textContent = "Error: " + data.error; return; }
 
+                const etiquetaMeta = (data.categoria === 'general') ? 'Artista' : 'Arreglos';
+
                 document.getElementById('titulo-cancion').textContent = data.nombreC;
-                document.getElementById('nombre-artista').textContent = data.arreglos ? `Arreglos: ${data.arreglos}` : '';
+                document.getElementById('nombre-artista').textContent = data.arreglos ? `${etiquetaMeta}: ${data.arreglos}` : '';
 
                 if (data.nombreC) {
                     buscarYCarGarGrabacion(data.nombreC);
