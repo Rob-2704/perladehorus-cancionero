@@ -161,31 +161,31 @@
             }
         }
 
-        /* Animación 6A: Pop elástico de entrada para el panel flotante de transposición y sus botones */
-        @keyframes popPanelTransponer {
+        /* Animación 6A: Desplazamiento vertical tipo barra ocultable con rebote elástico */
+        @keyframes deslizarPanelTransponer {
             0% {
                 opacity: 0;
-                transform: scale(0.5) translateY(20px);
+                transform: translateY(45px);
             }
             70% {
                 opacity: 1;
-                transform: scale(1.08) translateY(-3px);
+                transform: translateY(-4px);
             }
             100% {
                 opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0);
             }
         }
 
-        /* Animación 6B: Salida suave al replegar la barra de transposición */
-        @keyframes popPanelTransponerSalida {
+        /* Animación 6B: Desplazamiento vertical de salida hacia abajo al ocultarse */
+        @keyframes deslizarPanelTransponerSalida {
             0% {
                 opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0);
             }
             100% {
                 opacity: 0;
-                transform: scale(0.6) translateY(18px);
+                transform: translateY(45px);
             }
         }
 
@@ -477,15 +477,15 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Animaciones para la barra de transponer y sus botones al desplegarse y replegarse */
+        /* Animación deslizable (tipo barra de tareas) para la barra de transponer y sus botones */
         #panel-transponer.panel-transponer-entrada {
             will-change: transform, opacity;
-            animation: popPanelTransponer 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: deslizarPanelTransponer 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         #panel-transponer.panel-transponer-salida {
             will-change: transform, opacity;
-            animation: popPanelTransponerSalida 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            animation: deslizarPanelTransponerSalida 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
         }
 
         #panel-transponer.panel-transponer-entrada .btn-transponer,
@@ -906,7 +906,7 @@
                     observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
                 }
 
-                // Controlador de animación de entrada y salida para la barra de transponer
+                // Controlador de animación de deslizamiento vertical (estilo barra de tareas)
                 const panelTranspon = document.getElementById('panel-transponer');
                 if (panelTranspon) {
                     let enProcesoCierrePanel = false;
@@ -926,7 +926,7 @@
                                 panelTranspon.style.display = 'none';
                                 ultimoDisplayPanel = 'none';
                                 enProcesoCierrePanel = false;
-                            }, 180);
+                            }, 200);
                         } else if (displayActual !== 'none' && !enProcesoCierrePanel) {
                             ultimoDisplayPanel = displayActual;
                             panelTranspon.classList.remove('panel-transponer-salida');
