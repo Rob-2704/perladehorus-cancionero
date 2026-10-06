@@ -381,6 +381,7 @@
         function mostrarSugerencias() {
             const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
             const categoriaSeleccionada = selectCategoria.value;
+            const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
 
             if (!textoBusqueda) {
                 listaSugerencias.classList.remove('activa');
@@ -407,7 +408,7 @@
                 div.className = 'item-sugerencia';
                 div.innerHTML = `
                     <span>${cancion.nombreC}</span>
-                    <span class="sugerencia-meta">${cancion.arreglos ? `Arreglos: ${cancion.arreglos}` : ''}</span>
+                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>
                 `;
                 div.onclick = (e) => {
                     e.stopPropagation();
@@ -424,6 +425,7 @@
         function renderizarLista() {
             const categoriaSeleccionada = selectCategoria.value;
             const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+            const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
 
             listaDiv.innerHTML = "";
 
@@ -476,7 +478,7 @@
                         </span>
                     </h2>
                     <div class="meta">
-                        <span>Arreglos: ${cancion.arreglos || '—'}</span>
+                        <span>${etiquetaMeta}: ${cancion.arreglos || '—'}</span>
                         <span>Tonalidad: <span class="tonalidad-valor">…</span></span>
                     </div>
                 `;
