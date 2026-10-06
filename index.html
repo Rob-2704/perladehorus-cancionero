@@ -70,14 +70,17 @@
             margin-bottom: 10px;
         }
 
-        /* Desplegable de categoría */
+        /* Desplegable de categoría y Barra de Búsqueda */
         .contenedor-filtro {
             margin: 15px 0 10px 0;
             display: flex;
-            justify-content: flex-start;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .select-categoria {
+        .select-categoria,
+        .input-busqueda {
             background-color: var(--card-bg);
             color: var(--text-main);
             border: 2px solid var(--accent);
@@ -86,12 +89,26 @@
             font-family: 'Sono', monospace;
             font-size: 14px;
             outline: none;
-            cursor: pointer;
             transition: box-shadow 0.2s, border-color 0.2s;
         }
 
-        .select-categoria:focus {
+        .select-categoria {
+            cursor: pointer;
+        }
+
+        .input-busqueda {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .select-categoria:focus,
+        .input-busqueda:focus {
             box-shadow: 0 0 8px rgba(188, 151, 49, 0.4);
+        }
+
+        .input-busqueda::placeholder {
+            color: var(--text-sec);
+            opacity: 0.7;
         }
 
         /* Configuración de rejilla adaptativa */
@@ -230,6 +247,7 @@
                 <option value="rondalla">Rondalla</option>
                 <option value="general">General</option>
             </select>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar canción o arreglos..." autocomplete="off">
         </div>
     </header>
 
@@ -243,6 +261,7 @@
 
         const listaDiv = document.getElementById('lista-canciones');
         const selectCategoria = document.getElementById('select-categoria');
+        const inputBusqueda = document.getElementById('input-busqueda');
 
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
@@ -265,12 +284,21 @@
             return false;
         }
 
-        function renderizarLista(categoriaSeleccionada) {
+        function renderizarLista() {
+            const categoriaSeleccionada = selectCategoria.value;
+            const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+
             listaDiv.innerHTML = "";
-            const filtradas = cancionesGlobal.filter(c => (c.categoria || 'rondalla') === categoriaSeleccionada);
+
+            const filtradas = cancionesGlobal.filter(c => {
+                const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
+                const coincideNombre = (c.nombreC || '').toLowerCase().includes(textoBusqueda);
+                const coincideArreglos = (c.arreglos || '').toLowerCase().includes(textoBusqueda);
+                return coincideCategoria && (coincideNombre || coincideArreglos);
+            });
 
             if (filtradas.length === 0) {
-                listaDiv.innerHTML = "<div class='cargando'>Todavía no hay canciones registradas en esta categoría.</div>";
+                listaDiv.innerHTML = "<div class='cargando'>No se encontraron canciones.</div>";
                 return;
             }
 
@@ -334,11 +362,10 @@
                     .slice()
                     .sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 
-                selectCategoria.addEventListener('change', (e) => {
-                    renderizarLista(e.target.value);
-                });
+                selectCategoria.addEventListener('change', renderizarLista);
+                inputBusqueda.addEventListener('input', renderizarLista);
 
-                renderizarLista(selectCategoria.value);
+                renderizarLista();
             } catch (err) {
                 listaDiv.innerHTML = "<div class='cargando'>Error al cargar el cancionero.</div>";
             }
