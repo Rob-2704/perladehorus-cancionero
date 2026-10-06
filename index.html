@@ -79,6 +79,12 @@
             flex-wrap: wrap;
         }
 
+        .contenedor-busqueda {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
         .select-categoria,
         .input-busqueda {
             background-color: var(--card-bg);
@@ -97,8 +103,8 @@
         }
 
         .input-busqueda {
-            flex: 1;
-            min-width: 200px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .select-categoria:focus,
@@ -109,6 +115,54 @@
         .input-busqueda::placeholder {
             color: var(--text-sec);
             opacity: 0.7;
+        }
+
+        /* Menú flotante de sugerencias */
+        .lista-sugerencias {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            max-height: 240px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .lista-sugerencias.activa {
+            display: block;
+        }
+
+        .item-sugerencia {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(188, 151, 49, 0.2);
+            transition: background-color 0.15s;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .item-sugerencia:last-child {
+            border-bottom: none;
+        }
+
+        .item-sugerencia:hover {
+            background-color: rgba(188, 151, 49, 0.18);
+        }
+
+        .item-sugerencia .sugerencia-meta {
+            font-size: 11px;
+            color: var(--text-sec);
+            margin-left: 10px;
+            white-space: nowrap;
         }
 
         /* Configuración de rejilla adaptativa */
@@ -267,7 +321,10 @@
                 <option value="rondalla">Rondalla</option>
                 <option value="general">General</option>
             </select>
-            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar canción o arreglos..." autocomplete="off">
+            <div class="contenedor-busqueda">
+                <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar canción o arreglos..." autocomplete="off">
+                <div id="lista-sugerencias" class="lista-sugerencias"></div>
+            </div>
         </div>
     </header>
 
@@ -282,6 +339,8 @@
         const listaDiv = document.getElementById('lista-canciones');
         const selectCategoria = document.getElementById('select-categoria');
         const inputBusqueda = document.getElementById('input-busqueda');
+        const contenedorBusqueda = document.querySelector('.contenedor-busqueda');
+        const listaSugerencias = document.getElementById('lista-sugerencias');
 
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
@@ -312,6 +371,49 @@
             return false;
         }
 
+        function mostrarSugerencias() {
+            const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+            const categoriaSeleccionada = selectCategoria.value;
+
+            if (!textoBusqueda) {
+                listaSugerencias.classList.remove('activa');
+                listaSugerencias.innerHTML = '';
+                return;
+            }
+
+            const coincidencias = cancionesGlobal.filter(c => {
+                const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
+                const coincideNombre = (c.nombreC || '').toLowerCase().includes(textoBusqueda);
+                const coincideArreglos = (c.arreglos || '').toLowerCase().includes(textoBusqueda);
+                return coincideCategoria && (coincideNombre || coincideArreglos);
+            }).slice(0, 6);
+
+            if (coincidencias.length === 0) {
+                listaSugerencias.classList.remove('activa');
+                listaSugerencias.innerHTML = '';
+                return;
+            }
+
+            listaSugerencias.innerHTML = '';
+            coincidencias.forEach(cancion => {
+                const div = document.createElement('div');
+                div.className = 'item-sugerencia';
+                div.innerHTML = `
+                    <span>${cancion.nombreC}</span>
+                    <span class="sugerencia-meta">${cancion.arreglos ? `Arreglos: ${cancion.arreglos}` : ''}</span>
+                `;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    inputBusqueda.value = cancion.nombreC;
+                    listaSugerencias.classList.remove('activa');
+                    renderizarLista();
+                };
+                listaSugerencias.appendChild(div);
+            });
+
+            listaSugerencias.classList.add('activa');
+        }
+
         function renderizarLista() {
             const categoriaSeleccionada = selectCategoria.value;
             const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
@@ -337,7 +439,6 @@
                 const fila = document.createElement('div');
                 fila.className = "fila-cancion";
 
-                // Cálculo de paso diagonal y desfase rápido (25ms por paso)
                 const numFila = Math.floor(indice / numColumnas);
                 const numCol = indice % numColumnas;
                 const pasoDiagonal = numFila + numCol;
@@ -403,8 +504,23 @@
                     .slice()
                     .sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 
-                selectCategoria.addEventListener('change', renderizarLista);
-                inputBusqueda.addEventListener('input', renderizarLista);
+                selectCategoria.addEventListener('change', () => {
+                    listaSugerencias.classList.remove('activa');
+                    renderizarLista();
+                });
+
+                inputBusqueda.addEventListener('input', () => {
+                    renderizarLista();
+                    mostrarSugerencias();
+                });
+
+                inputBusqueda.addEventListener('focus', mostrarSugerencias);
+
+                document.addEventListener('click', (e) => {
+                    if (!contenedorBusqueda.contains(e.target)) {
+                        listaSugerencias.classList.remove('activa');
+                    }
+                });
 
                 renderizarLista();
             } catch (err) {
