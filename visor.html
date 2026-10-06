@@ -84,11 +84,11 @@
             }
         }
 
-        /* Expansión limpia de ancho desde el centro para el contenedor del slider */
+        /* Revelado continuo de izquierda a derecha para el slider de audio */
         @keyframes expandirSliderAncho {
             0% {
                 opacity: 0;
-                clip-path: inset(0 50% 0 50%);
+                clip-path: inset(0 100% 0 0);
             }
             100% {
                 opacity: 1;
@@ -149,7 +149,7 @@
             animation: desplegarCortina 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        /* Envoltorio para evitar recortes extraños en el slider nativo */
+        /* Envoltorio para revelado de izquierda a derecha sin recortes en el thumb */
         .audio-slider-wrapper {
             flex: 1;
             min-width: 0;
@@ -157,7 +157,7 @@
             align-items: center;
             opacity: 0;
             will-change: clip-path, opacity;
-            animation: expandirSliderAncho 0.28s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
+            animation: expandirSliderAncho 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
         }
 
         /* Aplicación del stagger a los elementos del reproductor */
@@ -197,7 +197,6 @@
 
         .audio-slider {
             width: 100%;
-            height: 6px;
             accent-color: var(--accent);
             cursor: pointer;
             border-radius: 3px;
