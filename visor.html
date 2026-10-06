@@ -177,19 +177,15 @@
             }
         }
 
-        /* Animación 6B: Salida con impulso más pronunciado hacia arriba antes de descender */
+        /* Animación 6B: Salida directa hacia abajo sin impulso superior */
         @keyframes deslizarPanelTransponerSalida {
             0% {
                 opacity: 1;
                 transform: translateY(0);
             }
-            28% {
-                opacity: 1;
-                transform: translateY(-20px);
-            }
             100% {
                 opacity: 0;
-                transform: translateY(55px);
+                transform: translateY(45px);
             }
         }
 
@@ -508,7 +504,7 @@
 
         #panel-transponer.panel-transponer-salida {
             will-change: transform, opacity;
-            animation: deslizarPanelTransponerSalida 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+            animation: deslizarPanelTransponerSalida 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
         }
 
         #panel-transponer.panel-transponer-entrada .btn-transponer,
@@ -932,7 +928,7 @@
                     observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
                 }
 
-                // Controlador de animación de deslizamiento vertical con impulso pronunciado de cierre
+                // Controlador de animación de deslizamiento vertical al ocultar
                 const panelTranspon = document.getElementById('panel-transponer');
                 if (panelTranspon) {
                     let enProcesoCierrePanel = false;
@@ -952,7 +948,7 @@
                                 panelTranspon.style.display = 'none';
                                 ultimoDisplayPanel = 'none';
                                 enProcesoCierrePanel = false;
-                            }, 260);
+                            }, 200);
                         } else if (displayActual !== 'none' && !enProcesoCierrePanel) {
                             ultimoDisplayPanel = displayActual;
                             panelTranspon.classList.remove('panel-transponer-salida');
