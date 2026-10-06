@@ -198,7 +198,7 @@
             }
         }
 
-        /* Animación instantánea estilo Nintendo 3DS / Wii U */
+        /* Animación instantánea estilo Nintendo 3DS / Wii U para tarjetas */
         @keyframes popWiiU {
             0% {
                 opacity: 0;
@@ -211,6 +211,22 @@
             100% {
                 opacity: 1;
                 transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* Animación fluida con rebote elástico para el icono de play */
+        @keyframes popIconoPlay {
+            0% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
             }
         }
 
@@ -269,6 +285,11 @@
             font-feature-settings: 'liga';
             -webkit-font-feature-settings: 'liga';
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+            
+            /* Aplicación de animación al aparecer dinámicamente */
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         /* Estilos para el icono de estado */
