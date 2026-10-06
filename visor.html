@@ -59,20 +59,32 @@
             }
         }
 
-        /* Animación 3: Despliegue de cortina para el fondo del reproductor */
+        /* Animación 3: Despliegue elástico de cortina para el fondo del reproductor (incluye expansión fluida de altura) */
         @keyframes desplegarCortina {
             0% {
                 opacity: 0;
+                max-height: 0;
+                margin-bottom: 0;
+                padding-top: 0;
+                padding-bottom: 0;
                 transform: scaleY(0);
                 transform-origin: top;
             }
             70% {
                 opacity: 1;
+                max-height: 100px;
+                margin-bottom: 10px;
+                padding-top: 12px;
+                padding-bottom: 12px;
                 transform: scaleY(1.05);
                 transform-origin: top;
             }
             100% {
                 opacity: 1;
+                max-height: 100px;
+                margin-bottom: 10px;
+                padding-top: 12px;
+                padding-bottom: 12px;
                 transform: scaleY(1);
                 transform-origin: top;
             }
@@ -213,7 +225,7 @@
             margin-bottom: 15px;
         }
         
-        /* Reproductor con efecto cortina */
+        /* Reproductor con efecto cortina y transición suave de altura */
         .contenedor-audio {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -225,9 +237,10 @@
             justify-content: center;
             gap: 12px;
             width: 100%;
+            overflow: hidden;
 
-            will-change: transform, opacity;
-            animation: desplegarCortina 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            will-change: transform, opacity, max-height, margin-bottom, padding;
+            animation: desplegarCortina 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         /* Envoltorio para revelado de izquierda a derecha sin recortes en el thumb */
@@ -633,7 +646,6 @@
             }
 
             .contenedor-audio {
-                padding: 12px 25px;
                 gap: 12px;
             }
 
