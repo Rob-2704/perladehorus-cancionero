@@ -185,12 +185,372 @@
       "archivo": "Ven (Ciro Vega González)"
     },
     {
+      "idC": "52",
+      "nombreC": "A Esa",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "A Esa (José José)"
+    },
+    {
+      "idC": "53",
+      "nombreC": "A Que No Te Atreves",
+      "arreglos": "Víctor Yturbe",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "A Que No Te Atreves (Víctor Yturbe)"
+    },
+    {
+      "idC": "54",
+      "nombreC": "Ahora No",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Ahora No (José José)"
+    },
+    {
+      "idC": "55",
+      "nombreC": "Bohemio De Afición",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Bohemio De Afición (Vicente Fernández)"
+    },
+    {
+      "idC": "56",
+      "nombreC": "Buenos Días Amor",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Buenos Días Amor (José José)"
+    },
+    {
+      "idC": "57",
+      "nombreC": "Cama Y Mesa",
+      "arreglos": "Roberto Carlos",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Cama Y Mesa (Roberto Carlos)"
+    },
+    {
+      "idC": "58",
+      "nombreC": "Cielito Lindo",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Cielito Lindo (Vicente Fernández)"
+    },
+    {
+      "idC": "59",
+      "nombreC": "Cielo Rojo",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Cielo Rojo (Vicente Fernández)"
+    },
+    {
+      "idC": "60",
+      "nombreC": "Cien Años",
+      "arreglos": "Pedro Infante",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Cien Años (Pedro Infante)"
+    },
+    {
       "idC": "51",
       "nombreC": "Como Quien Pierde Una Estrella",
       "arreglos": "Alejandro Fernández",
       "estado": "terminada",
       "categoria": "general",
       "archivo": "Como Quien Pierde Una Estrella (Alejandro Fernández)"
+    },
+    {
+      "idC": "61",
+      "nombreC": "Cruz De Olvido",
+      "arreglos": "Pepe Aguilar",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Cruz De Olvido (Pepe Aguilar)"
+    },
+    {
+      "idC": "62",
+      "nombreC": "El Andariego",
+      "arreglos": "Álvaro Carrillo",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Andariego (Álvaro Carrillo)"
+    },
+    {
+      "idC": "63",
+      "nombreC": "El Milagro De Tus Ojos",
+      "arreglos": "Jorge Muñiz",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Milagro De Tus Ojos (Jorge Muñiz)"
+    },
+    {
+      "idC": "64",
+      "nombreC": "El Oso Carpintero",
+      "arreglos": "Pedro Infante",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Oso Carpintero (Pedro Infante)"
+    },
+    {
+      "idC": "65",
+      "nombreC": "El Tapatío",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Tapatío (Vicente Fernández)"
+    },
+    {
+      "idC": "66",
+      "nombreC": "El Triste",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Triste (José José)"
+    },
+    {
+      "idC": "67",
+      "nombreC": "El Último Beso",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "El Último Beso (Vicente Fernández)"
+    },
+    {
+      "idC": "68",
+      "nombreC": "En Tu Pelo",
+      "arreglos": "Javier Solís",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "En Tu Pelo (Javier Solís)"
+    },
+    {
+      "idC": "69",
+      "nombreC": "Este Terco Corazón",
+      "arreglos": "Emmanuel",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Este Terco Corazón (Emmanuel)"
+    },
+    {
+      "idC": "70",
+      "nombreC": "Fina Estampa",
+      "arreglos": "Jorge Muñiz",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Fina Estampa (Jorge Muñiz)"
+    },
+    {
+      "idC": "71",
+      "nombreC": "Fly Me To The Moon",
+      "arreglos": "Frank Sinatra",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Fly Me To The Moon (Frank Sinatra)"
+    },
+    {
+      "idC": "72",
+      "nombreC": "Hermoso Cariño",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Hermoso Cariño (Vicente Fernández)"
+    },
+    {
+      "idC": "73",
+      "nombreC": "La Bikina",
+      "arreglos": "Luis Miguel",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "La Bikina (Luis Miguel)"
+    },
+    {
+      "idC": "74",
+      "nombreC": "La Ley Del Monte",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "La Ley Del Monte (Vicente Fernández)"
+    },
+    {
+      "idC": "75",
+      "nombreC": "Llamarada",
+      "arreglos": "Pepe Aguilar",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Llamarada (Pepe Aguilar)"
+    },
+    {
+      "idC": "76",
+      "nombreC": "Me Voy A Quitar De Enmedio",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Me Voy A Quitar De Enmedio (Vicente Fernández)"
+    },
+    {
+      "idC": "77",
+      "nombreC": "México En La Piel",
+      "arreglos": "Luis Miguel",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "México En La Piel (Luis Miguel)"
+    },
+    {
+      "idC": "78",
+      "nombreC": "México Lindo Y Querido",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "México Lindo Y Querido (Vicente Fernández)"
+    },
+    {
+      "idC": "79",
+      "nombreC": "Morenita Mía",
+      "arreglos": "Víctor Yturbe",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Morenita Mía (Víctor Yturbe)"
+    },
+    {
+      "idC": "80",
+      "nombreC": "Motivos",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Motivos (Vicente Fernández)"
+    },
+    {
+      "idC": "81",
+      "nombreC": "Mujeres Divinas",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Mujeres Divinas (Vicente Fernández)"
+    },
+    {
+      "idC": "82",
+      "nombreC": "Muñequita Linda",
+      "arreglos": "Javier Solís",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Muñequita Linda (Javier Solís)"
+    },
+    {
+      "idC": "83",
+      "nombreC": "No Me Se Rajar",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "No Me Se Rajar (Vicente Fernández)"
+    },
+    {
+      "idC": "84",
+      "nombreC": "Piel Canela",
+      "arreglos": "Jorge Muñiz",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Piel Canela (Jorge Muñiz)"
+    },
+    {
+      "idC": "85",
+      "nombreC": "Por El Amor De Una Mujer",
+      "arreglos": "Jorge Muñiz",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Por El Amor De Una Mujer (Jorge Muñiz)"
+    },
+    {
+      "idC": "86",
+      "nombreC": "Promesas",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Promesas (José José)"
+    },
+    {
+      "idC": "87",
+      "nombreC": "Raindrops Keep Fallin' On My Head",
+      "arreglos": "B. J. Thomas",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Raindrops Keep Fallin' On My Head (B. J. Thomas)"
+    },
+    {
+      "idC": "88",
+      "nombreC": "Sabes Una Cosa",
+      "arreglos": "Luis Miguel",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Sabes Una Cosa (Luis Miguel)"
+    },
+    {
+      "idC": "89",
+      "nombreC": "Sabor A Mí",
+      "arreglos": "Álvaro Carrillo",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Sabor A Mí (Álvaro Carrillo)"
+    },
+    {
+      "idC": "90",
+      "nombreC": "Soy Lo Prohibido",
+      "arreglos": "Víctor Yturbe",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Soy Lo Prohibido (Víctor Yturbe)"
+    },
+    {
+      "idC": "91",
+      "nombreC": "Sublime Mujer",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Sublime Mujer (Vicente Fernández)"
+    },
+    {
+      "idC": "92",
+      "nombreC": "Urge",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Urge (Vicente Fernández)"
+    },
+    {
+      "idC": "93",
+      "nombreC": "Verónica",
+      "arreglos": "Víctor Yturbe",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Verónica (Víctor Yturbe)"
+    },
+    {
+      "idC": "94",
+      "nombreC": "Viajera",
+      "arreglos": "José José",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Viajera (José José)"
+    },
+    {
+      "idC": "95",
+      "nombreC": "Ya No Insistas Corazón",
+      "arreglos": "Vicente Fernández",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Ya No Insistas Corazón (Vicente Fernández)"
+    },
+    {
+      "idC": "96",
+      "nombreC": "Yo Lo Comprendo",
+      "arreglos": "Víctor Yturbe",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Yo Lo Comprendo (Víctor Yturbe)"
     }
   ]
 }
