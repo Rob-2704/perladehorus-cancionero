@@ -49,15 +49,50 @@
             }
         }
 
-        /* Animación: Expansión de ancho desde el centro sin deformar ni escalar elementos internos */
-        @keyframes expandirDesdeCentro {
+        /* Animación 3: Despliegue de cortina para el fondo del reproductor */
+        @keyframes desplegarCortina {
             0% {
                 opacity: 0;
-                clip-path: inset(0 50% 0 50% round 50px);
+                transform: scaleY(0);
+                transform-origin: top;
+            }
+            70% {
+                opacity: 1;
+                transform: scaleY(1.05);
+                transform-origin: top;
             }
             100% {
                 opacity: 1;
-                clip-path: inset(0 0% 0 0% round 50px);
+                transform: scaleY(1);
+                transform-origin: top;
+            }
+        }
+
+        /* Pop para botones e indicadores de tiempo */
+        @keyframes popControlAudio {
+            0% {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+            75% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Expansión limpia de ancho desde el centro exclusivamente para el slider de audio */
+        @keyframes expandirSliderAncho {
+            0% {
+                opacity: 0;
+                clip-path: inset(0 50% 0 50%);
+            }
+            100% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
             }
         }
         
@@ -70,7 +105,7 @@
             margin-bottom: 15px;
         }
         
-        /* Reproductor con revelado de ancho desde el centro */
+        /* Reproductor con efecto cortina */
         .contenedor-audio {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -83,9 +118,31 @@
             gap: 12px;
             width: 100%;
 
-            will-change: clip-path, opacity;
-            animation: expandirDesdeCentro 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            will-change: transform, opacity;
+            animation: desplegarCortina 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+
+        /* Aplicación del stagger a los elementos del reproductor */
+        .contenedor-audio #btn-audio-play,
+        .contenedor-audio #audio-tiempo-actual,
+        .contenedor-audio #audio-tiempo-total,
+        .contenedor-audio #btn-audio-mute {
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Animación personalizada para la barra del slider */
+        .contenedor-audio #audio-progress {
+            opacity: 0;
+            will-change: clip-path, opacity;
+            animation: expandirSliderAncho 0.28s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
+        }
+
+        .contenedor-audio #btn-audio-play { animation-delay: 0.12s; }
+        .contenedor-audio #audio-tiempo-actual { animation-delay: 0.15s; }
+        .contenedor-audio #audio-tiempo-total { animation-delay: 0.22s; }
+        .contenedor-audio #btn-audio-mute { animation-delay: 0.25s; }
         
         .btn-audio-ctrl {
             background: var(--accent);
