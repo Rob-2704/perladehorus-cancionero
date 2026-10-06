@@ -137,6 +137,18 @@
             }
         }
 
+        /* Animación de entrada diagonal */
+        @keyframes entradaDiagonal {
+            0% {
+                opacity: 0;
+                transform: translate(-30px, -30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
         .fila-cancion {
             background-color: var(--card-bg);
             border-radius: 20px;
@@ -148,6 +160,10 @@
             flex-direction: column;
             justify-content: flex-start;
             -webkit-tap-highlight-color: transparent;
+            
+            /* Estado inicial invisible y aplicación de la animación */
+            opacity: 0;
+            animation: entradaDiagonal 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         
         @media (hover: hover) {
@@ -266,6 +282,15 @@
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
 
+        // Determina el número de columnas activas del grid según el ancho actual del viewport
+        function obtenerNumColumnas() {
+            const ancho = window.innerWidth;
+            if (ancho >= 1200) return 4;
+            if (ancho >= 900) return 3;
+            if (ancho >= 600) return 2;
+            return 1;
+        }
+
         async function tieneGrabacionAudio(nombreCancion) {
             if (!nombreCancion) return false;
             const nombreLimpio = nombreCancion
@@ -303,10 +328,25 @@
             }
 
             const fragmento = document.createDocumentFragment();
+            const numColumnas = obtenerNumColumnas();
 
-            for (const cancion of filtradas) {
+            filtradas.forEach((cancion, indice) => {
                 const fila = document.createElement('div');
                 fila.className = "fila-cancion";
+
+                // Cálculo de posición en la cuadrícula para el desfase diagonal
+                const numFila = Math.floor(indice / numColumnas);
+                const numCol = indice % numColumnas;
+                const pasoDiagonal = numFila + numCol;
+                
+                // Desfase de 0.05s por paso diagonal
+                fila.style.animationDelay = `${pasoDiagonal * 0.05}s`;
+
+                // Al terminar la animación, se remueve la regla para asegurar que el hover scale(1.05) funcione libremente
+                fila.addEventListener('animationend', () => {
+                    fila.style.animation = 'none';
+                    fila.style.opacity = '1';
+                });
 
                 fila.onclick = () => {
                     window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
@@ -350,7 +390,7 @@
                             `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
                     }
                 });
-            }
+            });
 
             listaDiv.appendChild(fragmento);
         }
