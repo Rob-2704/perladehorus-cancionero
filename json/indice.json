@@ -1,165 +1,196 @@
 {
   "canciones": [
     {
-      "idC": "1",
+      "idC": "27",
       "nombreC": "Amor Mío",
       "arreglos": "",
       "estado": "pendiente",
+      "categoria": "rondalla",
       "archivo": "--Amor Mío"
     },
     {
-      "idC": "2",
+      "idC": "28",
       "nombreC": "Chapala",
       "arreglos": "Ciro Vega González, Emmanuel León Apolinar",
       "estado": "pendiente",
+      "categoria": "rondalla",
       "archivo": "--Chapala (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
-      "idC": "4",
+      "idC": "29",
       "nombreC": "Serenata Huasteca",
       "arreglos": "",
       "estado": "pendiente",
+      "categoria": "rondalla",
       "archivo": "--Serenata Huasteca"
     },
     {
-      "idC": "25",
+      "idC": "30",
       "nombreC": "Ansiedad",
       "arreglos": "Ciro Vega González",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-Ansiedad (Ciro Vega González)"
     },
     {
-      "idC": "22",
+      "idC": "31",
       "nombreC": "Cuando Yo Quería Ser Grande",
       "arreglos": "",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-Cuando Yo Quería Ser Grande ()"
     },
     {
-      "idC": "7",
+      "idC": "32",
       "nombreC": "Esperando La Madrugada",
       "arreglos": "Emmanuel León Apolinar",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-Esperando La Madrugada (Emmanuel León Apolinar)"
     },
     {
-      "idC": "8",
+      "idC": "33",
       "nombreC": "Granada",
       "arreglos": "Osvaldo Daniel Barrera, Emmanuel León Apolinar",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-Granada (Osvaldo Daniel Barrera, Emmanuel León Apolinar)"
     },
     {
-      "idC": "26",
+      "idC": "34",
       "nombreC": "La Flor De La Canela",
       "arreglos": "Ciro Vega González, Emmanuel León Apolinar",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-La Flor De La Canela (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
-      "idC": "9",
+      "idC": "35",
       "nombreC": "Las Golondrinas",
       "arreglos": "Ciro Vega González",
       "estado": "revisar",
+      "categoria": "rondalla",
       "archivo": "-Las Golondrinas (Ciro Vega González)"
     },
     {
-      "idC": "12",
+      "idC": "36",
       "nombreC": "Adios Amor",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Adios Amor (Ciro Vega González)"
     },
     {
-      "idC": "13",
+      "idC": "37",
       "nombreC": "Aires Del Mayab",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Aires Del Mayab (Ciro Vega González)"
     },
     {
-      "idC": "5",
+      "idC": "38",
       "nombreC": "Alma, Corazón Y Vida",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Alma, Corazón Y Vida (Ciro Vega González)"
     },
     {
-      "idC": "23",
+      "idC": "39",
       "nombreC": "Bonita",
       "arreglos": "Joel Carrillo Cuenca, Osvaldo Daniel Barrera",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Bonita (Joel Carrillo Cuenca, Osvaldo Daniel Barrera)"
     },
     {
-      "idC": "24",
+      "idC": "40",
       "nombreC": "Ella",
       "arreglos": "Osvaldo Daniel Barrera",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Ella (Osvaldo Daniel Barrera)"
     },
     {
-      "idC": "15",
+      "idC": "41",
       "nombreC": "Imprescindible",
       "arreglos": "Emmanuel León Apolinar",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Imprescindible (Emmanuel León Apolinar)"
     },
     {
-      "idC": "16",
+      "idC": "42",
       "nombreC": "La Malagueña",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "La Malagueña (Ciro Vega González)"
     },
     {
-      "idC": "10",
+      "idC": "43",
       "nombreC": "Las Mañanitas",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Las Mañanitas (Ciro Vega González)"
     },
     {
-      "idC": "11",
+      "idC": "44",
       "nombreC": "Los Mirlos",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Los Mirlos (Ciro Vega González)"
     },
     {
-      "idC": "17",
+      "idC": "45",
       "nombreC": "Nochecita",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Nochecita (Ciro Vega González)"
     },
     {
-      "idC": "18",
+      "idC": "46",
       "nombreC": "Perdón",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Perdón (Ciro Vega González)"
     },
     {
-      "idC": "19",
+      "idC": "47",
       "nombreC": "Perfume De Gardénias",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Perfume De Gardénias (Ciro Vega González)"
     },
     {
-      "idC": "20",
+      "idC": "48",
       "nombreC": "Usted",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Usted (Ciro Vega González)"
     },
     {
-      "idC": "21",
+      "idC": "49",
       "nombreC": "Ven",
       "arreglos": "Ciro Vega González",
       "estado": "terminada",
+      "categoria": "rondalla",
       "archivo": "Ven (Ciro Vega González)"
+    },
+    {
+      "idC": "50",
+      "nombreC": "Como Quien Pierde Una Estrella (Alejandro Fernández) [Que Seas Muy Feliz]",
+      "arreglos": "",
+      "estado": "terminada",
+      "categoria": "general",
+      "archivo": "Como Quien Pierde Una Estrella (Alejandro Fernández) [Que Seas Muy Feliz]"
     }
   ]
 }
