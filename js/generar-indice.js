@@ -1,16 +1,6 @@
 // Uso: node js/generar-indice.js
-// Recorre Canciones/<Título (Arreglos)>.txt y crea json/indice.json.
-//
-// Formato del nombre de archivo:
-//   Título (Arreglos).txt      → terminada
-//   -Título (Arreglos).txt     → revisarla
-//   --Título (Arreglos).txt    → no terminada
-//
-// Los idC que usan las URLs son números, no el nombre del archivo (para que las
-// URLs queden limpias). Ese número se guarda en json/ids-canciones.json, indexado por
-// el nombre "limpio" (sin el prefijo de estado), así una canción conserva su
-// mismo número aunque cambie su estado (---, -, o ninguno). Si renombras el
-// título o los arreglos, se le asigna un número nuevo.
+// Recorre Canciones/<Título (Arreglos)>.txt y Canciones/General/<Título (Arreglos)>.txt
+// y crea json/indice.json.
 
 const fs = require('fs');
 const path = require('path');
@@ -42,12 +32,12 @@ function cargarIds() {
     try { return JSON.parse(fs.readFileSync(IDS_FILE, 'utf8')); } catch (_) { return {}; }
 }
 
-// Asigna un número a cada nombre "limpio" nuevo, conservando los que ya existían.
-function asignarIds(nombresLimpios) {
+// Asigna un número a cada clave "categoria_nombreLimpio" nueva, conservando los existentes.
+function asignarIds(clavesUnicas) {
     const mapa = cargarIds();
     let siguiente = 1 + Object.values(mapa).reduce((max, n) => Math.max(max, Number(n) || 0), 0);
-    for (const nombre of nombresLimpios) {
-        if (!(nombre in mapa)) mapa[nombre] = siguiente++;
+    for (const clave of clavesUnicas) {
+        if (!(clave in mapa)) mapa[clave] = siguiente++;
     }
     const dirJson = path.dirname(IDS_FILE);
     if (!fs.existsSync(dirJson)) {
@@ -58,28 +48,36 @@ function asignarIds(nombresLimpios) {
 }
 
 function leerCanciones() {
-    const archivos = fs.readdirSync(RAIZ, { withFileTypes: true })
-        .filter(d => d.isFile() && d.name.toLowerCase().endsWith('.txt'))
-        .map(d => d.name)
-        .sort(orden)
-        .map(f => {
-            const base = f.replace(/\.txt$/i, '');
-            const { estado, limpio } = leerEstado(base);
-            const { nombreC, arreglos } = parsearNombre(limpio);
-            return { archivo: base, limpio, nombreC, arreglos, estado };
-        });
+    const leerDirectorio = (dirPath, categoria) => {
+        if (!fs.existsSync(dirPath)) return [];
+        return fs.readdirSync(dirPath, { withFileTypes: true })
+            .filter(d => d.isFile() && d.name.toLowerCase().endsWith('.txt'))
+            .map(d => d.name)
+            .sort(orden)
+            .map(f => {
+                const base = f.replace(/\.txt$/i, '');
+                const { estado, limpio } = leerEstado(base);
+                const { nombreC, arreglos } = parsearNombre(limpio);
+                return { archivo: base, limpio, nombreC, arreglos, estado, categoria };
+            });
+    };
 
-    const mapaIds = asignarIds(archivos.map(a => a.limpio));
+    const cancionesRondalla = leerDirectorio(RAIZ, 'rondalla');
+    const cancionesGeneral = leerDirectorio(path.join(RAIZ, 'General'), 'general');
+
+    const archivos = [...cancionesRondalla, ...cancionesGeneral];
+    const mapaIds = asignarIds(archivos.map(a => `${a.categoria}_${a.limpio}`));
 
     return archivos.map(a => ({
-        idC: String(mapaIds[a.limpio]),
+        idC: String(mapaIds[`${a.categoria}_${a.limpio}`]),
         nombreC: a.nombreC,
         arreglos: a.arreglos,
         estado: a.estado,
-        archivo: a.archivo   // nombre real del .txt en disco (uso interno, nunca sale en la URL)
+        categoria: a.categoria,
+        archivo: a.archivo
     }));
 }
 
 const canciones = leerCanciones();
 fs.writeFileSync(INDICE_FILE, JSON.stringify({ canciones }, null, 2));
-console.log(`json/indice.json listo: ${canciones.length} canciones`);
+console.log(`json/indice.json listo: ${canciones.length} canciones procesadas.`);

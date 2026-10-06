@@ -1,6 +1,5 @@
 // api-cliente.js — versión estática para GitHub Pages (sin PHP)
-// Datos: json/indice.json (generado por generar-indice.js) + archivos .txt de /Canciones
-// Ya no hay artistas ni portadas: cada canción es un archivo suelto en Canciones/.
+// Datos: json/indice.json (generado por generar-indice.js) + archivos .txt de /Canciones y /Canciones/General
 const CARPETA = 'Canciones';
 
 let indicePromise = null;
@@ -25,8 +24,8 @@ export async function obtenerContenidoCancion(idC) {
     const info = indice.canciones.find(c => c.idC === idC);
     if (!info) return { error: 'Canción no encontrada' };
 
-    // El idC es solo un número para la URL; el archivo real en disco es "info.archivo"
-    const ruta = `${CARPETA}/${encodeURIComponent(info.archivo)}.txt`;
+    const subcarpeta = info.categoria === 'general' ? 'Canciones/General' : CARPETA;
+    const ruta = `${subcarpeta}/${encodeURIComponent(info.archivo)}.txt`;
     const r = await fetch(ruta);
     if (!r.ok) return { error: `No se encontró el archivo (${r.status})` };
 
@@ -35,6 +34,7 @@ export async function obtenerContenidoCancion(idC) {
         nombreC: info.nombreC,
         contenido: await r.text(),
         ytID: '',                       // pendiente: se definirá más adelante
-        arreglos: info.arreglos
+        arreglos: info.arreglos,
+        categoria: info.categoria || 'rondalla'
     };
 }
