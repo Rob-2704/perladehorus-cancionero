@@ -161,7 +161,7 @@
             }
         }
 
-        /* Animación 6A: Desplazamiento vertical tipo barra ocultable con rebote elástico */
+        /* Animación 6A: Entrada deslizable tipo barra con rebote elástico */
         @keyframes deslizarPanelTransponer {
             0% {
                 opacity: 0;
@@ -177,15 +177,19 @@
             }
         }
 
-        /* Animación 6B: Desplazamiento vertical de salida hacia abajo al ocultarse */
+        /* Animación 6B: Salida con impulso previo hacia arriba antes de descender */
         @keyframes deslizarPanelTransponerSalida {
             0% {
                 opacity: 1;
                 transform: translateY(0);
             }
+            25% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
             100% {
                 opacity: 0;
-                transform: translateY(45px);
+                transform: translateY(50px);
             }
         }
 
@@ -462,22 +466,41 @@
             z-index: 999;
         }
         
-        .fila-inferior,
-        .panel-scroll-flotante {
+        .fila-inferior {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            width: 290px;
+            max-width: 90vw;
+        }
+
+        #panel-scroll {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 20px;
         }
         
         .panel-scroll-flotante {
             background: var(--card-bg);
-            padding: 12px 25px;
             border-radius: 50px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
         }
 
-        /* Animación deslizable (tipo barra de tareas) para la barra de transponer y sus botones */
+        /* Animación para la barra de transponer y sus botones */
+        #panel-transponer {
+            width: 290px;
+            max-width: 90vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+        }
+
         #panel-transponer.panel-transponer-entrada {
             will-change: transform, opacity;
             animation: deslizarPanelTransponer 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -485,7 +508,7 @@
 
         #panel-transponer.panel-transponer-salida {
             will-change: transform, opacity;
-            animation: deslizarPanelTransponerSalida 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            animation: deslizarPanelTransponerSalida 0.24s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
         }
 
         #panel-transponer.panel-transponer-entrada .btn-transponer,
@@ -511,6 +534,7 @@
             border-radius: 50%;
             cursor: pointer;
             font-weight: bold;
+            flex-shrink: 0;
         }
         
         .btn-scroll { 
@@ -546,7 +570,7 @@
             color: var(--text-main);
             height: 62px;
             width: 62px;
-            padding: 0 16px;
+            padding: 0;
             border-radius: 50px;
             font-size: 15px;
             text-align: center;
@@ -560,7 +584,9 @@
         }
         
         .slider-scroll { 
-            width: 100px; 
+            flex: 1;
+            min-width: 0;
+            width: 100%;
             accent-color: var(--accent); 
         }
 
@@ -906,7 +932,7 @@
                     observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
                 }
 
-                // Controlador de animación de deslizamiento vertical (estilo barra de tareas)
+                // Controlador de animación de deslizamiento vertical con impulso de cierre
                 const panelTranspon = document.getElementById('panel-transponer');
                 if (panelTranspon) {
                     let enProcesoCierrePanel = false;
@@ -926,7 +952,7 @@
                                 panelTranspon.style.display = 'none';
                                 ultimoDisplayPanel = 'none';
                                 enProcesoCierrePanel = false;
-                            }, 200);
+                            }, 240);
                         } else if (displayActual !== 'none' && !enProcesoCierrePanel) {
                             ultimoDisplayPanel = displayActual;
                             panelTranspon.classList.remove('panel-transponer-salida');
