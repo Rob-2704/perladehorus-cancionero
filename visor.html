@@ -95,6 +95,33 @@
                 clip-path: inset(0 0 0 0);
             }
         }
+
+        /* Animación 4: Entradas elásticas para el Título, Artista y Capo */
+        @keyframes deslizarTexto {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popBadgeCapo {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.12);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
         
         /* Encabezados y Botón Volver */
         .btn-volver { 
@@ -170,6 +197,7 @@
 
         .audio-slider {
             width: 100%;
+            height: 6px;
             accent-color: var(--accent);
             cursor: pointer;
             border-radius: 3px;
@@ -198,9 +226,12 @@
         .info-cabecera h1 {
             margin: 0;
             font-size: 24px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        /* Badge de Capotrasto */
+        /* Badge de Capotrasto animado */
         .badge-capo {
             display: inline-flex;
             align-items: center;
@@ -214,6 +245,9 @@
             font-weight: 600;
             white-space: nowrap;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popBadgeCapo 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s forwards;
         }
         
         .info-cabecera h2 {
@@ -222,6 +256,9 @@
             font-size: 18px;
             font-weight: 400;
             border-bottom: 2px solid var(--accent);
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
         
         /* Área Principal (Workspace) */
