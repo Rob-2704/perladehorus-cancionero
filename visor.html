@@ -133,11 +133,11 @@
             }
         }
 
-        /* Animación 5: Pop emergente elástico para el diagrama de acordes */
-        @keyframes popModalAcorde {
+        /* Animación 5A: Entrada elástica para la caja de diagrama de acordes */
+        @keyframes popModalEntrada {
             0% {
                 opacity: 0;
-                transform: scale(0.7) translateY(12px);
+                transform: scale(0.6) translateY(12px);
             }
             70% {
                 opacity: 1;
@@ -146,6 +146,18 @@
             100% {
                 opacity: 1;
                 transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Animación 5B: Salida suave al cerrar el diagrama de acordes */
+        @keyframes popModalSalida {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.7) translateY(8px);
             }
         }
         
@@ -357,7 +369,7 @@
             font-weight: bold; 
         }
         
-        /* Modales y Cajas Emergentes con Animación Pop */
+        /* Modales y Cajas Emergentes */
         .caja-acorde-emergente { 
             position: fixed; 
             display: none; 
@@ -369,9 +381,15 @@
             width: fit-content;
             max-width: 90vw;
             text-align: center;
-
             will-change: transform, opacity;
-            animation: popModalAcorde 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .caja-acorde-emergente.animar-entrada {
+            animation: popModalEntrada 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .caja-acorde-emergente.animar-salida {
+            animation: popModalSalida 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         
         .caja-acorde-emergente h4 { 
@@ -779,6 +797,47 @@
 
                 letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
                 inicializarModalAcordes('caja-acorde');
+
+                // Controlador de animaciones dinámicas de entrada, cambio de acorde y salida
+                const cajaAcordeEl = document.getElementById('caja-acorde');
+                if (cajaAcordeEl) {
+                    let enProcesoDeCierre = false;
+                    let ultimoDisplayVal = 'none';
+
+                    document.addEventListener('click', (e) => {
+                        const linkAcorde = e.target.closest('.acorde-link');
+                        if (linkAcorde) {
+                            enProcesoDeCierre = false;
+                            cajaAcordeEl.classList.remove('animar-salida');
+
+                            cajaAcordeEl.classList.remove('animar-entrada');
+                            void cajaAcordeEl.offsetWidth;
+                            cajaAcordeEl.classList.add('animar-entrada');
+                        }
+                    }, true);
+
+                    const observadorCaja = new MutationObserver(() => {
+                        const displayActual = cajaAcordeEl.style.display;
+
+                        if (displayActual === 'none' && !enProcesoDeCierre && ultimoDisplayVal !== 'none') {
+                            enProcesoDeCierre = true;
+                            cajaAcordeEl.style.display = ultimoDisplayVal;
+                            cajaAcordeEl.classList.remove('animar-entrada');
+                            cajaAcordeEl.classList.add('animar-salida');
+
+                            setTimeout(() => {
+                                cajaAcordeEl.classList.remove('animar-salida');
+                                cajaAcordeEl.style.display = 'none';
+                                ultimoDisplayVal = 'none';
+                                enProcesoDeCierre = false;
+                            }, 180);
+                        } else if (displayActual !== 'none' && !enProcesoDeCierre) {
+                            ultimoDisplayVal = displayActual;
+                        }
+                    });
+
+                    observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
+                }
 
                 inicializarAutoscroll('btn-play-scroll', 'slider-velocidad');
                 
