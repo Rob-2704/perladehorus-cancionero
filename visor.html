@@ -30,6 +30,16 @@
             margin: 0 auto;
         }
 
+        /* Animación Fade In para la imagen de fondo de la letra */
+        @keyframes fadeInImagen {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.18;
+            }
+        }
+
         /* Animación 1: Extensión vertical para la letra */
         @keyframes extenderContenedor {
             0% {
@@ -296,9 +306,12 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
-            opacity: 0.18;
+            opacity: 0;
             pointer-events: none;
             z-index: 0;
+
+            will-change: opacity;
+            animation: fadeInImagen 0.6s ease-out forwards;
         }
         
         .letra-texto { 

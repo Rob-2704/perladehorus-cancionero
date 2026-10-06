@@ -22,6 +22,16 @@
             margin: 0 auto;
         }
 
+        /* Animación Fade In para la imagen de fondo */
+        @keyframes fadeInImagen {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.18;
+            }
+        }
+
         body::before {
             content: "";
             position: fixed;
@@ -34,9 +44,12 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
-            opacity: 0.18;
+            opacity: 0;
             pointer-events: none;
             z-index: 0;
+
+            will-change: opacity;
+            animation: fadeInImagen 0.6s ease-out forwards;
         }
 
         /* Aislamiento de capas para evitar que las animaciones 3D de las tarjetas sobrepasen el encabezado */
