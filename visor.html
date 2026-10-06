@@ -30,7 +30,7 @@
             margin: 0 auto;
         }
 
-        /* Animación de extensión vertical para la letra */
+        /* Animación 1: Extensión vertical para la letra */
         @keyframes extenderContenedor {
             0% {
                 opacity: 0;
@@ -48,6 +48,25 @@
                 transform-origin: top;
             }
         }
+
+        /* Animación 2: Expansión tipo píldora horizontal para el reproductor */
+        @keyframes expandirPildora {
+            0% {
+                opacity: 0;
+                transform: scaleX(0.08) scaleY(0.85);
+                transform-origin: center;
+            }
+            70% {
+                opacity: 1;
+                transform: scaleX(1.03) scaleY(1.02);
+                transform-origin: center;
+            }
+            100% {
+                opacity: 1;
+                transform: scaleX(1) scaleY(1);
+                transform-origin: center;
+            }
+        }
         
         /* Encabezados y Botón Volver */
         .btn-volver { 
@@ -58,6 +77,7 @@
             margin-bottom: 15px;
         }
         
+        /* Reproductor con animación de expansión horizontal tipo píldora */
         .contenedor-audio {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -69,6 +89,9 @@
             justify-content: center;
             gap: 12px;
             width: 100%;
+
+            will-change: transform, opacity;
+            animation: expandirPildora 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
         .btn-audio-ctrl {
