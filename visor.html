@@ -49,22 +49,38 @@
             }
         }
 
-        /* Animación 2: Expansión tipo píldora horizontal para el reproductor */
-        @keyframes expandirPildora {
+        /* Animación 3: Despliegue de cortina para el fondo del reproductor */
+        @keyframes desplegarCortina {
             0% {
                 opacity: 0;
-                transform: scaleX(0.08) scaleY(0.85);
-                transform-origin: center;
+                transform: scaleY(0);
+                transform-origin: top;
             }
             70% {
                 opacity: 1;
-                transform: scaleX(1.03) scaleY(1.02);
-                transform-origin: center;
+                transform: scaleY(1.05);
+                transform-origin: top;
             }
             100% {
                 opacity: 1;
-                transform: scaleX(1) scaleY(1);
-                transform-origin: center;
+                transform: scaleY(1);
+                transform-origin: top;
+            }
+        }
+
+        /* Pop secuencial (stagger) para los controles internos del reproductor */
+        @keyframes popControlAudio {
+            0% {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+            75% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
             }
         }
         
@@ -77,7 +93,7 @@
             margin-bottom: 15px;
         }
         
-        /* Reproductor con animación de expansión horizontal tipo píldora */
+        /* Reproductor con efecto cortina */
         .contenedor-audio {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -91,8 +107,25 @@
             width: 100%;
 
             will-change: transform, opacity;
-            animation: expandirPildora 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: desplegarCortina 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+
+        /* Aplicación del stagger a los elementos del reproductor */
+        .contenedor-audio #btn-audio-play,
+        .contenedor-audio #audio-tiempo-actual,
+        .contenedor-audio #audio-progress,
+        .contenedor-audio #audio-tiempo-total,
+        .contenedor-audio #btn-audio-mute {
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .contenedor-audio #btn-audio-play { animation-delay: 0.12s; }
+        .contenedor-audio #audio-tiempo-actual { animation-delay: 0.16s; }
+        .contenedor-audio #audio-progress { animation-delay: 0.20s; }
+        .contenedor-audio #audio-tiempo-total { animation-delay: 0.24s; }
+        .contenedor-audio #btn-audio-mute { animation-delay: 0.28s; }
         
         .btn-audio-ctrl {
             background: var(--accent);
