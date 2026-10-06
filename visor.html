@@ -160,6 +160,37 @@
                 transform: scale(0.7) translateY(8px);
             }
         }
+
+        /* Animación 6: Pop elástico para el panel flotante de transposición y sus botones */
+        @keyframes popPanelTransponer {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) translateY(20px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.08) translateY(-3px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes popBotonTransponer {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
         
         /* Encabezados y Botón Volver */
         .btn-volver { 
@@ -374,7 +405,7 @@
             position: fixed; 
             display: none; 
             background: var(--card-bg);
-            border-radius: 20px; 
+            border-radius: 10%;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
             padding: 12px; 
             z-index: 1000; 
@@ -433,6 +464,25 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
         }
+
+        /* Animaciones para la barra de transponer y sus botones al desplegarse */
+        #panel-transponer {
+            will-change: transform, opacity;
+            animation: popPanelTransponer 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        #panel-transponer .btn-transponer,
+        #panel-transponer #btn-reset-tono {
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popBotonTransponer 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        #panel-transponer #btn-bajar-tono   { animation-delay: 0.05s; }
+        #panel-transponer #btn-bajar-medio  { animation-delay: 0.09s; }
+        #panel-transponer #btn-subir-medio  { animation-delay: 0.13s; }
+        #panel-transponer #btn-subir-tono   { animation-delay: 0.17s; }
+        #panel-transponer #btn-reset-tono   { animation-delay: 0.21s; }
         
         .btn-scroll,
         .btn-transponer,
