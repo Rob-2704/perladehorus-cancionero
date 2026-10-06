@@ -481,7 +481,9 @@
                 });
 
                 fila.onclick = () => {
-                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
+                    const cat = cancion.categoria || categoriaSeleccionada;
+                    const url = `visor?idC=${encodeURIComponent(cancion.idC)}&titulo=${encodeURIComponent(cancion.nombreC || '')}&arreglos=${encodeURIComponent(cancion.arreglos || '')}&cat=${encodeURIComponent(cat)}`;
+                    window.location.href = url;
                 };
 
                 const claseEstado = cancion.estado || 'terminada';

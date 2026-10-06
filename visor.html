@@ -562,6 +562,9 @@
 
         const params = new URLSearchParams(window.location.search);
         const idC = params.get('idC');
+        const tituloParam = params.get('titulo');
+        const arreglosParam = params.get('arreglos');
+        const catParam = params.get('cat');
 
         const letraCancionDiv = document.getElementById('letra-cancion');
 
@@ -575,6 +578,17 @@
             { ext: 'opus', mime: 'audio/opus' },
             { ext: 'webm', mime: 'audio/webm' }
         ];
+
+        // Renderizado instantáneo sincrónico desde los parámetros de la URL
+        if (tituloParam) {
+            document.getElementById('titulo-cancion').textContent = tituloParam;
+            buscarYCarGarGrabacion(tituloParam);
+        }
+
+        if (arreglosParam !== null && arreglosParam !== '') {
+            const etiquetaMeta = (catParam === 'general') ? 'Artista' : 'Arreglos';
+            document.getElementById('nombre-artista').textContent = `${etiquetaMeta}: ${arreglosParam}`;
+        }
 
         function formatearTiempo(segundos) {
             if (isNaN(segundos) || segundos < 0) return "0:00";
@@ -679,11 +693,13 @@
 
                 const etiquetaMeta = (data.categoria === 'general') ? 'Artista' : 'Arreglos';
 
-                document.getElementById('titulo-cancion').textContent = data.nombreC;
-                document.getElementById('nombre-artista').textContent = data.arreglos ? `${etiquetaMeta}: ${data.arreglos}` : '';
-
-                if (data.nombreC) {
+                if (!tituloParam && data.nombreC) {
+                    document.getElementById('titulo-cancion').textContent = data.nombreC;
                     buscarYCarGarGrabacion(data.nombreC);
+                }
+
+                if (arreglosParam === null && data.arreglos) {
+                    document.getElementById('nombre-artista').textContent = `${etiquetaMeta}: ${data.arreglos}`;
                 }
 
                 let contenidoProcesar = data.contenido || "";
