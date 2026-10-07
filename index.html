@@ -207,7 +207,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(188, 151, 49, 0.2);
-            transition: background-color 0.15s, transform 0.1s;
+            transition: background-color 0.15s, padding-left 0.15s;
             font-family: 'Sono', monospace;
             font-size: 13px;
             color: var(--text-main);
@@ -496,9 +496,7 @@
                 `;
                 div.onclick = (e) => {
                     e.stopPropagation();
-                    inputBusqueda.value = cancion.nombreC;
-                    listaSugerencias.classList.remove('activa');
-                    renderizarLista();
+                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
                 };
                 listaSugerencias.appendChild(div);
             });
