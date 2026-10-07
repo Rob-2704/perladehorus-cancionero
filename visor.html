@@ -948,20 +948,19 @@
                 void letraCancionDiv.offsetWidth;
                 letraCancionDiv.classList.add('animar-entrada-texto');
 
-                // Garantiza que la marca de agua aparezca independientemente de si la API tarda más o menos que la animación inicial
+                // Activar animación del fondo garantizado en móvil y escritorio
                 if (letraContenedorEl) {
-                    const animaciones = letraContenedorEl.getAnimations();
-                    const animExtender = animaciones.find(a => a.animationName === 'extenderContenedor');
+                    const activarFondo = () => letraContenedorEl.classList.add('fondo-activo');
+                    
+                    // Escuchar la finalización de la animación
+                    letraContenedorEl.addEventListener('animationend', (e) => {
+                        if (e.animationName === 'extenderContenedor') {
+                            activarFondo();
+                        }
+                    }, { once: true });
 
-                    if (!animExtender || animExtender.playState === 'finished') {
-                        letraContenedorEl.classList.add('fondo-activo');
-                    } else {
-                        letraContenedorEl.addEventListener('animationend', (e) => {
-                            if (e.animationName === 'extenderContenedor') {
-                                letraContenedorEl.classList.add('fondo-activo');
-                            }
-                        }, { once: true });
-                    }
+                    // Fallback para navegadores móviles donde animationend o la API no se dispare a tiempo
+                    setTimeout(activarFondo, 450);
                 }
 
                 inicializarModalAcordes('caja-acorde');
@@ -1061,7 +1060,7 @@
                         letraCancionDiv.innerHTML = procesarLetraYAcordes(texto);
                     },
                     tonalidadLabelId: 'btn-toggle-transponer',
-                    btnSubirTonoId: 'btn-subir-mono',
+                    btnSubirTonoId: 'btn-subir-tono',
                     btnSubirMedioId: 'btn-subir-medio',
                     btnBajarMedioId: 'btn-bajar-medio',
                     btnBajarTonoId: 'btn-bajar-tono',
