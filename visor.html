@@ -948,13 +948,20 @@
                 void letraCancionDiv.offsetWidth;
                 letraCancionDiv.classList.add('animar-entrada-texto');
 
-                // Activar animación del fondo una vez que finaliza la expansión del contenedor
+                // Garantiza que la marca de agua aparezca independientemente de si la API tarda más o menos que la animación inicial
                 if (letraContenedorEl) {
-                    letraContenedorEl.addEventListener('animationend', (e) => {
-                        if (e.animationName === 'extenderContenedor') {
-                            letraContenedorEl.classList.add('fondo-activo');
-                        }
-                    }, { once: true });
+                    const animaciones = letraContenedorEl.getAnimations();
+                    const animExtender = animaciones.find(a => a.animationName === 'extenderContenedor');
+
+                    if (!animExtender || animExtender.playState === 'finished') {
+                        letraContenedorEl.classList.add('fondo-activo');
+                    } else {
+                        letraContenedorEl.addEventListener('animationend', (e) => {
+                            if (e.animationName === 'extenderContenedor') {
+                                letraContenedorEl.classList.add('fondo-activo');
+                            }
+                        }, { once: true });
+                    }
                 }
 
                 inicializarModalAcordes('caja-acorde');
@@ -1054,7 +1061,7 @@
                         letraCancionDiv.innerHTML = procesarLetraYAcordes(texto);
                     },
                     tonalidadLabelId: 'btn-toggle-transponer',
-                    btnSubirTonoId: 'btn-subir-tono',
+                    btnSubirTonoId: 'btn-subir-mono',
                     btnSubirMedioId: 'btn-subir-medio',
                     btnBajarMedioId: 'btn-bajar-medio',
                     btnBajarTonoId: 'btn-bajar-tono',
