@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="img/icono.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
+
+    <link href="style.css" rel="stylesheet">
+    <title>404 - Página no encontrada</title>
+    <style>
+        body {
+            position: relative;
+            max-width: 80%;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animación Fade In para la imagen de fondo */
+        @keyframes fadeInImagen {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.18;
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background-image: url('img/fondo.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+
+            will-change: opacity;
+            animation: fadeInImagen 0.6s ease-out forwards;
+        }
+
+        header {
+            position: relative;
+            z-index: 100;
+            isolation: isolate;
+            margin: 0 auto 10px auto;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 32px;
+            }
+        }
+
+        p.subtitulo {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: var(--text-sec);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Contenedor principal de error 404 */
+        main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0 60px 0;
+        }
+
+        /* Animación estilo Nintendo 3DS / Wii U para la tarjeta del 404 */
+        @keyframes popWiiU {
+            0% {
+                opacity: 0;
+                transform: translate(-15px, -15px) scale(0.75);
+            }
+            75% {
+                opacity: 1;
+                transform: translate(2px, 2px) scale(1.03);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        .tarjeta-404 {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popWiiU 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .codigo-404 {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0;
+            line-height: 1;
+            font-family: 'Sono', monospace;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 12px;
+            width: 100%;
+        }
+
+        .mensaje-404 {
+            font-size: 15px;
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.5;
+            font-family: 'Sono', monospace;
+        }
+
+        .btn-inicio {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            outline: none;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+            margin-top: 10px;
+        }
+
+        @media (hover: hover) {
+            .btn-inicio:hover {
+                transform: translateY(-2px) scale(1.03);
+                box-shadow: 0 0 10px rgba(188, 151, 49, 0.4);
+            }
+        }
+
+        .btn-inicio:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        @media (max-width: 1300px) {
+            body { 
+                padding-left: 23px;
+                padding-right: 23px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cancionero</h1>
+        <p class="subtitulo">Rondalla Perla De Horus</p>
+    </header>
+
+    <main>
+        <article class="tarjeta-404">
+            <h2 class="codigo-404">404</h2>
+            <p class="mensaje-404">Parece que esta nota quedó fuera de compás. La página que buscas no existe o fue movida.</p>
+            <a href="./" class="btn-inicio">← Volver al cancionero</a>
+        </article>
+    </main>
+</body>
+</html>
