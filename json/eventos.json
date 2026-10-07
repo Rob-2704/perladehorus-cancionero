@@ -1,0 +1,32 @@
+[
+  {
+    "idE": "evt-001",
+    "titulo": "Egreso 1",
+    "fecha": "2026-10-08",
+    "horaInicio": "11:00a.m.",
+    "horaFin": "1:00p.m.",
+    "vestimenta": "Traje, camisa blanca, corbata roja",
+    "lugar": "Tecnológico de Toluca, Auditorio",
+    "canciones": ["31", "35"],
+    "notas": "Ensayo general, Miercoles 1:00p.m."
+  },
+  {
+    "idE": "evt-002",
+    "titulo": "Egreso 2",
+    "fecha": "2026-10-08",
+    "horaInicio": "4:00p.m.",
+    "horaFin": "6:00p.m.",
+    "vestimenta": "Traje, camisa blanca, corbata roja",
+    "lugar": "Tecnológico de Toluca, Auditorio",
+    "canciones": ["31", "35"],
+    "notas": "Ensayo general, Miercoles 1:00p.m."
+  },
+  {
+    "idE": "evt-003",
+    "titulo": "Presentaciones",
+    "fecha": "2026-10-25",
+    "vestimenta": "",
+    "lugar": "Tecnológico de Toluca",
+    "notas": ""
+  }
+]

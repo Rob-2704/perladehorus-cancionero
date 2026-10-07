@@ -69,7 +69,7 @@
             position: relative;
             z-index: 100;
             isolation: isolate;
-            margin: 0 auto 30px auto;
+            margin: 0 auto 15px auto;
         }
 
         main {
@@ -107,9 +107,175 @@
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
 
+        /* Secciones */
+        .titulo-seccion {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 18px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Sono', monospace;
+        }
+
+        /* Regla universal para evitar FOUT (Flash of Unstyled Text) y saltos de texto */
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            user-select: none;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-feature-settings: 'liga';
+            -webkit-font-feature-settings: 'liga';
+            visibility: hidden;
+            opacity: 0;
+            width: 1em; /* Reserva exacto el espacio final cuadrado del ícono */
+            height: 1em;
+            display: inline-block;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            will-change: transform, opacity, visibility;
+        }
+
+        /* Ocultamiento dinámico con tamaño fijo */
+        .icono-grabacion,
+        .icono-general {
+            visibility: hidden;
+            opacity: 0;
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            will-change: transform, opacity, visibility;
+        }
+
+        .fuente-cargada {
+            visibility: visible !important;
+            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+
+        /* Lista de Eventos Compacta con margen interno para no recortar el hover */
+        .contenedor-eventos {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding: 6px;
+            margin-left: -6px;
+            margin-right: -6px;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s cubic-bezier(0.34, 1.25, 0.64, 1);
+            box-sizing: border-box;
+        }
+
+        .tarjeta-evento {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 12px 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            border-left: 4px solid var(--accent);
+        }
+
+        .tarjeta-evento.oculto {
+            display: none !important;
+        }
+
+        @media (hover: hover) {
+            .tarjeta-evento:hover { 
+                transform: scale(1.015); 
+                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+                z-index: 2;
+            }
+        }
+        .tarjeta-evento:active { transform: scale(1.015); }
+
+        .tarjeta-evento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tarjeta-evento h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .badge-proximo {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .tarjeta-evento .meta-evento {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 12px;
+            color: var(--text-sec);
+        }
+
+        .meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Botón circular compacto con flechita */
+        .btn-toggle-eventos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            margin: 6px auto 14px auto;
+            background: var(--card-bg);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s, background-color 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0;
+        }
+
+        .btn-toggle-eventos:hover {
+            background-color: rgba(188, 151, 49, 0.15);
+        }
+
+        .btn-toggle-eventos:active {
+            transform: scale(0.9);
+        }
+
+        .btn-toggle-eventos .material-symbols-outlined {
+            font-size: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+
         /* Desplegable de categoría y Barra de Búsqueda */
         .contenedor-filtro {
-            margin: 15px 0 10px 0;
+            margin: 12px 0 10px 0;
             display: flex;
             gap: 12px;
             align-items: center;
@@ -139,7 +305,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Alineación y estilo personalizado para la flecha del select */
         .select-categoria {
             cursor: pointer;
             -webkit-appearance: none;
@@ -153,7 +318,6 @@
             transition: background-position 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Animación interactiva en hover / focus / active para el select */
         .select-categoria:hover,
         .input-busqueda:hover {
             transform: translateY(-1px);
@@ -164,7 +328,6 @@
             transform: translateY(1px) scale(0.98);
         }
 
-        /* Animación para desplegar el menú de sugerencias */
         @keyframes popDropdown {
             0% {
                 opacity: 0;
@@ -198,7 +361,6 @@
             opacity: 0.7;
         }
 
-        /* Menú flotante de sugerencias superpuesto y animado */
         .lista-sugerencias {
             position: absolute;
             top: calc(100% + 6px);
@@ -249,7 +411,6 @@
             white-space: nowrap;
         }
 
-        /* Configuración de rejilla adaptativa */
         .lista-canciones {
             display: grid;
             grid-template-columns: 1fr;
@@ -275,7 +436,6 @@
             }
         }
 
-        /* Animación instantánea estilo Nintendo 3DS / Wii U para tarjetas */
         @keyframes popWiiU {
             0% {
                 opacity: 0;
@@ -291,7 +451,6 @@
             }
         }
 
-        /* Animación fluida con rebote elástico para el icono de play */
         @keyframes popIconoPlay {
             0% {
                 opacity: 0;
@@ -313,10 +472,11 @@
             padding: 16px 20px;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: transform 0.05s, box-shadow 0.15s;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            position: relative;
             -webkit-tap-highlight-color: transparent;
             
             opacity: 0;
@@ -327,6 +487,8 @@
         @media (hover: hover) {
             .fila-cancion:hover {
                 transform: scale(1.05);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+                z-index: 2;
             }
         }
         
@@ -362,19 +524,8 @@
             font-feature-settings: 'liga';
             -webkit-font-feature-settings: 'liga';
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
-            
-            /* Evita que el ID de texto ('play_circle') aparezca visible antes de cargar la fuente */
-            visibility: hidden;
-            opacity: 0;
-            will-change: transform, opacity, visibility;
         }
 
-        .icono-grabacion.fuente-cargada {
-            visibility: visible;
-            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        /* Estilos para el icono de estado */
         .estado-icono {
             display: inline-block;
             width: 12px;
@@ -398,7 +549,6 @@
             box-shadow: 0 0 8px rgba(231, 29, 54, 0.5);
         }
 
-        /* Forzado a 2 filas independientes */
         .fila-cancion .meta {
             display: flex;
             flex-direction: column;
@@ -410,7 +560,7 @@
         .cargando {
             text-align: center;
             color: var(--accent);
-            padding: 40px;
+            padding: 20px;
             font-family: 'Sono', monospace;
             grid-column: 1 / -1;
         }
@@ -427,6 +577,24 @@
     <header>
         <h1>Cancionero</h1>
         <p>Rondalla Perla De Horus</p>
+    </header>
+
+    <main>
+        <!-- Sección de Eventos Programados -->
+        <div id="seccion-eventos" style="display: none;">
+            <div class="titulo-seccion">
+                <span class="material-symbols-outlined">event_available</span> Próximos Eventos
+            </div>
+            <div id="contenedor-eventos" class="contenedor-eventos"></div>
+            <button id="btn-toggle-eventos" class="btn-toggle-eventos" title="Ver más eventos" style="display: none;">
+                <span id="icono-toggle-eventos" class="material-symbols-outlined">expand_more</span>
+            </button>
+        </div>
+
+        <div class="titulo-seccion">
+            <span class="material-symbols-outlined">queue_music</span> Catálogo de Canciones
+        </div>
+
         <div class="contenedor-filtro">
             <select id="select-categoria" class="select-categoria">
                 <option value="rondalla">Rondalla</option>
@@ -437,10 +605,10 @@
                 <div id="lista-sugerencias" class="lista-sugerencias"></div>
             </div>
         </div>
-    </header>
 
-    <main id="lista-canciones" class="lista-canciones">
-        <div class="cargando"></div>
+        <div id="lista-canciones" class="lista-canciones">
+            <div class="cargando">Cargando canciones...</div>
+        </div>
     </main>
 
     <script type="module">
@@ -452,9 +620,22 @@
         const inputBusqueda = document.getElementById('input-busqueda');
         const contenedorBusqueda = document.querySelector('.contenedor-busqueda');
         const listaSugerencias = document.getElementById('lista-sugerencias');
+        const seccionEventos = document.getElementById('seccion-eventos');
+        const contenedorEventos = document.getElementById('contenedor-eventos');
+        const btnToggleEventos = document.getElementById('btn-toggle-eventos');
+        const iconoToggleEventos = document.getElementById('icono-toggle-eventos');
 
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
+
+        // Función global para mostrar íconos solo cuando la fuente del sistema esté renderizada
+        function activarAnimacionIconos() {
+            document.fonts.ready.then(() => {
+                document.querySelectorAll('.material-symbols-outlined, .icono-grabacion').forEach(icono => {
+                    icono.classList.add('fuente-cargada');
+                });
+            });
+        }
 
         function obtenerNumColumnas() {
             const ancho = window.innerWidth;
@@ -462,6 +643,165 @@
             if (ancho >= 900) return 3;
             if (ancho >= 600) return 2;
             return 1;
+        }
+
+        function formatearHoraAMPM(horaStr) {
+            if (!horaStr) return '';
+            if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) {
+                return horaStr;
+            }
+            const partes = horaStr.split(':');
+            if (partes.length < 2) return horaStr;
+
+            let hrs = parseInt(partes[0], 10);
+            const mins = partes[1].trim();
+            if (isNaN(hrs)) return horaStr;
+
+            const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
+            hrs = hrs % 12;
+            if (hrs === 0) hrs = 12;
+
+            return `${hrs}:${mins}${ampm}`;
+        }
+
+        function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
+            if (!stringFecha) return '';
+            const partes = stringFecha.split('-');
+            let textoFecha = stringFecha;
+
+            if (partes.length === 3) {
+                const d = new Date(partes[0], partes[1] - 1, partes[2]);
+                textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+                
+                // Capitalizar primera letra del día de la semana
+                textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
+            }
+
+            const inicioFormatted = formatearHoraAMPM(horaInicio);
+            const finFormatted = formatearHoraAMPM(horaFin);
+
+            let rangoHoras = '';
+            if (inicioFormatted && finFormatted) {
+                rangoHoras = `${inicioFormatted}-${finFormatted}`;
+            } else if (inicioFormatted) {
+                rangoHoras = inicioFormatted;
+            }
+
+            return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
+        }
+
+        function calcularAlturaCompacta() {
+            const vis = Array.from(contenedorEventos.children).slice(0, 2);
+            let h = 12;
+            vis.forEach(el => { h += el.offsetHeight + 8; });
+            return h;
+        }
+
+        async function cargarEventos() {
+            try {
+                const res = await fetch('json/eventos.json');
+                if (!res.ok) return;
+                const eventos = await res.json();
+                if (!Array.isArray(eventos) || eventos.length === 0) return;
+
+                const ordenados = eventos
+                    .map(e => {
+                        const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
+                        const f = e.fecha ? e.fecha.split('-') : [2000, 1, 1];
+                        return { ...e, fechaObj: new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0) };
+                    })
+                    .sort((a, b) => a.fechaObj - b.fechaObj);
+
+                contenedorEventos.innerHTML = '';
+                let desplegado = false;
+                let enAnimacion = false;
+
+                ordenados.forEach((evento, idx) => {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''}`;
+
+                    tarjeta.onclick = () => {
+                        window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
+                    };
+
+                    const esProximo = idx === 0;
+
+                    tarjeta.innerHTML = `
+                        <div class="tarjeta-evento-header">
+                            <h3>${evento.titulo}</h3>
+                            ${esProximo ? '<span class="badge-proximo">Próximo</span>' : ''}
+                        </div>
+                        <div class="meta-evento">
+                            <span class="meta-item">
+                                <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
+                                ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
+                            </span>
+                            <span class="meta-item">
+                                <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
+                                ${evento.lugar || '—'}
+                            </span>
+                        </div>
+                    `;
+                    contenedorEventos.appendChild(tarjeta);
+                });
+
+                seccionEventos.style.display = 'block';
+
+                requestAnimationFrame(() => {
+                    const alturaInicial = calcularAlturaCompacta();
+                    contenedorEventos.style.maxHeight = `${alturaInicial}px`;
+                    setTimeout(() => {
+                        contenedorEventos.style.overflow = 'visible';
+                    }, 350);
+                });
+
+                if (ordenados.length > 2) {
+                    btnToggleEventos.style.display = 'flex';
+                    btnToggleEventos.onclick = () => {
+                        if (enAnimacion) return;
+                        enAnimacion = true;
+                        desplegado = !desplegado;
+
+                        const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(2);
+                        const duracionTransicion = 300;
+
+                        if (desplegado) {
+                            contenedorEventos.style.overflow = 'hidden';
+                            tarjetasExtra.forEach(t => t.classList.remove('oculto'));
+                            
+                            const alturaExpandida = contenedorEventos.scrollHeight + 12;
+                            contenedorEventos.style.maxHeight = `${alturaExpandida}px`;
+
+                            setTimeout(() => { 
+                                contenedorEventos.style.maxHeight = 'none';
+                                contenedorEventos.style.overflow = 'visible';
+                                enAnimacion = false; 
+                            }, duracionTransicion + 50);
+
+                            btnToggleEventos.title = 'Ver menos';
+                            iconoToggleEventos.textContent = 'expand_less';
+                        } else {
+                            contenedorEventos.style.overflow = 'hidden';
+                            contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
+                            void contenedorEventos.offsetWidth;
+
+                            const alturaFinal = calcularAlturaCompacta();
+                            contenedorEventos.style.maxHeight = `${alturaFinal}px`;
+
+                            setTimeout(() => {
+                                tarjetasExtra.forEach(t => t.classList.add('oculto'));
+                                contenedorEventos.style.overflow = 'visible';
+                                enAnimacion = false;
+                            }, duracionTransicion);
+
+                            btnToggleEventos.title = 'Ver más eventos';
+                            iconoToggleEventos.textContent = 'expand_more';
+                        }
+                    };
+                }
+
+                activarAnimacionIconos();
+            } catch (_) {}
         }
 
         async function tieneGrabacionAudio(nombreCancion) {
@@ -522,7 +862,7 @@
             });
 
             listaSugerencias.classList.remove('activa');
-            void listaSugerencias.offsetWidth; // Reinicia animación CSS
+            void listaSugerencias.offsetWidth;
             listaSugerencias.classList.add('activa');
         }
 
@@ -603,22 +943,19 @@
                     if (tieneAudio) {
                         contenedorIconos.insertAdjacentHTML('afterbegin',
                             `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
-
-                        const iconoEl = contenedorIconos.querySelector('.icono-grabacion');
-                        if (iconoEl) {
-                            document.fonts.ready.then(() => {
-                                iconoEl.classList.add('fuente-cargada');
-                            });
-                        }
+                        activarAnimacionIconos();
                     }
                 });
             });
 
             listaDiv.appendChild(fragmento);
+            activarAnimacionIconos();
         }
 
         async function init() {
             try {
+                cargarEventos();
+
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
                 cancionesGlobal = (await obtenerCanciones())
                     .slice()
