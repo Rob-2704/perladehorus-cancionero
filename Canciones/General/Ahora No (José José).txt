@@ -1,5 +1,5 @@
 (Intro)
-FA#m7, SI7, SOL#m7, DO#m7, FA#m7, SI7, MI
+FA#m7-SI7 SOL#m7-DO#m7 FA#m7-SI7 MI
 
       FA#m7-SI7     SOL#m7-DO#m7
 Ahora no, será otra vez
@@ -67,14 +67,12 @@ Ahora no, Ahora no
         MI
 Será después
 
-
       FA#m7-SI7     SOL#m7-DO#m7
 Ahora no, será otra vez
       FA#m7         SI7
 Ahora no, no puedes hoy
          MI
 Y cuando pues
-
 
       FA#m7-SI7     SOL#m7-DO#m7
 Ahora no, será otra vez

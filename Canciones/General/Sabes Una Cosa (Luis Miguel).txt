@@ -1,7 +1,8 @@
-REm-REm7-SOL7, DO-DOmaj, FAm LA#7, RE# REm SOL
+(Intro)
+REm-REm7-SOL7 DO-DOmaj7 FAm LA#7 RE# REm SOL
 
-           DO
--Sabes una cosa
+          DO
+Sabes una cosa
                  REm
 Tengo algo que decirte
      MIm         REm7       DO
@@ -9,8 +10,8 @@ Y no sé como empezar a explicar
    LA7              REm SOL7
 Lo que te quiero contar
 
-           REm7 SOL
--Sabes una cosa
+          REm7 SOL
+Sabes una cosa
      REm           REm7
 No encuentro las palabras
    SOL
@@ -20,8 +21,8 @@ Quizá con una rosa
       MIm         RE#7-SOL#-SOL
 Te lo pueda decir
 
-           DO
--Sabes una cosa
+          DO
+Sabes una cosa
                REm
 No sé ni desde cuando
    MIm        REm7
@@ -29,8 +30,8 @@ Llegaste de repente
    DO                   REm7 SOL7
 Mi corazón se puso a cantar
 
-           REm7 SOL
--Sabes una cosa
+          REm7 SOL
+Sabes una cosa
    REm            REm7
 Te quiero niña hermosa
        SOL
@@ -38,36 +39,36 @@ Y te entrego en esta rosa
    REm         SOL      DO  LA7
 La vida que me pueda quedar
 
-| REm7
-|=Doy gracias al cielo
-| SOL
-|=Por haberte conocido
-| DO
-|=Por haberte conocido
-|=Doy gracias al cielo
+REm7
+Doy gracias al cielo
+SOL
+Por haberte conocido
+DO
+Por haberte conocido
+Doy gracias al cielo
 
-|FAm
-|Y le cuento a las estrellas
-|LA#7
-|Lo bonito que sentí
-|RE#
-|Lo bonito que sentí
-|REm           SOL
-|Cuando te conocí
+FAm
+Y le cuento a las estrellas
+LA#7
+Lo bonito que sentí
+RE#
+Lo bonito que sentí
+REm           SOL
+Cuando te conocí
 
-|REm SOL           DO   DOmaj
-|Sabes,  sabes una cosa
-|          FAm    LA#7
-|Que yo te quiero
-|              RE#
-|Que sin ti me muero
-|         REm-SOL (SOL con rasgueo rapido)
-|Si estás lejos
+REm SOL           DO   DOmaj7
+Sabes,  sabes una cosa
+          FAm    LA#7
+Que yo te quiero
+              RE#
+Que sin ti me muero
+         REm-SOL
+Si estás lejos
 
-REm-REm7-SOL7, DO-DOmaj, FAm LA#7, RE# REm SOL
+REm-REm7-SOL7 DO-DOmaj7 FAm LA#7 RE# REm SOL
 
-           DO
--Sabes una cosa
+          DO
+Sabes una cosa
                  REm
 Tengo algo que decirte
      MIm         REm7       DO
@@ -75,8 +76,8 @@ Y no sé como empezar a explicar
    LA7              REm SOL7
 Lo que te quiero contar
 
-           REm7 SOL
--Sabes una cosa
+          REm7 SOL
+Sabes una cosa
    REm           REm7
 Te quiero y te venero
     SOL
@@ -84,9 +85,33 @@ Te adoro y te deseo
   REm        SOL     DO  LA7
 Cariño ven y déjate amar
 
-|
+REm7
+Doy gracias al cielo
+SOL
+Por haberte conocido
+DO
+Por haberte conocido
+Doy gracias al cielo
 
- DO        REm
-=Sabes una cosa
- DO        REm  DO
-=Sabes una cosa
+FAm
+Y le cuento a las estrellas
+LA#7
+Lo bonito que sentí
+RE#
+Lo bonito que sentí
+REm           SOL
+Cuando te conocí
+
+REm SOL           DO   DOmaj7
+Sabes,  sabes una cosa
+          FAm    LA#7
+Que yo te quiero
+              RE#
+Que sin ti me muero
+         REm-SOL
+Si estás lejos
+
+DO        REm
+Sabes una cosa
+DO        REm  DO
+Sabes una cosa

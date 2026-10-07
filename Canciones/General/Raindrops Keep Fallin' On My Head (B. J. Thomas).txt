@@ -1,4 +1,5 @@
-Intro: F, C, Bb, C7
+(Intro)
+F C Bb C7
 
 F			    Fmaj7
 Raindrops are falling on my head
@@ -59,7 +60,8 @@ Gm7	  C7	   F
 Nothing's worrying me
 _____________________________________________________________________________
 
-Intro: FA, DO, SIb, DO7
+(Intro)
+FA, DO, SIb, DO7
 
 FA			 FAmaj7
 Gotas de lluvia que al caer

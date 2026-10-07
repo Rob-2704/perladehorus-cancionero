@@ -37,7 +37,7 @@ Diciéndote ven regresa otra vez
    DOm-FA         LA#
 No rompas mas corazones
 
-(Intro)
+LA#-LA#maj7 SOLm7 REm-SOLm7 DOm-FA DOm-FA DOm-FA DOm-FA LA#maj7-FA
 
    RE7             SOLm7
 No se que será sin verte

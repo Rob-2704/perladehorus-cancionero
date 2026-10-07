@@ -1,4 +1,5 @@
-Intro: DOm, DOm7, FAm, SOL, DOm
+(Intro)
+DOm DOm7 FAm SOL DOm
 
                  FAm          LA#7
 Qué triste fue decirnos adiós
@@ -52,7 +53,7 @@ Oh oh oh oh
 RE#      DOm
 Oh oh oh oh
 
-SOL#, RE7, SOL, DOm
+SOL# RE7 SOL DOm
 
                FAm
 Hoy quiero saborear mi dolor

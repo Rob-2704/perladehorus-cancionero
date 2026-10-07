@@ -38,7 +38,8 @@ Ay corazón
         RE7                     SOLm
 Si no entiendes, ¿por qué no te callas?
 
-(Intro)
+DOm FA7 LA#maj7 RE#maj7 LAm RE7 SOLm SOL7
+DOm FA7 LA#maj7 RE#maj7 LAm RE7 SOLm RE7
 
 SOLm                                  DOm
 Quiérelo tan solo un poco, no te pide tanto

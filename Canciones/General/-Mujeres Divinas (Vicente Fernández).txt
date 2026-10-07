@@ -1,9 +1,6 @@
-Intro:
-RE#, SOL#, RE#, SOL#
-
-Rasgueo rapido: DO7, FAm
-
-DO7, FAm
+(Intro)
+RE# SOL# RE# SOL#
+DO7 FAm DO7 FAm
 
 FAm           FA7         LA#m
 Hablando de mujeres y traiciones
@@ -23,7 +20,6 @@ Me dijo "le suplico compañero
                                     FAm
 Que no hable en mi presencia de las damas"
 
-Rasgueo rapido:
    RE#                     SOL#
 Le dije que nosotros simplemente
   RE#                        SOL#
@@ -38,7 +34,8 @@ Que si alguien opinaba diferente
   DO7                        FAm
 Sería porque jamás lo traicionaron
 
-Intro
+RE# SOL# RE# SOL#
+DO7 FAm DO7 FAm
 
 FAm            FA7        LA#m
 Me dijo yo soy uno de los seres
@@ -58,7 +55,6 @@ Las horas más hermosas de mi vida
                              FAm
 Las he pasado al lado de una dama
 
-Rasgueo rapido:
   RE#                      SOL#
 Pudiéramos morir en las cantinas
   RE#                   SOL#
