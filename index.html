@@ -115,7 +115,7 @@
             font-family: 'Sono', monospace;
             font-size: 14px;
             outline: none;
-            transition: box-shadow 0.2s, border-color 0.2s;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -130,6 +130,37 @@
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 14px;
+            transition: background-position 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Animación interactiva en hover / focus / active para el select */
+        .select-categoria:hover,
+        .input-busqueda:hover {
+            transform: translateY(-1px);
+        }
+
+        .select-categoria:active,
+        .input-busqueda:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Animación para desplegar el menú de sugerencias */
+        @keyframes popDropdown {
+            0% {
+                opacity: 0;
+                transform: translateY(-8px) scaleY(0.85);
+                transform-origin: top;
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(2px) scaleY(1.02);
+                transform-origin: top;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scaleY(1);
+                transform-origin: top;
+            }
         }
 
         .input-busqueda {
@@ -147,7 +178,7 @@
             opacity: 0.7;
         }
 
-        /* Menú flotante de sugerencias superpuesto */
+        /* Menú flotante de sugerencias superpuesto y animado */
         .lista-sugerencias {
             position: absolute;
             top: calc(100% + 6px);
@@ -161,10 +192,12 @@
             max-height: 240px;
             overflow-y: auto;
             display: none;
+            will-change: transform, opacity;
         }
 
         .lista-sugerencias.activa {
             display: block;
+            animation: popDropdown 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         .item-sugerencia {
@@ -174,7 +207,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(188, 151, 49, 0.2);
-            transition: background-color 0.15s;
+            transition: background-color 0.15s, transform 0.1s;
             font-family: 'Sono', monospace;
             font-size: 13px;
             color: var(--text-main);
@@ -186,6 +219,7 @@
 
         .item-sugerencia:hover {
             background-color: rgba(188, 151, 49, 0.18);
+            padding-left: 18px;
         }
 
         .item-sugerencia .sugerencia-meta {
@@ -469,6 +503,8 @@
                 listaSugerencias.appendChild(div);
             });
 
+            listaSugerencias.classList.remove('activa');
+            void listaSugerencias.offsetWidth; // Reinicia animación CSS
             listaSugerencias.classList.add('activa');
         }
 
@@ -552,7 +588,6 @@
 
                         const iconoEl = contenedorIconos.querySelector('.icono-grabacion');
                         if (iconoEl) {
-                            // Mostrar únicamente cuando la fuente de iconos esté completamente disponible en el navegador
                             document.fonts.ready.then(() => {
                                 iconoEl.classList.add('fuente-cargada');
                             });
