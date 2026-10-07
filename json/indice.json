@@ -209,6 +209,14 @@
       "archivo": "Ven (Ciro Vega González)"
     },
     {
+      "idC": "81",
+      "nombreC": "Mujeres Divinas",
+      "arreglos": "Vicente Fernández",
+      "estado": "revisar",
+      "categoria": "general",
+      "archivo": "-Mujeres Divinas (Vicente Fernández)"
+    },
+    {
       "idC": "52",
       "nombreC": "A Esa",
       "arreglos": "José José",
@@ -447,14 +455,6 @@
       "estado": "terminada",
       "categoria": "general",
       "archivo": "Motivos (Vicente Fernández)"
-    },
-    {
-      "idC": "81",
-      "nombreC": "Mujeres Divinas",
-      "arreglos": "Vicente Fernández",
-      "estado": "terminada",
-      "categoria": "general",
-      "archivo": "Mujeres Divinas (Vicente Fernández)"
     },
     {
       "idC": "82",
