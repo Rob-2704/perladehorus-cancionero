@@ -421,9 +421,12 @@
             opacity: 0;
             pointer-events: none;
             z-index: 0;
-
             will-change: opacity;
-            animation: fadeInImagen 0.6s ease-out forwards;
+        }
+
+        /* Disparo de la imagen únicamente al finalizar la expansión del contenedor */
+        .letra-contenedor.fondo-activo::before {
+            animation: fadeInImagen 0.5s ease-out forwards;
         }
         
         .letra-texto { 
@@ -750,7 +753,7 @@
         </div>
 
         <div class="workspace">
-            <article class="letra-contenedor">
+            <article id="letra-contenedor" class="letra-contenedor">
                 <pre id="letra-cancion" class="letra-texto">Abriendo canción...</pre>
             </article>
         </div>
@@ -792,6 +795,7 @@
         const idC = params.get('idC');
 
         const letraCancionDiv = document.getElementById('letra-cancion');
+        const letraContenedorEl = document.getElementById('letra-contenedor');
 
         const FORMATOS_AUDIO = [
             { ext: 'mp3', mime: 'audio/mpeg' },
@@ -943,6 +947,15 @@
                 letraCancionDiv.classList.remove('animar-entrada-texto');
                 void letraCancionDiv.offsetWidth;
                 letraCancionDiv.classList.add('animar-entrada-texto');
+
+                // Activar animación del fondo una vez que finaliza la expansión del contenedor
+                if (letraContenedorEl) {
+                    letraContenedorEl.addEventListener('animationend', (e) => {
+                        if (e.animationName === 'extenderContenedor') {
+                            letraContenedorEl.classList.add('fondo-activo');
+                        }
+                    }, { once: true });
+                }
 
                 inicializarModalAcordes('caja-acorde');
 
