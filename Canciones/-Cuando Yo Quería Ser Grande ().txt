@@ -1,16 +1,17 @@
 Capo: 1
 
 (Intro)
-MIm FA#m SI7 MIm FA#m SI7 MIm
+LAm RE7 SOL MIm LAm SI7 MIm MI7
+LAm RE7 SOL MIm LAm SI7 MIm
 
 (Solo)
    MIm
 Se van perdiendo en el tiempo
-                             FA#m
+                             SI7
 Mis años se van quedando muy lejos
-SI7               FA#m
+                  SI7
 Ya no me lleva mi padre la mano
-SI7              MIm
+                 MIm
 Solamente sus consejos
 
 MI7
@@ -26,9 +27,9 @@ Mientras mi madre miraba
 
                    MIm
 Años que vienen despacio, primero
-                  FA#m   SI7
+                  SI7
 Con qué lentitud avanzan
-                FA#m             SI7
+                SI7
 Cómo quería ser grande, recuerdo
                     MIm
 Para no quedarme en casa
@@ -45,7 +46,7 @@ Era muy inteligente
 Era mejor que ninguno
 
 (Solo)
-          MI7        LAm            RE7 
+          MI7        LAm            RE7
 Hoy ya no quiero que pasen los años
                 SOL           MIm
 Porque mi padre ya está viejo
@@ -54,7 +55,7 @@ Se la han cubierto de arrugas sus manos
                  MIm
 Y de nieve sus cabellos
 
-     MI7          LAm            RE7 
+     MI7          LAm            RE7
 Oh señor detén el tiempo te pido
                  SOL     MIm
 Porque tú puedes hacerlo
@@ -65,9 +66,9 @@ Se nos va lo bueno
 
                     MIm
 Cuando se cansen un día tus pasos
-                        FA#m  SI7
+                        SI7
 Yo quiero ser quien los cuide
-                       FA#m          SI7
+                       SI7
 Mientras tanto dame el brazo y vamos
                      MIm
 A ver qué vas a decirme
