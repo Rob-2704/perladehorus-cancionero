@@ -63,7 +63,7 @@
         @keyframes fadeInTexto {
             0% {
                 opacity: 0;
-                transform: translateY(15px);
+                transform: translateY(12px);
             }
             100% {
                 opacity: 1;
@@ -438,9 +438,12 @@
             white-space: pre;
             overflow-x: auto;
             width: 100%;
-            opacity: 0;
+            opacity: 1;
             will-change: transform, opacity;
-            animation: fadeInTexto 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards;
+        }
+
+        .letra-texto.animar-entrada-texto {
+            animation: fadeInTexto 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
         .acorde-link { 
@@ -935,6 +938,12 @@
                 }
 
                 letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
+                
+                // Disparar la animación de la letra justo al insertar el contenido real
+                letraCancionDiv.classList.remove('animar-entrada-texto');
+                void letraCancionDiv.offsetWidth;
+                letraCancionDiv.classList.add('animar-entrada-texto');
+
                 inicializarModalAcordes('caja-acorde');
 
                 // Controlador de animaciones dinámicas de entrada, cambio de acorde y salida
