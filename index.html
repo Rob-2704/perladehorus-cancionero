@@ -308,9 +308,14 @@
             -webkit-font-feature-settings: 'liga';
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
             
-            /* Aplicación de animación al aparecer dinámicamente */
+            /* Evita que el ID de texto ('play_circle') aparezca visible antes de cargar la fuente */
+            visibility: hidden;
             opacity: 0;
-            will-change: transform, opacity;
+            will-change: transform, opacity, visibility;
+        }
+
+        .icono-grabacion.fuente-cargada {
+            visibility: visible;
             animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
@@ -543,6 +548,14 @@
                     if (tieneAudio) {
                         contenedorIconos.insertAdjacentHTML('afterbegin',
                             `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
+
+                        const iconoEl = contenedorIconos.querySelector('.icono-grabacion');
+                        if (iconoEl) {
+                            // Mostrar únicamente cuando la fuente de iconos esté completamente disponible en el navegador
+                            document.fonts.ready.then(() => {
+                                iconoEl.classList.add('fuente-cargada');
+                            });
+                        }
                     }
                 });
             });
