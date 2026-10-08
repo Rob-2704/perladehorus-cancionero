@@ -7,14 +7,14 @@ LAm          SI7            MIm
 Antes de conocerte, te adiviné
      MI7                            LAm
 Y llegaste en el momento que te esperaba
-MIm                FA#m-SI7         MIm
+MIm                FA#m-SI7         MI
 No hubo sorpresa alguna cuando te hallé
 
    MI                           SI7
 El día en que cruzaste por mi camino
 LA              SI7              MI
 Tuve el presentimiento de algo fatal
-MI7                          LA
+MI7                          LA   LAm
 Esos ojos me dije, son mi destino
 MI              FA#m-SI7         MI
 Y esos brazos morenos, son mi dogal
@@ -23,7 +23,7 @@ Y esos brazos morenos, son mi dogal
 El día en que cruzaste por mi camino
 LA              SI7              MI
 Tuve el presentimiento de algo fatal
-MI7                          LA
+MI7                          LA   LAm
 Esos ojos me dije, son mi destino
-MI              FA#m-SI7         MI
+MI              FA#m SI7        MI-LAm-MI
 Y esos brazos morenos, son mi dogal
