@@ -51,7 +51,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* Regla universal para evitar FOUT y saltos de texto al cargar íconos */
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
             user-select: none;
@@ -93,16 +92,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .btn-volver { 
-            display: inline-block;
-            color: var(--text-sec);
-            text-decoration: none;
-            font-size: 13px;
-            margin-top: 20px;
-            margin-bottom: 15px;
-            font-family: 'Sono', monospace;
-        }
-
         header {
             position: relative;
             z-index: 100;
@@ -132,7 +121,6 @@
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
 
-        /* Bloque principal de detalles */
         @keyframes extenderContenedor {
             0% { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
             70% { opacity: 1; transform: scaleY(1.015); transform-origin: top; }
@@ -147,7 +135,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             position: relative;
             z-index: 1;
             opacity: 0;
@@ -183,7 +171,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Bloque de Notas con centrado vertical */
         .bloque-notas {
             background: rgba(188, 151, 49, 0.12);
             border: 1px solid var(--accent);
@@ -192,7 +179,7 @@
             font-size: 13px;
             color: var(--text-main);
             display: flex;
-            align-items: center; /* Centra icono y contenido verticalmente */
+            align-items: center;
             gap: 10px;
             font-family: 'Sono', monospace;
         }
@@ -203,18 +190,173 @@
             flex-shrink: 0;
         }
 
-        /* Texto del lugar convertido en enlace (color de acento) */
         .link-lugar {
-            color: var(--accent);
+            color: var(--accent) !important;
             text-decoration: underline;
             text-underline-offset: 3px;
             width: fit-content;
             transition: opacity 0.15s;
+            position: relative;
+            z-index: 5;
+            cursor: pointer;
+            display: inline-block;
         }
 
-        .link-lugar:active { opacity: 0.7; }
+        .link-lugar:hover { opacity: 0.85; }
+        .link-lugar:active { opacity: 0.65; }
 
-        /* Lista de Canciones del Repertorio idéntica al Index */
+        .tarjeta-asistencia {
+            background-color: #1e1e24;
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            font-family: 'Sono', monospace;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-asistencia {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-asistencia h3 {
+            margin: 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        .btn-confirmar-main {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s, opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-confirmar-main:active { transform: scale(0.97); }
+
+        .lista-asistentes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item-asistente {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background-color: #2a2a32;
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .badge-estado {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-estado.asistira { color: #2ec4b6; }
+        .badge-estado.no-asistira { color: #e71d36; }
+
+        .modal-rsvp-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-rsvp-overlay.activo { display: flex; }
+
+        .modal-rsvp-card {
+            background-color: #1e1e24;
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            font-family: 'Sono', monospace;
+        }
+
+        .modal-rsvp-card h4 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
+        .input-nombre-rsvp {
+            background-color: #121215;
+            color: var(--text-main);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .acciones-modal-rsvp {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-opcion-rsvp {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: 'Sono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-opcion-asistir { background-color: #2ec4b6; color: #fff; }
+        .btn-opcion-faltar { background-color: #e71d36; color: #fff; }
+        .btn-opcion-cancelar { background-color: transparent; color: var(--text-sec); }
+
         .titulo-seccion {
             font-size: 18px;
             font-weight: 600;
@@ -244,18 +386,9 @@
         }
 
         @keyframes popWiiU {
-            0% {
-                opacity: 0;
-                transform: translate(-15px, -15px) scale(0.75);
-            }
-            75% {
-                opacity: 1;
-                transform: translate(2px, 2px) scale(1.03);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
+            0% { opacity: 0; transform: translate(-15px, -15px) scale(0.75); }
+            75% { opacity: 1; transform: translate(2px, 2px) scale(1.03); }
+            100% { opacity: 1; transform: translate(0, 0) scale(1); }
         }
 
         .fila-cancion {
@@ -271,13 +404,12 @@
             position: relative;
             -webkit-tap-highlight-color: transparent;
             overflow: hidden;
-            background-clip: padding-box;
             
             opacity: 0;
             will-change: transform, opacity;
             animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        
+
         @media (hover: hover) {
             .fila-cancion:hover {
                 transform: scale(1.05);
@@ -286,9 +418,7 @@
             }
         }
         
-        .fila-cancion:active {
-            transform: scale(1.05);
-        }
+        .fila-cancion:active { transform: scale(1.05); }
 
         .fila-cancion h2 {
             margin: 0 0 12px 0;
@@ -364,8 +494,6 @@
     </style>
 </head>
 <body>
-    <!-- <a href="./" class="btn-volver">← Volver al cancionero</a> -->
-
     <header>
         <h1 id="titulo-evento">Cargando evento...</h1>
         <p class="subtitulo">Rondalla Perla De Horus</p>
@@ -376,6 +504,17 @@
             <div class="cargando">Cargando detalles del evento...</div>
         </div>
 
+        <!-- Tarjeta de Confirmación de Asistencia -->
+        <div id="seccion-asistencia" class="tarjeta-asistencia" style="display: none;">
+            <div class="header-asistencia">
+                <h3><span class="material-symbols-outlined">how_to_reg</span> Asistencia</h3>
+                <button id="btn-abrir-rsvp" class="btn-confirmar-main">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Confirmar asistencia
+                </button>
+            </div>
+            <div id="lista-asistentes" class="lista-asistentes"></div>
+        </div>
+
         <div id="seccion-repertorio" style="display: none;">
             <div class="titulo-seccion">
                 <span class="material-symbols-outlined">queue_music</span> Repertorio Programado
@@ -384,9 +523,43 @@
         </div>
     </main>
 
+    <!-- Modal para ingresar el nombre -->
+    <div id="modal-rsvp" class="modal-rsvp-overlay">
+        <div class="modal-rsvp-card">
+            <h4>Confirmar Asistencia</h4>
+            <input type="text" id="input-nombre-rsvp" class="input-nombre-rsvp" placeholder="Escribe tu nombre..." autocomplete="off">
+            <div class="acciones-modal-rsvp">
+                <button id="btn-cancelar-rsvp" class="btn-opcion-rsvp btn-opcion-cancelar">Cancelar</button>
+                <button id="btn-faltar-rsvp" class="btn-opcion-rsvp btn-opcion-faltar">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">cancel</span> No podré ir
+                </button>
+                <button id="btn-asistir-rsvp" class="btn-opcion-rsvp btn-opcion-asistir">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Asistiré
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
         import { obtenerCanciones, obtenerContenidoCancion } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
+
+        // Configuración de Firebase (Reemplaza con las credenciales de tu consola)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+            authDomain: "rondalla-f04a4.firebaseapp.com",
+            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+            projectId: "rondalla-f04a4",
+            storageBucket: "rondalla-f04a4.firebasestorage.app",
+            messagingSenderId: "835273996097",
+            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
         const params = new URLSearchParams(window.location.search);
         const idE = params.get('idE');
@@ -396,6 +569,15 @@
         const seccionRepertorioEl = document.getElementById('seccion-repertorio');
         const listaRepertorioEl = document.getElementById('lista-repertorio');
 
+        const seccionAsistenciaEl = document.getElementById('seccion-asistencia');
+        const listaAsistentesEl = document.getElementById('lista-asistentes');
+        const btnAbrirRsvp = document.getElementById('btn-abrir-rsvp');
+        const modalRsvp = document.getElementById('modal-rsvp');
+        const inputNombreRsvp = document.getElementById('input-nombre-rsvp');
+        const btnCancelarRsvp = document.getElementById('btn-cancelar-rsvp');
+        const btnAsistirRsvp = document.getElementById('btn-asistir-rsvp');
+        const btnFaltarRsvp = document.getElementById('btn-faltar-rsvp');
+
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
 
         function activarAnimacionIconos() {
@@ -404,6 +586,13 @@
                     icono.classList.add('fuente-cargada');
                 });
             });
+        }
+
+        function normalizarUrl(url) {
+            if (!url) return '#';
+            const limpia = url.trim();
+            if (/^https?:\/\//i.test(limpia)) return limpia;
+            return `https://${limpia}`;
         }
 
         function obtenerNumColumnas() {
@@ -446,8 +635,6 @@
                     month: 'long', 
                     year: 'numeric' 
                 });
-                
-                // Capitalizar primera letra del día
                 textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
             }
 
@@ -462,6 +649,63 @@
             }
 
             return rangoHoras ? `${textoFecha} (${rangoHoras})` : textoFecha;
+        }
+
+        // Suscripción Global a Firebase en tiempo real
+        function conectarAsistenciasFirebase() {
+            if (!idE) return;
+            const rsvpRef = ref(db, `asistencias/${idE}`);
+
+            onValue(rsvpRef, (snapshot) => {
+                const datos = snapshot.val();
+                listaAsistentesEl.innerHTML = '';
+
+                if (!datos) {
+                    listaAsistentesEl.innerHTML = '<div style="font-size:12px; color:var(--text-sec);">Aún no hay confirmaciones grabadas.</div>';
+                    return;
+                }
+
+                Object.values(datos).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'item-asistente';
+
+                    const esAsiste = item.estado === 'asistira';
+                    const icono = esAsiste ? 'check_circle' : 'cancel';
+                    const texto = esAsiste ? 'Asistirá' : 'No asistirá';
+                    const clase = esAsiste ? 'asistira' : 'no-asistira';
+
+                    div.innerHTML = `
+                        <span>${item.nombre}</span>
+                        <span class="badge-estado ${clase}">
+                            <span class="material-symbols-outlined" style="font-size:16px;">${icono}</span>
+                            ${texto}
+                        </span>
+                    `;
+                    listaAsistentesEl.appendChild(div);
+                });
+
+                activarAnimacionIconos();
+            });
+        }
+
+        // Guardado Global en Firebase
+        async function guardarRespuestaFirebase(nombre, estado) {
+            if (!nombre || !nombre.trim() || !idE) return;
+            const nombreLimpio = nombre.trim();
+            
+            // Clave única basada en el nombre en minúsculas para evitar duplicados
+            const idUsuario = nombreLimpio.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const registroRef = ref(db, `asistencias/${idE}/${idUsuario}`);
+
+            try {
+                await set(registroRef, {
+                    nombre: nombreLimpio,
+                    estado: estado
+                });
+            } catch (err) {
+                console.error("Error guardando en Firebase:", err);
+                alert("No se pudo registrar la asistencia. Verifica tu conexión.");
+            }
         }
 
         async function tieneGrabacionAudio(nombreCancion) {
@@ -503,6 +747,29 @@
 
                 tituloEventoEl.textContent = evento.titulo;
 
+                const tieneLugarTexto = evento.lugar && evento.lugar.trim() !== '';
+                const tieneLugarLink = evento.linkLugar && evento.linkLugar.trim() !== '';
+
+                let htmlLugar = '<span>—</span>';
+                if (tieneLugarTexto && tieneLugarLink) {
+                    htmlLugar = `<a href="${normalizarUrl(evento.linkLugar)}" target="_blank" rel="noopener noreferrer" class="link-lugar">${evento.lugar}</a>`;
+                } else if (tieneLugarLink) {
+                    htmlLugar = `<a href="${normalizarUrl(evento.linkLugar)}" target="_blank" rel="noopener noreferrer" class="link-lugar">Ver ubicación en mapa</a>`;
+                } else if (tieneLugarTexto) {
+                    htmlLugar = `<span>${evento.lugar}</span>`;
+                }
+
+                const textoNota = (evento.notas || evento.nota || '').toString().trim();
+                let htmlNotas = '';
+                if (textoNota) {
+                    htmlNotas = `
+                        <div class="bloque-notas">
+                            <span class="material-symbols-outlined">sticky_note_2</span>
+                            <div><strong>Nota:</strong> ${textoNota}</div>
+                        </div>
+                    `;
+                }
+
                 let htmlDetalle = `
                     <div class="tarjeta-detalle-evento">
                         <div class="item-info">
@@ -525,26 +792,50 @@
                             <span class="material-symbols-outlined">location_on</span>
                             <div class="item-info-contenido">
                                 <span class="item-info-etiqueta">Lugar</span>
-                                ${evento.linkLugar
-                                    ? `<a href="${evento.linkLugar}" target="_blank" rel="noopener noreferrer" class="link-lugar">${evento.lugar || 'Ver ubicación'}</a>`
-                                    : `<span>${evento.lugar || '—'}</span>`}
+                                ${htmlLugar}
                             </div>
                         </div>
 
-                        ${evento.notas && evento.notas.trim() !== '' ? `
-                            <div class="bloque-notas">
-                                <div><strong>Nota:</strong> ${evento.notas}</div>
-                            </div>
-                        ` : ''}
+                        ${htmlNotas}
                     </div>
                 `;
 
                 contenedorDetalleEl.innerHTML = htmlDetalle;
+                seccionAsistenciaEl.style.display = 'flex';
+                
+                // Conectar lista en vivo desde Firebase
+                conectarAsistenciasFirebase();
                 activarAnimacionIconos();
+
+                btnAbrirRsvp.onclick = () => {
+                    modalRsvp.classList.add('activo');
+                    inputNombreRsvp.focus();
+                };
+
+                btnCancelarRsvp.onclick = () => {
+                    modalRsvp.classList.remove('activo');
+                    inputNombreRsvp.value = '';
+                };
+
+                btnAsistirRsvp.onclick = async () => {
+                    if (!inputNombreRsvp.value.trim()) return;
+                    await guardarRespuestaFirebase(inputNombreRsvp.value, 'asistira');
+                    modalRsvp.classList.remove('activo');
+                    inputNombreRsvp.value = '';
+                };
+
+                btnFaltarRsvp.onclick = async () => {
+                    if (!inputNombreRsvp.value.trim()) return;
+                    await guardarRespuestaFirebase(inputNombreRsvp.value, 'no_asistira');
+                    modalRsvp.classList.remove('activo');
+                    inputNombreRsvp.value = '';
+                };
 
                 if (Array.isArray(evento.canciones) && evento.canciones.length > 0) {
                     const todasLasCanciones = await obtenerCanciones();
-                    const cancionesEvento = todasLasCanciones.filter(c => evento.canciones.includes(c.idC));
+                    const cancionesEvento = todasLasCanciones.filter(c => 
+                        evento.canciones.some(id => String(id) === String(c.idC))
+                    );
 
                     if (cancionesEvento.length > 0) {
                         listaRepertorioEl.innerHTML = '';
@@ -598,9 +889,9 @@
 
                             obtenerContenidoCancion(cancion.idC)
                                 .then(datos => {
-                                    spanTonalidad.textContent = datos.contenido
-                                        ? nombreTonalidad(detectarTonalidad(datos.contenido))
-                                        : '—';
+                                    const contenidoTexto = typeof datos === 'string' ? datos : (datos?.contenido || '');
+                                    const tonDetectada = detectarTonalidad(contenidoTexto);
+                                    spanTonalidad.textContent = tonDetectada ? nombreTonalidad(tonDetectada) : '—';
                                 })
                                 .catch(() => { spanTonalidad.textContent = '—'; });
 

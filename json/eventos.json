@@ -25,6 +25,18 @@
   },
   {
     "idE": "evt-003",
+    "titulo": "QUIMERA 2026 ",
+    "fecha": "",
+    "horaInicio": "",
+    "horaFin": "",
+    "vestimenta": "",
+    "lugar": "",
+    "linkLugar": "",
+    "canciones": [],
+    "notas": ""
+  },
+  {
+    "idE": "evt-004",
     "titulo": "Presentaciones",
     "fecha": "2026-10-25",
     "vestimenta": "",
