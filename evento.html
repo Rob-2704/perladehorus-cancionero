@@ -735,7 +735,13 @@
                     return;
                 }
 
-                const lista = Object.values(datos);
+                const prioridadEstado = { asistira: 0, duda: 1, no_asistira: 2 };
+                const lista = Object.values(datos).sort((a, b) => {
+                    const pa = prioridadEstado[a.estado] ?? 0;
+                    const pb = prioridadEstado[b.estado] ?? 0;
+                    if (pa !== pb) return pa - pb;
+                    return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es', { sensitivity: 'base' });
+                });
                 numRespuestasEl.textContent = lista.length;
 
                 lista.forEach(item => {
