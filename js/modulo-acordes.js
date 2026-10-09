@@ -130,6 +130,26 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
 
         ultimoIndice = coincidencia.index + acorde.length;
 
+        // Compensación de espacios para preservar la alineación de columnas al cambiar cifrado
+        const diff = acordeMostrar.length - acorde.length;
+        if (diff !== 0) {
+            const resto = textoProcesado.slice(ultimoIndice);
+            const matchEspacios = resto.match(/^ */);
+            const numEspacios = matchEspacios ? matchEspacios[0].length : 0;
+
+            if (numEspacios > 1) {
+                if (diff > 0) {
+                    // El acorde creció: absorbemos espacios sobrantes
+                    const recorte = Math.min(numEspacios - 1, diff);
+                    ultimoIndice += recorte;
+                    regexAcordes.lastIndex += recorte;
+                } else if (diff < 0) {
+                    // El acorde se acortó: añadimos espacios de relleno
+                    resultado += ' '.repeat(-diff);
+                }
+            }
+        }
+
         if (acorde.length === 0) regexAcordes.lastIndex++;
     }
 
