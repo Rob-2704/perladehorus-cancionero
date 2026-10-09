@@ -555,7 +555,7 @@
             
             <div class="contenedor-controles-rsvp">
                 <select id="select-alumno" class="select-asistencia">
-                    <option value="" disabled>Selecciona tu nombre</option>
+                    <option value="" disabled selected>Selecciona tu nombre</option>
                 </select>
 
                 <div class="grupo-botones-rsvp">
@@ -702,7 +702,7 @@
             const alumnosRef = ref(db, 'alumnos');
             onValue(alumnosRef, (snapshot) => {
                 const datos = snapshot.val();
-                selectAlumnoEl.innerHTML = '<option value="">Selecciona tu nombre</option>';
+                selectAlumnoEl.innerHTML = '<option value="" disabled selected>Selecciona tu nombre</option>';
 
                 if (!datos) return;
 
@@ -849,7 +849,7 @@
                 let htmlDetalle = `
                     <div class="tarjeta-detalle-evento">
                         <div class="item-info">
-                            <span class="material-symbols-outlined">schedule</span>
+                            <span class="material-symbols-outlined">calendar_month</span>
                             <div class="item-info-contenido">
                                 <span class="item-info-etiqueta">Fecha y Hora</span>
                                 <span>${formatearFechaYHorarioDetalle(evento.fecha, evento.horaInicio, evento.horaFin)}</span>
