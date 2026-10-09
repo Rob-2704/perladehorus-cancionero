@@ -2,7 +2,6 @@
 <html lang="es-mx">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="icon" type="image/x-icon" href="img/icono.png">
@@ -22,14 +21,9 @@
             margin: 0 auto;
         }
 
-        /* Animación Fade In para la imagen de fondo */
         @keyframes fadeInImagen {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 0.18;
-            }
+            0% { opacity: 0; }
+            100% { opacity: 0.18; }
         }
 
         body::before {
@@ -47,24 +41,15 @@
             opacity: 0;
             pointer-events: none;
             z-index: 0;
-
             will-change: opacity;
             animation: fadeInImagen 0.6s ease-out forwards;
         }
 
-        /* Animación de entrada idéntica a la del visor para el título y subtítulo */
         @keyframes deslizarTexto {
-            0% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* Aislamiento de capas para evitar que las animaciones 3D de las tarjetas sobrepasen el encabezado */
         header {
             position: relative;
             z-index: 100;
@@ -82,16 +67,13 @@
             font-size: 40px;
             font-weight: 700;
             letter-spacing: -0.5px;
-
             opacity: 0;
             will-change: transform, opacity;
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 32px;
-            }
+            h1 { font-size: 32px; }
         }
 
         p {
@@ -101,13 +83,11 @@
             border-bottom: 2px solid var(--accent);
             padding-bottom: 10px;
             margin-bottom: 10px;
-
             opacity: 0;
             will-change: transform, opacity;
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
 
-        /* Secciones */
         .titulo-seccion {
             font-size: 16px;
             font-weight: 600;
@@ -119,7 +99,6 @@
             font-family: 'Sono', monospace;
         }
 
-        /* Regla universal para evitar FOUT (Flash of Unstyled Text) y saltos de texto */
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
             user-select: none;
@@ -129,7 +108,7 @@
             -webkit-font-feature-settings: 'liga';
             visibility: hidden;
             opacity: 0;
-            width: 1em; /* Reserva exacto el espacio final cuadrado del ícono */
+            width: 1em;
             height: 1em;
             display: inline-block;
             text-align: center;
@@ -138,7 +117,6 @@
             will-change: transform, opacity, visibility;
         }
 
-        /* Ocultamiento dinámico con tamaño fijo */
         .icono-grabacion,
         .icono-general {
             visibility: hidden;
@@ -156,7 +134,7 @@
             animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
 
-        /* Lista de Eventos Compacta con margen interno para no recortar el hover */
+        /* Contenedor de eventos con transición suave y sin sobreimpulso */
         .contenedor-eventos {
             display: flex;
             flex-direction: column;
@@ -167,7 +145,7 @@
             margin-right: -6px;
             overflow: hidden;
             max-height: 0;
-            transition: max-height 0.35s cubic-bezier(0.34, 1.25, 0.64, 1);
+            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             box-sizing: border-box;
         }
 
@@ -186,9 +164,7 @@
             border: 2px solid var(--accent);
         }
 
-        .tarjeta-evento.oculto {
-            display: none !important;
-        }
+        .tarjeta-evento.oculto { display: none !important; }
 
         @media (hover: hover) {
             .tarjeta-evento:hover { 
@@ -242,7 +218,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Botón circular compacto con flechita */
         .btn-toggle-eventos {
             display: flex;
             align-items: center;
@@ -250,30 +225,29 @@
             width: 35px;
             height: 35px;
             margin: 6px auto 14px auto;
-            background: var(--card-bg);
+            background-color: var(--card-bg);
             color: var(--accent);
             border: 2px solid var(--accent);
             border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.15s, background-color 0.15s;
+            transition: transform 0.15s, background-color 0.15s, color 0.15s;
             -webkit-tap-highlight-color: transparent;
             padding: 0;
+            position: relative;
+            z-index: 10;
         }
 
-        .btn-toggle-eventos:hover {
-            background-color: rgba(188, 151, 49, 0.15);
+        .btn-toggle-eventos:hover { 
+            background-color: var(--accent); 
+            color: var(--bg-color, #121215); 
         }
-
-        .btn-toggle-eventos:active {
-            transform: scale(0.9);
-        }
+        .btn-toggle-eventos:active { transform: scale(0.9); }
 
         .btn-toggle-eventos .material-symbols-outlined {
             font-size: 20px;
             transition: transform 0.2s ease-in-out;
         }
 
-        /* Desplegable de categoría y Barra de Búsqueda */
         .contenedor-filtro {
             margin: 12px 0 10px 0;
             display: flex;
@@ -319,47 +293,23 @@
         }
 
         .select-categoria:hover,
-        .input-busqueda:hover {
-            transform: translateY(-1px);
-        }
+        .input-busqueda:hover { transform: translateY(-1px); }
 
         .select-categoria:active,
-        .input-busqueda:active {
-            transform: translateY(1px) scale(0.98);
-        }
+        .input-busqueda:active { transform: translateY(1px) scale(0.98); }
 
         @keyframes popDropdown {
-            0% {
-                opacity: 0;
-                transform: translateY(-8px) scaleY(0.85);
-                transform-origin: top;
-            }
-            70% {
-                opacity: 1;
-                transform: translateY(2px) scaleY(1.02);
-                transform-origin: top;
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scaleY(1);
-                transform-origin: top;
-            }
+            0% { opacity: 0; transform: translateY(-8px) scaleY(0.85); transform-origin: top; }
+            70% { opacity: 1; transform: translateY(2px) scaleY(1.02); transform-origin: top; }
+            100% { opacity: 1; transform: translateY(0) scaleY(1); transform-origin: top; }
         }
 
-        .input-busqueda {
-            width: 100%;
-            box-sizing: border-box;
-        }
+        .input-busqueda { width: 100%; box-sizing: border-box; }
 
         .select-categoria:focus,
-        .input-busqueda:focus {
-            box-shadow: 0 0 8px rgba(188, 151, 49, 0.4);
-        }
+        .input-busqueda:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
 
-        .input-busqueda::placeholder {
-            color: var(--text-sec);
-            opacity: 0.7;
-        }
+        .input-busqueda::placeholder { color: var(--text-sec); opacity: 0.7; }
 
         .lista-sugerencias {
             position: absolute;
@@ -395,9 +345,7 @@
             color: var(--text-main);
         }
 
-        .item-sugerencia:last-child {
-            border-bottom: none;
-        }
+        .item-sugerencia:last-child { border-bottom: none; }
 
         .item-sugerencia:hover {
             background-color: rgba(188, 151, 49, 0.18);
@@ -418,52 +366,20 @@
             margin: 0 auto;
         }
 
-        @media (min-width: 600px) {
-            .lista-canciones {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 900px) {
-            .lista-canciones {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .lista-canciones {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
+        @media (min-width: 600px) { .lista-canciones { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px) { .lista-canciones { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1200px) { .lista-canciones { grid-template-columns: repeat(4, 1fr); } }
 
         @keyframes popWiiU {
-            0% {
-                opacity: 0;
-                transform: translate(-15px, -15px) scale(0.75);
-            }
-            75% {
-                opacity: 1;
-                transform: translate(2px, 2px) scale(1.03);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
+            0% { opacity: 0; transform: translate(-15px, -15px) scale(0.75); }
+            75% { opacity: 1; transform: translate(2px, 2px) scale(1.03); }
+            100% { opacity: 1; transform: translate(0, 0) scale(1); }
         }
 
         @keyframes popIconoPlay {
-            0% {
-                opacity: 0;
-                transform: scale(0.2);
-            }
-            70% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.2); }
+            70% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .fila-cancion {
@@ -478,7 +394,6 @@
             justify-content: flex-start;
             position: relative;
             -webkit-tap-highlight-color: transparent;
-            
             opacity: 0;
             will-change: transform, opacity;
             animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -492,9 +407,7 @@
             }
         }
         
-        .fila-cancion:active {
-            transform: scale(1.05);
-        }
+        .fila-cancion:active { transform: scale(1.05); }
 
         .fila-cancion h2 {
             margin: 0 0 12px 0;
@@ -566,10 +479,7 @@
         }
 
         @media (max-width: 1300px) {
-            body { 
-                padding-left: 23px;
-                padding-right: 23px;
-            }
+            body { padding-left: 23px; padding-right: 23px; }
         }
     </style>
 </head>
@@ -612,8 +522,24 @@
     </main>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
         import { obtenerCanciones, obtenerContenidoCancion } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+            authDomain: "rondalla-f04a4.firebaseapp.com",
+            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+            projectId: "rondalla-f04a4",
+            storageBucket: "rondalla-f04a4.firebasestorage.app",
+            messagingSenderId: "835273996097",
+            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
         const listaDiv = document.getElementById('lista-canciones');
         const selectCategoria = document.getElementById('select-categoria');
@@ -628,7 +554,6 @@
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
 
-        // Función global para mostrar íconos solo cuando la fuente del sistema esté renderizada
         function activarAnimacionIconos() {
             document.fonts.ready.then(() => {
                 document.querySelectorAll('.material-symbols-outlined, .icono-grabacion').forEach(icono => {
@@ -672,8 +597,6 @@
             if (partes.length === 3) {
                 const d = new Date(partes[0], partes[1] - 1, partes[2]);
                 textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
-                
-                // Capitalizar primera letra del día de la semana
                 textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
             }
 
@@ -697,12 +620,20 @@
             return h;
         }
 
-        async function cargarEventos() {
-            try {
-                const res = await fetch('json/eventos.json');
-                if (!res.ok) return;
-                const eventos = await res.json();
-                if (!Array.isArray(eventos) || eventos.length === 0) return;
+        function cargarEventosFirebase() {
+            const eventosRef = ref(db, 'eventos');
+            onValue(eventosRef, (snapshot) => {
+                const datos = snapshot.val();
+                if (!datos) {
+                    seccionEventos.style.display = 'none';
+                    return;
+                }
+
+                const eventos = Object.values(datos);
+                if (!Array.isArray(eventos) || eventos.length === 0) {
+                    seccionEventos.style.display = 'none';
+                    return;
+                }
 
                 const ordenados = eventos
                     .map(e => {
@@ -725,6 +656,7 @@
                     };
 
                     const esProximo = idx === 0;
+                    const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
 
                     tarjeta.innerHTML = `
                         <div class="tarjeta-evento-header">
@@ -733,12 +665,16 @@
                         </div>
                         <div class="meta-evento">
                             <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
+                                <span class="material-symbols-outlined" style="font-size:15px;">calendar_month</span> 
                                 ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
                             </span>
                             <span class="meta-item">
                                 <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
                                 ${evento.lugar || '—'}
+                            </span>
+                            <span class="meta-item">
+                                <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
+                                ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
                             </span>
                         </div>
                     `;
@@ -752,7 +688,7 @@
                     contenedorEventos.style.maxHeight = `${alturaInicial}px`;
                     setTimeout(() => {
                         contenedorEventos.style.overflow = 'visible';
-                    }, 350);
+                    }, 300);
                 });
 
                 if (ordenados.length > 2) {
@@ -776,13 +712,15 @@
                                 contenedorEventos.style.maxHeight = 'none';
                                 contenedorEventos.style.overflow = 'visible';
                                 enAnimacion = false; 
-                            }, duracionTransicion + 50);
+                            }, duracionTransicion + 30);
 
                             btnToggleEventos.title = 'Ver menos';
                             iconoToggleEventos.textContent = 'expand_less';
                         } else {
                             contenedorEventos.style.overflow = 'hidden';
                             contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
+                            
+                            // Forzar reflow previo al cambio de altura objetivo
                             void contenedorEventos.offsetWidth;
 
                             const alturaFinal = calcularAlturaCompacta();
@@ -798,10 +736,12 @@
                             iconoToggleEventos.textContent = 'expand_more';
                         }
                     };
+                } else {
+                    btnToggleEventos.style.display = 'none';
                 }
 
                 activarAnimacionIconos();
-            } catch (_) {}
+            });
         }
 
         async function tieneGrabacionAudio(nombreCancion) {
@@ -954,7 +894,7 @@
 
         async function init() {
             try {
-                cargarEventos();
+                cargarEventosFirebase();
 
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
                 cancionesGlobal = (await obtenerCanciones())

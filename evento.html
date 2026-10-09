@@ -205,11 +205,12 @@
         .link-lugar:hover { opacity: 0.85; }
         .link-lugar:active { opacity: 0.65; }
 
+        /* Tarjeta de Confirmar Asistencia */
         .tarjeta-asistencia {
-            background-color: #1e1e24;
+            background-color: var(--card-bg);
             border-radius: 20px;
-            padding: 20px 24px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             margin-bottom: 30px;
             display: flex;
             flex-direction: column;
@@ -219,143 +220,186 @@
             z-index: 2;
         }
 
-        .header-asistencia {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .header-asistencia h3 {
+        .tarjeta-asistencia h3 {
             margin: 0;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
             color: var(--text-main);
         }
 
-        .btn-confirmar-main {
-            background-color: var(--accent);
-            color: var(--bg-color);
-            border: none;
-            padding: 8px 16px;
+        .label-asistencia {
+            font-size: 11px;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            margin-bottom: -6px;
+        }
+
+        /* Contenedor flexible para alinear el Dropdown y los Botones */
+        .contenedor-controles-rsvp {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        @media (min-width: 850px) {
+            .contenedor-controles-rsvp {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        /* Dropdown adaptativo */
+        .select-asistencia {
+            width: 100%;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent);
             border-radius: 12px;
+            padding: 10px 16px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            outline: none;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.15s, opacity 0.15s;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 36px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-confirmar-main:active { transform: scale(0.97); }
+        @media (min-width: 850px) {
+            .select-asistencia {
+                flex: 1;
+            }
+        }
 
+        .select-asistencia:hover { transform: translateY(-1px); }
+        .select-asistencia:active { transform: translateY(1px) scale(0.98); }
+        .select-asistencia:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
+
+        .select-asistencia option {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .grupo-botones-rsvp {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 850px) {
+            .grupo-botones-rsvp {
+                display: flex;
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grupo-botones-rsvp {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-rsvp {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.12s, opacity 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+
+        .btn-rsvp:active { transform: scale(0.96); }
+
+        .btn-rsvp.asistire {
+            background-color: #2ec4b6;
+            color: #ffffff;
+        }
+
+        .btn-rsvp.duda {
+            background-color: #f5c518;
+            color: #121215;
+        }
+
+        .btn-rsvp.no-ire {
+            background-color: #e71d36;
+            color: #ffffff;
+        }
+
+        .seccion-respuestas-titulo {
+            font-size: 13px;
+            color: var(--text-sec);
+            font-weight: 600;
+            margin-top: 6px;
+            margin-bottom: -4px;
+        }
+
+        /* Lista con scrollbar estilizado */
         .lista-asistentes {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .lista-asistentes::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .lista-asistentes::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .lista-asistentes::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 8px;
         }
 
         .item-asistente {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 14px;
-            background-color: #2a2a32;
-            border-radius: 10px;
-            font-size: 13px;
-            color: var(--text-main);
-        }
-
-        .badge-estado {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-estado.asistira { color: #2ec4b6; }
-        .badge-estado.no-asistira { color: #e71d36; }
-
-        .modal-rsvp-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .modal-rsvp-overlay.activo { display: flex; }
-
-        .modal-rsvp-card {
-            background-color: #1e1e24;
-            border: 2px solid var(--accent);
-            border-radius: 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            font-family: 'Sono', monospace;
-        }
-
-        .modal-rsvp-card h4 {
-            margin: 0;
-            font-size: 18px;
-            color: var(--text-main);
-        }
-
-        .input-nombre-rsvp {
-            background-color: #121215;
-            color: var(--text-main);
-            border: 1px solid var(--accent);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-family: 'Sono', monospace;
+            padding: 10px 16px;
+            background-color: var(--bg-color);
+            border-radius: 12px;
             font-size: 14px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
+            font-weight: 600;
+            color: var(--text-main);
+            border: 1px solid rgba(188, 151, 49, 0.15);
         }
 
-        .acciones-modal-rsvp {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+        .icono-estado {
+            font-size: 22px !important;
+            flex-shrink: 0;
         }
 
-        .btn-opcion-rsvp {
-            border: none;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-family: 'Sono', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-opcion-asistir { background-color: #2ec4b6; color: #fff; }
-        .btn-opcion-faltar { background-color: #e71d36; color: #fff; }
-        .btn-opcion-cancelar { background-color: transparent; color: var(--text-sec); }
+        .icono-estado.asistira { color: #2ec4b6; }
+        .icono-estado.duda { color: #f5c518; }
+        .icono-estado.no_asistira { color: #e71d36; }
 
         .titulo-seccion {
             font-size: 18px;
@@ -504,14 +548,33 @@
             <div class="cargando">Cargando detalles del evento...</div>
         </div>
 
-        <!-- Tarjeta de Confirmación de Asistencia -->
         <div id="seccion-asistencia" class="tarjeta-asistencia" style="display: none;">
-            <div class="header-asistencia">
-                <h3><span class="material-symbols-outlined">how_to_reg</span> Asistencia</h3>
-                <button id="btn-abrir-rsvp" class="btn-confirmar-main">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Confirmar asistencia
-                </button>
+            <h3><span class="material-symbols-outlined">person_add</span> Confirmar Asistencia</h3>
+            
+            <div class="label-asistencia">SELECCIONA TU NOMBRE</div>
+            
+            <div class="contenedor-controles-rsvp">
+                <select id="select-alumno" class="select-asistencia">
+                    <option value="">Selecciona tu nombre</option>
+                </select>
+
+                <div class="grupo-botones-rsvp">
+                    <button id="btn-asistire" class="btn-rsvp asistire">
+                        <span class="material-symbols-outlined">check_circle</span> Asistiré
+                    </button>
+                    <button id="btn-duda" class="btn-rsvp duda">
+                        <span class="material-symbols-outlined">help</span> Duda
+                    </button>
+                    <button id="btn-no-ire" class="btn-rsvp no-ire">
+                        <span class="material-symbols-outlined">cancel</span> No iré
+                    </button>
+                </div>
             </div>
+
+            <div class="seccion-respuestas-titulo">
+                Respuestas registradas (<span id="num-respuestas">0</span>):
+            </div>
+
             <div id="lista-asistentes" class="lista-asistentes"></div>
         </div>
 
@@ -523,23 +586,6 @@
         </div>
     </main>
 
-    <!-- Modal para ingresar el nombre -->
-    <div id="modal-rsvp" class="modal-rsvp-overlay">
-        <div class="modal-rsvp-card">
-            <h4>Confirmar Asistencia</h4>
-            <input type="text" id="input-nombre-rsvp" class="input-nombre-rsvp" placeholder="Escribe tu nombre..." autocomplete="off">
-            <div class="acciones-modal-rsvp">
-                <button id="btn-cancelar-rsvp" class="btn-opcion-rsvp btn-opcion-cancelar">Cancelar</button>
-                <button id="btn-faltar-rsvp" class="btn-opcion-rsvp btn-opcion-faltar">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">cancel</span> No podré ir
-                </button>
-                <button id="btn-asistir-rsvp" class="btn-opcion-rsvp btn-opcion-asistir">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Asistiré
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -547,7 +593,6 @@
         import { obtenerCanciones, obtenerContenidoCancion } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
 
-        // Configuración de Firebase (Reemplaza con las credenciales de tu consola)
         const firebaseConfig = {
             apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
             authDomain: "rondalla-f04a4.firebaseapp.com",
@@ -570,13 +615,12 @@
         const listaRepertorioEl = document.getElementById('lista-repertorio');
 
         const seccionAsistenciaEl = document.getElementById('seccion-asistencia');
+        const selectAlumnoEl = document.getElementById('select-alumno');
+        const btnAsistire = document.getElementById('btn-asistire');
+        const btnDuda = document.getElementById('btn-duda');
+        const btnNoIre = document.getElementById('btn-no-ire');
+        const numRespuestasEl = document.getElementById('num-respuestas');
         const listaAsistentesEl = document.getElementById('lista-asistentes');
-        const btnAbrirRsvp = document.getElementById('btn-abrir-rsvp');
-        const modalRsvp = document.getElementById('modal-rsvp');
-        const inputNombreRsvp = document.getElementById('input-nombre-rsvp');
-        const btnCancelarRsvp = document.getElementById('btn-cancelar-rsvp');
-        const btnAsistirRsvp = document.getElementById('btn-asistir-rsvp');
-        const btnFaltarRsvp = document.getElementById('btn-faltar-rsvp');
 
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
 
@@ -623,7 +667,20 @@
         }
 
         function formatearFechaYHorarioDetalle(stringFecha, horaInicio, horaFin) {
-            if (!stringFecha) return '—';
+            const inicioFormatted = formatearHoraAMPM(horaInicio);
+            const finFormatted = formatearHoraAMPM(horaFin);
+
+            let rangoHoras = '';
+            if (inicioFormatted && finFormatted) {
+                rangoHoras = `${inicioFormatted}-${finFormatted}`;
+            } else if (inicioFormatted) {
+                rangoHoras = inicioFormatted;
+            }
+
+            if (!stringFecha) {
+                return rangoHoras ? rangoHoras : '—';
+            }
+
             const partes = stringFecha.split('-');
             let textoFecha = stringFecha;
 
@@ -638,20 +695,32 @@
                 textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
             }
 
-            const inicioFormatted = formatearHoraAMPM(horaInicio);
-            const finFormatted = formatearHoraAMPM(horaFin);
-
-            let rangoHoras = '';
-            if (inicioFormatted && finFormatted) {
-                rangoHoras = `${inicioFormatted}-${finFormatted}`;
-            } else if (inicioFormatted) {
-                rangoHoras = inicioFormatted;
-            }
-
             return rangoHoras ? `${textoFecha} (${rangoHoras})` : textoFecha;
         }
 
-        // Suscripción Global a Firebase en tiempo real
+        function cargarAlumnosFirebase() {
+            const alumnosRef = ref(db, 'alumnos');
+            onValue(alumnosRef, (snapshot) => {
+                const datos = snapshot.val();
+                selectAlumnoEl.innerHTML = '<option value="">Selecciona tu nombre</option>';
+
+                if (!datos) return;
+
+                const lista = Array.isArray(datos) ? datos : Object.values(datos);
+                
+                const ordenados = lista
+                    .filter(nombre => typeof nombre === 'string' && nombre.trim() !== '')
+                    .sort((a, b) => a.trim().localeCompare(b.trim(), 'es', { sensitivity: 'base' }));
+
+                ordenados.forEach(nombre => {
+                    const opt = document.createElement('option');
+                    opt.value = nombre.trim();
+                    opt.textContent = nombre.trim();
+                    selectAlumnoEl.appendChild(opt);
+                });
+            });
+        }
+
         function conectarAsistenciasFirebase() {
             if (!idE) return;
             const rsvpRef = ref(db, `asistencias/${idE}`);
@@ -661,25 +730,32 @@
                 listaAsistentesEl.innerHTML = '';
 
                 if (!datos) {
-                    listaAsistentesEl.innerHTML = '<div style="font-size:12px; color:var(--text-sec);">Aún no hay confirmaciones grabadas.</div>';
+                    numRespuestasEl.textContent = '0';
+                    listaAsistentesEl.innerHTML = '<div style="font-size:12px; color:var(--text-sec); padding: 6px 0;">Aún no hay respuestas registradas.</div>';
                     return;
                 }
 
-                Object.values(datos).forEach(item => {
+                const lista = Object.values(datos);
+                numRespuestasEl.textContent = lista.length;
+
+                lista.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'item-asistente';
 
-                    const esAsiste = item.estado === 'asistira';
-                    const icono = esAsiste ? 'check_circle' : 'cancel';
-                    const texto = esAsiste ? 'Asistirá' : 'No asistirá';
-                    const clase = esAsiste ? 'asistira' : 'no-asistira';
+                    let icono = 'check_circle';
+                    let clase = 'asistira';
+
+                    if (item.estado === 'duda') {
+                        icono = 'help';
+                        clase = 'duda';
+                    } else if (item.estado === 'no_asistira') {
+                        icono = 'cancel';
+                        clase = 'no_asistira';
+                    }
 
                     div.innerHTML = `
                         <span>${item.nombre}</span>
-                        <span class="badge-estado ${clase}">
-                            <span class="material-symbols-outlined" style="font-size:16px;">${icono}</span>
-                            ${texto}
-                        </span>
+                        <span class="material-symbols-outlined icono-estado ${clase}">${icono}</span>
                     `;
                     listaAsistentesEl.appendChild(div);
                 });
@@ -688,23 +764,24 @@
             });
         }
 
-        // Guardado Global en Firebase
-        async function guardarRespuestaFirebase(nombre, estado) {
-            if (!nombre || !nombre.trim() || !idE) return;
-            const nombreLimpio = nombre.trim();
-            
-            // Clave única basada en el nombre en minúsculas para evitar duplicados
-            const idUsuario = nombreLimpio.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        async function guardarRespuestaFirebase(estado) {
+            const nombre = selectAlumnoEl.value;
+            if (!nombre) {
+                alert("Por favor selecciona tu nombre de la lista.");
+                return;
+            }
+
+            const idUsuario = nombre.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const registroRef = ref(db, `asistencias/${idE}/${idUsuario}`);
 
             try {
                 await set(registroRef, {
-                    nombre: nombreLimpio,
+                    nombre: nombre,
                     estado: estado
                 });
             } catch (err) {
-                console.error("Error guardando en Firebase:", err);
-                alert("No se pudo registrar la asistencia. Verifica tu conexión.");
+                console.error("Error guardando asistencia:", err);
+                alert("No se pudo registrar la respuesta.");
             }
         }
 
@@ -726,26 +803,25 @@
             return false;
         }
 
-        async function init() {
+        function cargarEventoFirebase() {
             if (!idE) {
                 tituloEventoEl.textContent = "Error";
                 contenedorDetalleEl.innerHTML = "<div class='cargando'>No se especificó un identificador de evento.</div>";
                 return;
             }
 
-            try {
-                const resEvents = await fetch('json/eventos.json');
-                if (!resEvents.ok) throw new Error("No se pudo cargar eventos.json");
-                const eventos = await resEvents.json();
-
-                const evento = eventos.find(e => e.idE === idE);
+            const eventoRef = ref(db, `eventos/${idE}`);
+            onValue(eventoRef, async (snapshot) => {
+                const evento = snapshot.val();
                 if (!evento) {
                     tituloEventoEl.textContent = "Evento no encontrado";
                     contenedorDetalleEl.innerHTML = "<div class='cargando'>El evento solicitado no existe.</div>";
+                    seccionAsistenciaEl.style.display = 'none';
+                    seccionRepertorioEl.style.display = 'none';
                     return;
                 }
 
-                tituloEventoEl.textContent = evento.titulo;
+                tituloEventoEl.textContent = evento.titulo || 'Evento';
 
                 const tieneLugarTexto = evento.lugar && evento.lugar.trim() !== '';
                 const tieneLugarLink = evento.linkLugar && evento.linkLugar.trim() !== '';
@@ -803,117 +879,105 @@
                 contenedorDetalleEl.innerHTML = htmlDetalle;
                 seccionAsistenciaEl.style.display = 'flex';
                 
-                // Conectar lista en vivo desde Firebase
                 conectarAsistenciasFirebase();
                 activarAnimacionIconos();
 
-                btnAbrirRsvp.onclick = () => {
-                    modalRsvp.classList.add('activo');
-                    inputNombreRsvp.focus();
-                };
-
-                btnCancelarRsvp.onclick = () => {
-                    modalRsvp.classList.remove('activo');
-                    inputNombreRsvp.value = '';
-                };
-
-                btnAsistirRsvp.onclick = async () => {
-                    if (!inputNombreRsvp.value.trim()) return;
-                    await guardarRespuestaFirebase(inputNombreRsvp.value, 'asistira');
-                    modalRsvp.classList.remove('activo');
-                    inputNombreRsvp.value = '';
-                };
-
-                btnFaltarRsvp.onclick = async () => {
-                    if (!inputNombreRsvp.value.trim()) return;
-                    await guardarRespuestaFirebase(inputNombreRsvp.value, 'no_asistira');
-                    modalRsvp.classList.remove('activo');
-                    inputNombreRsvp.value = '';
-                };
-
                 if (Array.isArray(evento.canciones) && evento.canciones.length > 0) {
-                    const todasLasCanciones = await obtenerCanciones();
-                    const cancionesEvento = todasLasCanciones.filter(c => 
-                        evento.canciones.some(id => String(id) === String(c.idC))
-                    );
+                    try {
+                        const todasLasCanciones = await obtenerCanciones();
+                        const cancionesEvento = todasLasCanciones.filter(c => 
+                            evento.canciones.some(id => String(id) === String(c.idC))
+                        );
 
-                    if (cancionesEvento.length > 0) {
-                        listaRepertorioEl.innerHTML = '';
-                        const fragmento = document.createDocumentFragment();
-                        const numColumnas = obtenerNumColumnas();
+                        if (cancionesEvento.length > 0) {
+                            listaRepertorioEl.innerHTML = '';
+                            const fragmento = document.createDocumentFragment();
+                            const numColumnas = obtenerNumColumnas();
 
-                        cancionesEvento.forEach((cancion, indice) => {
-                            const fila = document.createElement('div');
-                            fila.className = "fila-cancion";
+                            cancionesEvento.forEach((cancion, indice) => {
+                                const fila = document.createElement('div');
+                                fila.className = "fila-cancion";
 
-                            const numFila = Math.floor(indice / numColumnas);
-                            const numCol = indice % numColumnas;
-                            const pasoDiagonal = numFila + numCol;
+                                const numFila = Math.floor(indice / numColumnas);
+                                const numCol = indice % numColumnas;
+                                const pasoDiagonal = numFila + numCol;
 
-                            fila.style.animationDelay = `${pasoDiagonal * 0.025}s`;
+                                fila.style.animationDelay = `${pasoDiagonal * 0.025}s`;
 
-                            fila.addEventListener('animationend', () => {
-                                fila.style.animation = 'none';
-                                fila.style.opacity = '1';
+                                fila.addEventListener('animationend', () => {
+                                    fila.style.animation = 'none';
+                                    fila.style.opacity = '1';
+                                });
+
+                                fila.onclick = () => {
+                                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
+                                };
+
+                                const claseEstado = cancion.estado || 'terminada';
+                                const tituloEstado = {
+                                    terminada: 'Canción terminada',
+                                    revisar: 'Hay que revisarla',
+                                    pendiente: 'Canción no terminada'
+                                }[claseEstado] || '';
+
+                                const etiquetaMeta = (cancion.categoria === 'general') ? 'Artista' : 'Arreglos';
+
+                                fila.innerHTML = `
+                                    <h2>
+                                        <span>${cancion.nombreC}</span>
+                                        <span class="contenedor-iconos-header">
+                                            <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
+                                        </span>
+                                    </h2>
+                                    <div class="meta">
+                                        <span>${etiquetaMeta}: ${cancion.arreglos || '—'}</span>
+                                        <span>Tonalidad: <span class="tonalidad-valor">…</span></span>
+                                    </div>
+                                `;
+                                fragmento.appendChild(fila);
+
+                                const spanTonalidad = fila.querySelector('.tonalidad-valor');
+                                const contenedorIconos = fila.querySelector('.contenedor-iconos-header');
+
+                                obtenerContenidoCancion(cancion.idC)
+                                    .then(datos => {
+                                        const contenidoTexto = typeof datos === 'string' ? datos : (datos?.contenido || '');
+                                        const tonDetectada = detectarTonalidad(contenidoTexto);
+                                        spanTonalidad.textContent = tonDetectada ? nombreTonalidad(tonDetectada) : '—';
+                                    })
+                                    .catch(() => { spanTonalidad.textContent = '—'; });
+
+                                tieneGrabacionAudio(cancion.nombreC).then(tieneAudio => {
+                                    if (tieneAudio) {
+                                        contenedorIconos.insertAdjacentHTML('afterbegin',
+                                            `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
+                                        activarAnimacionIconos();
+                                    }
+                                });
                             });
 
-                            fila.onclick = () => {
-                                window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
-                            };
-
-                            const claseEstado = cancion.estado || 'terminada';
-                            const tituloEstado = {
-                                terminada: 'Canción terminada',
-                                revisar: 'Hay que revisarla',
-                                pendiente: 'Canción no terminada'
-                            }[claseEstado] || '';
-
-                            const etiquetaMeta = (cancion.categoria === 'general') ? 'Artista' : 'Arreglos';
-
-                            fila.innerHTML = `
-                                <h2>
-                                    <span>${cancion.nombreC}</span>
-                                    <span class="contenedor-iconos-header">
-                                        <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
-                                    </span>
-                                </h2>
-                                <div class="meta">
-                                    <span>${etiquetaMeta}: ${cancion.arreglos || '—'}</span>
-                                    <span>Tonalidad: <span class="tonalidad-valor">…</span></span>
-                                </div>
-                            `;
-                            fragmento.appendChild(fila);
-
-                            const spanTonalidad = fila.querySelector('.tonalidad-valor');
-                            const contenedorIconos = fila.querySelector('.contenedor-iconos-header');
-
-                            obtenerContenidoCancion(cancion.idC)
-                                .then(datos => {
-                                    const contenidoTexto = typeof datos === 'string' ? datos : (datos?.contenido || '');
-                                    const tonDetectada = detectarTonalidad(contenidoTexto);
-                                    spanTonalidad.textContent = tonDetectada ? nombreTonalidad(tonDetectada) : '—';
-                                })
-                                .catch(() => { spanTonalidad.textContent = '—'; });
-
-                            tieneGrabacionAudio(cancion.nombreC).then(tieneAudio => {
-                                if (tieneAudio) {
-                                    contenedorIconos.insertAdjacentHTML('afterbegin',
-                                        `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
-                                    activarAnimacionIconos();
-                                }
-                            });
-                        });
-
-                        listaRepertorioEl.appendChild(fragmento);
-                        seccionRepertorioEl.style.display = 'block';
-                        activarAnimacionIconos();
+                            listaRepertorioEl.appendChild(fragmento);
+                            seccionRepertorioEl.style.display = 'block';
+                            activarAnimacionIconos();
+                        } else {
+                            seccionRepertorioEl.style.display = 'none';
+                        }
+                    } catch (e) {
+                        console.error("Error al cargar repertorio:", e);
                     }
+                } else {
+                    seccionRepertorioEl.style.display = 'none';
                 }
+            });
+        }
 
-            } catch (err) {
-                console.error(err);
-                contenedorDetalleEl.innerHTML = "<div class='cargando'>Error al cargar los detalles del evento.</div>";
-            }
+        function init() {
+            cargarAlumnosFirebase();
+            cargarEventoFirebase();
+
+            btnAsistire.onclick = () => guardarRespuestaFirebase('asistira');
+            btnDuda.onclick = () => guardarRespuestaFirebase('duda');
+            btnNoIre.onclick = () => guardarRespuestaFirebase('no_asistira');
         }
 
         init();
