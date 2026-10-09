@@ -20,26 +20,29 @@ const GRADOS_A_REEMPLAZAR = {
     13: [20, 21, 22]
 };
 
+// Mapa a Cifrado Latino (Notas base SIEMPRE en Mayúsculas)
 const MAPA_A_LATINO = {
-    'C': 'Do', 'D': 'Re', 'E': 'Mi', 'F': 'Fa', 'G': 'Sol', 'A': 'La', 'B': 'Si'
+    'C': 'DO', 'D': 'RE', 'E': 'MI', 'F': 'FA', 'G': 'SOL', 'A': 'LA', 'B': 'SI'
 };
 
+// Mapa a Cifrado Anglosajón (Notas base SIEMPRE en Mayúsculas)
 const MAPA_A_ANGLO = {
-    'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B',
-    'Do': 'C', 'Re': 'D', 'Mi': 'E', 'Fa': 'F', 'Sol': 'G', 'La': 'A', 'Si': 'B'
+    'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
 };
 
 /**
- * Convierte un acorde individual entre el sistema Anglosajón (C, D, E) y Latino (Do, Re, Mi)
+ * Convierte un acorde individual garantizando que la nota base SIEMPRE sea Mayúscula (DO, RE, MI... / C, D, E...).
  */
 export function convertirAcordeASistema(acordeStr, sistema = 'ANGLOSAJON') {
     if (!acordeStr) return acordeStr;
-    return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|Do|Re|Mi|Fa|Sol|La|Si|[CDEFGAB])/g, (match) => {
+    
+    return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])/gi, (match) => {
         const upper = match.toUpperCase();
         if (sistema === 'LATINO' || sistema === 'ESPAÑOL') {
-            return MAPA_A_LATINO[upper] || MAPA_A_LATINO[MAPA_A_ANGLO[upper]] || match;
+            const notaAnglo = MAPA_A_ANGLO[upper] || upper;
+            return MAPA_A_LATINO[notaAnglo] || upper;
         } else {
-            return MAPA_A_ANGLO[upper] || match;
+            return MAPA_A_ANGLO[upper] || upper;
         }
     });
 }
