@@ -588,7 +588,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         import { obtenerCanciones, obtenerContenidoCancion } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
@@ -777,14 +777,28 @@
                 return;
             }
 
-            const idUsuario = nombre.toLowerCase().replace(/[^a-z0-9]/g, '_');
-            const registroRef = ref(db, `asistencias/${idE}/${idUsuario}`);
-
             try {
-                await set(registroRef, {
-                    nombre: nombre,
-                    estado: estado
-                });
+                const asistenciasRef = ref(db, `asistencias/${idE}`);
+                const snapshot = await get(asistenciasRef);
+                const existentes = snapshot.val() || {};
+
+                const claveExistente = Object.keys(existentes).find(
+                    clave => (existentes[clave]?.nombre || '').trim() === nombre.trim()
+                );
+
+                if (claveExistente) {
+                    await update(ref(db, `asistencias/${idE}/${claveExistente}`), { estado: estado });
+                } else {
+                    const idUsuario = nombre
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, '_');
+                    await set(ref(db, `asistencias/${idE}/${idUsuario}`), {
+                        nombre: nombre,
+                        estado: estado
+                    });
+                }
             } catch (err) {
                 console.error("Error guardando asistencia:", err);
                 alert("No se pudo registrar la respuesta.");
