@@ -29,11 +29,17 @@
             margin: 0 auto;
         }
 
+        /* Animación Fade In para la imagen de fondo de la letra */
         @keyframes fadeInImagen {
-            0% { opacity: 0; }
-            100% { opacity: 0.18; }
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.18;
+            }
         }
 
+        /* Animación 1: Extensión vertical suave con rebote elástico refinado */
         @keyframes extenderContenedor {
             0% {
                 opacity: 0;
@@ -52,6 +58,7 @@
             }
         }
 
+        /* Animación suave de entrada para el texto de la letra */
         @keyframes fadeInTexto {
             0% {
                 opacity: 0;
@@ -63,6 +70,7 @@
             }
         }
 
+        /* Animación 3: Despliegue elástico de cortina para el fondo del reproductor */
         @keyframes desplegarCortina {
             0% {
                 opacity: 0;
@@ -93,62 +101,149 @@
             }
         }
 
+        /* Pop para botones e indicadores de tiempo */
         @keyframes popControlAudio {
-            0% { opacity: 0; transform: scale(0.4); }
-            75% { opacity: 1; transform: scale(1.15); }
-            100% { opacity: 1; transform: scale(1); }
+            0% {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+            75% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
+        /* Revelado continuo de izquierda a derecha para el slider de audio */
         @keyframes expandirSliderAncho {
-            0% { opacity: 0; clip-path: inset(0 100% 0 0); }
-            100% { opacity: 1; clip-path: inset(0 0 0 0); }
+            0% {
+                opacity: 0;
+                clip-path: inset(0 100% 0 0);
+            }
+            100% {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+            }
         }
 
+        /* Animación 4: Entradas elásticas para el Título, Artista y Capo */
         @keyframes deslizarTexto {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes popBadgeCapo {
-            0% { opacity: 0; transform: scale(0.5); }
-            70% { opacity: 1; transform: scale(1.12); }
-            100% { opacity: 1; transform: scale(1); }
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.12);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
+        /* Animación 5A: Entrada elástica para la caja de diagrama de acordes */
         @keyframes popModalEntrada {
-            0% { opacity: 0; transform: scale(0.6) translateY(12px); }
-            70% { opacity: 1; transform: scale(1.06) translateY(-2px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% {
+                opacity: 0;
+                transform: scale(0.6) translateY(12px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.06) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
+        /* Animación 5B: Salida suave al cerrar el diagrama de acordes */
         @keyframes popModalSalida {
-            0% { opacity: 1; transform: scale(1) translateY(0); }
-            100% { opacity: 0; transform: scale(0.7) translateY(8px); }
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.7) translateY(8px);
+            }
         }
 
+        /* Animación 6A: Entrada deslizable tipo barra desde abajo con rebote elástico */
         @keyframes deslizarPanelTransponer {
-            0% { opacity: 0; transform: translateY(45px); }
-            70% { opacity: 1; transform: translateY(-4px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(45px);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        /* Animación 6B: Salida directa hacia abajo */
         @keyframes deslizarPanelTransponerSalida {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(45px); }
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(45px);
+            }
         }
 
         @keyframes popBotonTransponer {
-            0% { opacity: 0; transform: scale(0.3); }
-            70% { opacity: 1; transform: scale(1.15); }
-            100% { opacity: 1; transform: scale(1); }
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
+        /* Animación 7: Entrada deslizable desde abajo para la barra de autoscroll y botón de transposición */
         @keyframes deslizarElementoInferior {
-            0% { opacity: 0; transform: translateY(45px); }
-            70% { opacity: 1; transform: translateY(-4px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(45px);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
+        /* Encabezados y Botón Volver */
         .btn-volver { 
             display: inline-block;
             color: var(--text-sec);
@@ -157,6 +252,7 @@
             margin-bottom: 15px;
         }
         
+        /* Reproductor con efecto cortina y transición suave de altura */
         .contenedor-audio {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -181,6 +277,7 @@
             flex-shrink: 0;
         }
 
+        /* Envoltorio para revelado de izquierda a derecha sin recortes en el thumb */
         .audio-slider-wrapper {
             flex: 1;
             min-width: 0;
@@ -191,6 +288,7 @@
             animation: expandirSliderAncho 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
         }
 
+        /* Aplicación del stagger a los elementos del reproductor */
         .contenedor-audio .icono-pista-audio,
         .contenedor-audio #btn-audio-play,
         .contenedor-audio #audio-tiempo-actual,
@@ -262,6 +360,7 @@
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
+        /* Badge de Capotrasto animado */
         .badge-capo {
             display: inline-flex;
             align-items: center;
@@ -291,6 +390,7 @@
             animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
         }
         
+        /* Área Principal (Workspace) */
         .workspace { 
             display: grid;
             gap: 30px;
@@ -298,6 +398,7 @@
             align-items: start;
         }
         
+        /* Contenedor de la Letra animado con curva elástica suave */
         .letra-contenedor {
             position: relative;
             background: var(--text-main);
@@ -331,6 +432,7 @@
             will-change: opacity;
         }
 
+        /* Disparo de la imagen únicamente al finalizar la expansión del contenedor */
         .letra-contenedor.fondo-activo::before {
             animation: fadeInImagen 0.5s ease-out forwards;
         }
@@ -369,6 +471,7 @@
             font-weight: bold; 
         }
         
+        /* Modales y Cajas Emergentes */
         .caja-acorde-emergente { 
             position: fixed; 
             display: none; 
@@ -422,7 +525,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            width: 360px;
+            width: 290px;
             max-width: 90vw;
         }
 
@@ -454,6 +557,7 @@
             backdrop-filter: blur(5px);
         }
 
+        /* Animación para la barra de transponer y sus botones */
         #panel-transponer {
             width: 290px;
             max-width: 90vw;
@@ -546,18 +650,9 @@
             line-height: 1;
         }
 
-        #btn-toggle-transponer::before {
+        /* Ícono indicador de afinación/tonalidad */
+        .btn-toggle-transponer::before {
             content: 'tune';
-            font-family: 'Material Symbols Outlined' !important;
-            font-size: 16px;
-            font-weight: normal;
-            font-style: normal;
-            color: var(--accent);
-            line-height: 1;
-        }
-
-        #btn-toggle-cifrado::before {
-            content: 'language';
             font-family: 'Material Symbols Outlined' !important;
             font-size: 16px;
             font-weight: normal;
@@ -663,6 +758,8 @@
 </head>
 <body>
     <div class="container">
+        <!-- <a id="link-regreso" href="." class="btn-volver">← Volver al cancionero</a> -->
+
         <div class="info-cabecera">
             <div class="titulo-row">
                 <h1 id="titulo-cancion">Cargando...</h1>
@@ -712,7 +809,6 @@
                 <span class="material-symbols-outlined icono-velocidad-scroll" title="Velocidad de desplazamiento">speed</span>
                 <input type="range" id="slider-velocidad" class="slider-scroll" min="1" max="30" value="10">
             </div>
-            <button id="btn-toggle-cifrado" class="btn-toggle-transponer" title="Cambiar cifrado (Inglés / Español)">C</button>
             <button id="btn-toggle-transponer" class="btn-toggle-transponer" title="Transponer tonalidad">—</button>
         </div>
     </div>
@@ -730,16 +826,6 @@
 
         const letraCancionDiv = document.getElementById('letra-cancion');
         const letraContenedorEl = document.getElementById('letra-contenedor');
-        const btnToggleCifrado = document.getElementById('btn-toggle-cifrado');
-
-        let sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'ANGLOSAJON';
-        let contenidoActualTranspuesto = '';
-
-        function actualizarBotonCifrado() {
-            if (btnToggleCifrado) {
-                btnToggleCifrado.lastChild.textContent = sistemaCifrado === 'LATINO' ? 'Do' : 'C';
-            }
-        }
 
         const FORMATOS_AUDIO = [
             { ext: 'mp3', mime: 'audio/mpeg' },
@@ -835,7 +921,9 @@
                         inicializarControladorAudio();
                         return;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    // Continuar con el siguiente formato
+                }
             }
 
             contenedorAudio.style.display = 'none';
@@ -883,27 +971,31 @@
                     if (badgeCapo) badgeCapo.style.display = 'none';
                 }
 
-                contenidoActualTranspuesto = contenidoProcesar;
-                actualizarBotonCifrado();
-                letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar, sistemaCifrado);
+                letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoProcesar);
                 
+                // Disparar la animación de la letra justo al insertar el contenido real
                 letraCancionDiv.classList.remove('animar-entrada-texto');
                 void letraCancionDiv.offsetWidth;
                 letraCancionDiv.classList.add('animar-entrada-texto');
 
+                // Activar animación del fondo garantizado en móvil y escritorio
                 if (letraContenedorEl) {
                     const activarFondo = () => letraContenedorEl.classList.add('fondo-activo');
+                    
+                    // Escuchar la finalización de la animación
                     letraContenedorEl.addEventListener('animationend', (e) => {
                         if (e.animationName === 'extenderContenedor') {
                             activarFondo();
                         }
                     }, { once: true });
 
+                    // Fallback para navegadores móviles donde animationend o la API no se dispare a tiempo
                     setTimeout(activarFondo, 450);
                 }
 
-                inicializarModalAcordes('caja-acorde', () => sistemaCifrado);
+                inicializarModalAcordes('caja-acorde');
 
+                // Controlador de animaciones dinámicas de entrada, cambio de acorde y salida
                 const cajaAcordeEl = document.getElementById('caja-acorde');
                 if (cajaAcordeEl) {
                     let enProcesoDeCierre = false;
@@ -944,6 +1036,7 @@
                     observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
                 }
 
+                // Controlador de animación de deslizamiento vertical al ocultar
                 const panelTranspon = document.getElementById('panel-transponer');
                 if (panelTranspon) {
                     let enProcesoCierrePanel = false;
@@ -998,8 +1091,7 @@
                 inicializarTransponer({
                     contenidoOriginal: contenidoProcesar,
                     onRetransponer: (texto) => {
-                        contenidoActualTranspuesto = texto;
-                        letraCancionDiv.innerHTML = procesarLetraYAcordes(texto, sistemaCifrado);
+                        letraCancionDiv.innerHTML = procesarLetraYAcordes(texto);
                     },
                     tonalidadLabelId: 'btn-toggle-transponer',
                     btnSubirTonoId: 'btn-subir-tono',
@@ -1010,17 +1102,6 @@
                     btnToggleId: 'btn-toggle-transponer',
                     panelId: 'panel-transponer'
                 });
-
-                if (btnToggleCifrado) {
-                    btnToggleCifrado.addEventListener('click', () => {
-                        sistemaCifrado = sistemaCifrado === 'ANGLOSAJON' ? 'LATINO' : 'ANGLOSAJON';
-                        localStorage.setItem('sistemaCifrado', sistemaCifrado);
-                        actualizarBotonCifrado();
-                        if (contenidoActualTranspuesto) {
-                            letraCancionDiv.innerHTML = procesarLetraYAcordes(contenidoActualTranspuesto, sistemaCifrado);
-                        }
-                    });
-                }
 
             } catch (err) {
                 console.error(err);

@@ -20,30 +20,6 @@ const GRADOS_A_REEMPLAZAR = {
     13: [20, 21, 22]
 };
 
-const MAPA_A_LATINO = {
-    'C': 'Do', 'D': 'Re', 'E': 'Mi', 'F': 'Fa', 'G': 'Sol', 'A': 'La', 'B': 'Si'
-};
-
-const MAPA_A_ANGLO = {
-    'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B',
-    'Do': 'C', 'Re': 'D', 'Mi': 'E', 'Fa': 'F', 'Sol': 'G', 'La': 'A', 'Si': 'B'
-};
-
-/**
- * Convierte un acorde individual entre el sistema Anglosajón (C, D, E) y Latino (Do, Re, Mi)
- */
-export function convertirAcordeASistema(acordeStr, sistema = 'ANGLOSAJON') {
-    if (!acordeStr) return acordeStr;
-    return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|Do|Re|Mi|Fa|Sol|La|Si|[CDEFGAB])/g, (match) => {
-        const upper = match.toUpperCase();
-        if (sistema === 'LATINO' || sistema === 'ESPAÑOL') {
-            return MAPA_A_LATINO[upper] || MAPA_A_LATINO[MAPA_A_ANGLO[upper]] || match;
-        } else {
-            return MAPA_A_ANGLO[upper] || match;
-        }
-    });
-}
-
 // Aplica las alteraciones entre paréntesis (b5, #9, add9, etc.) a una fórmula base de intervalos.
 function aplicarAlteraciones(formulaBase, textoAlteracion) {
     if (!textoAlteracion) return formulaBase;
@@ -100,7 +76,7 @@ export function crearRegexAcordes() {
     return new RegExp(`(?<![a-záéíóúüñ])(?:${conAlteracion}|${sinAlteracion})`, 'g');
 }
 
-export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
+export function procesarLetraYAcordes(textoOriginal) {
     if (!textoOriginal) return "";
     
     let textoProcesado = textoOriginal.replace(/-/g, '—');
@@ -121,9 +97,7 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
 
         const acorde = coincidencia[0];
         const idAcordeDiccionario = acorde.replace('/', '_');
-        const acordeMostrar = convertirAcordeASistema(acorde, sistema);
-
-        resultado += `<a class="acorde-link" data-acorde="${idAcordeDiccionario}">${acordeMostrar}</a>`;
+        resultado += `<a class="acorde-link" data-acorde="${idAcordeDiccionario}">${acorde}</a>`;
 
         ultimoIndice = coincidencia.index + acorde.length;
 
@@ -135,7 +109,7 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
     return resultado;
 }
 
-export function inicializarModalAcordes(cajaId, obtenerSistema = () => 'ANGLOSAJON') {
+export function inicializarModalAcordes(cajaId) {
     const caja = document.getElementById(cajaId);
     if (!caja) return;
 
@@ -146,15 +120,14 @@ export function inicializarModalAcordes(cajaId, obtenerSistema = () => 'ANGLOSAJ
             evento.stopPropagation();
             evento.preventDefault();
             const nombreAcorde = link.getAttribute('data-acorde');
-            const sistema = obtenerSistema();
-            abrirCajaAcorde(nombreAcorde, evento, caja, sistema);
+            abrirCajaAcorde(nombreAcorde, evento, caja);
         } else if (caja.style.display === "block" && !caja.contains(evento.target)) {
             cerrarCajaAcorde(caja);
         }
     });
 }
 
-function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') {
+function abrirCajaAcorde(nombreAcordeRaw, evento, caja) {
     const titulo = document.getElementById('acorde-titulo');
     const badgeorigen = document.getElementById('origen-acorde-modal');
     const wrapperRender = document.getElementById('wrapper-render');
@@ -162,7 +135,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
     if (!titulo || !wrapperRender) return;
 
     let textoLimpio = nombreAcordeRaw.trim().replace(/[\s-\-❚❙]/g, '');        
-    titulo.textContent = convertirAcordeASistema(textoLimpio.replace('_', '/'), sistema);
+    titulo.textContent = textoLimpio.replace('_', '/');
 
     let partesBajo = textoLimpio.split('_');
     let acordeEstructura = partesBajo[0];
@@ -311,15 +284,17 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         }
     }
 
-    // --- POSICIONAMIENTO UNIVERSAL ---
+    // --- POSICIONAMIENTO UNIVERSAL PARA MÓVILES Y COMPUTADORAS ---
     const esMovil = window.innerWidth <= 600;
     const rect = caja.getBoundingClientRect();
     const padding = 12;
 
     if (esMovil) {
+        // En celulares: centrar horizontalmente usando el ancho ajustado y colocar cerca del toque
         let left = (window.innerWidth - rect.width) / 2;
         let top = evento.clientY ? (evento.clientY - rect.height - 15) : (window.innerHeight / 3);
 
+        // Si se sale arriba o abajo en la pantalla del celular, centrar verticalmente
         if (top < padding || top + rect.height > window.innerHeight - padding) {
             top = Math.max(padding, (window.innerHeight - rect.height) / 2);
         }
@@ -327,6 +302,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         caja.style.left = `${Math.max(padding, left)}px`;
         caja.style.top = `${top}px`;
     } else {
+        // En PC: flotante dinámico junto al cursor
         let clientX = evento.clientX || (evento.touches && evento.touches[0].clientX) || 100;
         let clientY = evento.clientY || (evento.touches && evento.touches[0].clientY) || 100;
 
@@ -349,8 +325,13 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const esMovil = window.innerWidth <= 600;
     const canvas = document.createElement('canvas');
     
+    // Dimensiones dinámicas según el dispositivo
     const anchoCanvas = esMovil ? 110 : 140;
     const altoCanvas = esMovil ? 120 : 150;
+    
+    // Resolución real de la pantalla: sin esto, en pantallas Retina/HiDPI
+    // (devicePixelRatio > 1) el canvas se ve borroso al dibujarse a su tamaño
+    // "lógico" pero mostrarse físicamente más grande en píxeles reales.
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = anchoCanvas * dpr;
@@ -363,10 +344,11 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
     wrapper.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    ctx.scale(dpr, dpr); // todo lo que sigue se dibuja en coordenadas "lógicas" de siempre
     const trastesArr = datos.strings.trim().toUpperCase().split(/\s+/);
     const trasteBase = datos.trasteInicio || 1;
 
+    // Márgenes y proporciones escaladas
     const xInicio = esMovil ? 20 : 25;
     const yInicio = esMovil ? 20 : 25;
     const anchoDiapason = esMovil ? 65 : 85;
@@ -376,6 +358,7 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const espacioCuerdas = anchoDiapason / (numCuerdas - 1);
     const espacioTrastes = altoDiapason / numTrastesVisibles;
 
+    // Dibujar cejilla superior o traste de inicio
     ctx.strokeStyle = "#717171";
     if (trasteBase === 1) {
         ctx.lineWidth = esMovil ? 3 : 4;
@@ -389,18 +372,21 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
         ctx.fillText(`Fr. ${trasteBase}`, xInicio - 4, yInicio + (espacioTrastes / 2) + 3);
     }
 
+    // Dibujar líneas de trastes horizontales
     ctx.lineWidth = 1; ctx.strokeStyle = "#717171";
     for (let i = 1; i <= numTrastesVisibles; i++) {
         let y = yInicio + (i * espacioTrastes);
         ctx.beginPath(); ctx.moveTo(xInicio, y); ctx.lineTo(xInicio + anchoDiapason, y); ctx.stroke();
     }
 
+    // Dibujar cuerdas verticales
     for (let i = 0; i < numCuerdas; i++) {
         let x = xInicio + (i * espacioCuerdas);
         ctx.lineWidth = (i >= 4) ? 1.5 : 1; 
         ctx.beginPath(); ctx.moveTo(x, yInicio); ctx.lineTo(x, yInicio + altoDiapason); ctx.stroke();
     }
 
+    // Dibujar barra de cejilla física si aplica
     if (datos.cejilla && datos.cuerdasCejilla) {
         const cuerdaInicio = datos.cuerdasCejilla[0] - 1; 
         const cuerdaFin = datos.cuerdasCejilla[1] - 1;
@@ -416,6 +402,7 @@ function dibujarAcordeCanvasExpandido(wrapper, datos) {
         ctx.lineCap = "butt";
     }
 
+    // Dibujar posiciones de los dedos (puntos)
     trastesArr.forEach((trasteStr, indiceCuerda) => {
         let x = xInicio + (indiceCuerda * espacioCuerdas);
 
