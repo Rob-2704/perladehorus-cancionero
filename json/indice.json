@@ -17,14 +17,6 @@
       "archivo": "--Chapala (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
-      "idC": "100",
-      "nombreC": "Las Flores Del Camposanto",
-      "arreglos": "",
-      "estado": "pendiente",
-      "categoria": "rondalla",
-      "archivo": "--Las Flores Del Camposanto ()"
-    },
-    {
       "idC": "29",
       "nombreC": "Serenata Huasteca",
       "arreglos": "",
@@ -79,6 +71,14 @@
       "estado": "revisar",
       "categoria": "rondalla",
       "archivo": "-La Flor De La Canela (Ciro Vega González, Emmanuel León Apolinar)"
+    },
+    {
+      "idC": "100",
+      "nombreC": "Las Flores Del Camposanto",
+      "arreglos": "",
+      "estado": "revisar",
+      "categoria": "rondalla",
+      "archivo": "-Las Flores Del Camposanto ()"
     },
     {
       "idC": "35",
