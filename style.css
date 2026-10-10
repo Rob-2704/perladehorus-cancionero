@@ -14,9 +14,8 @@ body {
     font-family: 'Sono', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
-    margin: 0;
-    padding: 40px;
     position: relative;
+    padding: 40px 0;
 }
 
 /* Fondo de pantalla global compartido */
@@ -59,8 +58,8 @@ body::before {
 /* Reducción de padding lateral en dispositivos móviles / pantallas menores a 1300px */
 @media (max-width: 1300px) {
     body {
-        padding-left: 23px;
-        padding-right: 23px;
+        padding-left: 20px;
+        padding-right: 20px;
     }
 }
 
