@@ -16,38 +16,8 @@
     <title>Cancionero</title>
     <style>
         body {
-            position: relative;
             max-width: 80%;
             margin: 0 auto;
-        }
-
-        @keyframes fadeInImagen {
-            0% { opacity: 0; }
-            100% { opacity: 0.18; }
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: 70%;
-            background-image: url('img/fondo.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
-            will-change: opacity;
-            animation: fadeInImagen 0.6s ease-out forwards;
-        }
-
-        @keyframes deslizarTexto {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
         }
 
         header {
@@ -134,7 +104,6 @@
             animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
 
-        /* Contenedor de eventos con transición suave y sin sobreimpulso */
         .contenedor-eventos {
             display: flex;
             flex-direction: column;
@@ -369,12 +338,6 @@
         @media (min-width: 600px) { .lista-canciones { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 900px) { .lista-canciones { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1200px) { .lista-canciones { grid-template-columns: repeat(4, 1fr); } }
-
-        @keyframes popWiiU {
-            0% { opacity: 0; transform: translate(-15px, -15px) scale(0.75); }
-            75% { opacity: 1; transform: translate(2px, 2px) scale(1.03); }
-            100% { opacity: 1; transform: translate(0, 0) scale(1); }
-        }
 
         @keyframes popIconoPlay {
             0% { opacity: 0; transform: scale(0.2); }
@@ -720,7 +683,6 @@
                             contenedorEventos.style.overflow = 'hidden';
                             contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
                             
-                            // Forzar reflow previo al cambio de altura objetivo
                             void contenedorEventos.offsetWidth;
 
                             const alturaFinal = calcularAlturaCompacta();

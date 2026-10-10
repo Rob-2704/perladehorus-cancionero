@@ -16,39 +16,9 @@
     <title>Detalles del Evento</title>
     <style>
         body {
-            position: relative;
             max-width: 80%;
             margin: 0 auto;
             padding-bottom: 60px;
-        }
-
-        @keyframes fadeInImagen {
-            0% { opacity: 0; }
-            100% { opacity: 0.18; }
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: 70%;
-            background-image: url('img/fondo.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
-            will-change: opacity;
-            animation: fadeInImagen 0.6s ease-out forwards;
-        }
-
-        @keyframes deslizarTexto {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
         }
 
         .material-symbols-outlined {
@@ -205,7 +175,6 @@
         .link-lugar:hover { opacity: 0.85; }
         .link-lugar:active { opacity: 0.65; }
 
-        /* Tarjeta de Confirmar Asistencia */
         .tarjeta-asistencia {
             background-color: var(--card-bg);
             border-radius: 20px;
@@ -239,7 +208,6 @@
             margin-bottom: -6px;
         }
 
-        /* Contenedor flexible para alinear el Dropdown y los Botones */
         .contenedor-controles-rsvp {
             display: flex;
             flex-direction: column;
@@ -254,7 +222,6 @@
             }
         }
 
-        /* Dropdown adaptativo */
         .select-asistencia {
             width: 100%;
             background-color: var(--card-bg);
@@ -280,9 +247,7 @@
         }
 
         @media (min-width: 850px) {
-            .select-asistencia {
-                flex: 1;
-            }
+            .select-asistencia { flex: 1; }
         }
 
         .select-asistencia:hover { transform: translateY(-1px); }
@@ -301,16 +266,11 @@
         }
 
         @media (min-width: 850px) {
-            .grupo-botones-rsvp {
-                display: flex;
-                flex-shrink: 0;
-            }
+            .grupo-botones-rsvp { display: flex; flex-shrink: 0; }
         }
 
         @media (max-width: 600px) {
-            .grupo-botones-rsvp {
-                grid-template-columns: 1fr;
-            }
+            .grupo-botones-rsvp { grid-template-columns: 1fr; }
         }
 
         .btn-rsvp {
@@ -332,20 +292,9 @@
 
         .btn-rsvp:active { transform: scale(0.96); }
 
-        .btn-rsvp.asistire {
-            background-color: #2ec4b6;
-            color: #ffffff;
-        }
-
-        .btn-rsvp.duda {
-            background-color: #f5c518;
-            color: #121215;
-        }
-
-        .btn-rsvp.no-ire {
-            background-color: #e71d36;
-            color: #ffffff;
-        }
+        .btn-rsvp.asistire { background-color: #2ec4b6; color: #ffffff; }
+        .btn-rsvp.duda { background-color: #f5c518; color: #121215; }
+        .btn-rsvp.no-ire { background-color: #e71d36; color: #ffffff; }
 
         .seccion-respuestas-titulo {
             font-size: 13px;
@@ -355,7 +304,6 @@
             margin-bottom: -4px;
         }
 
-        /* Lista con scrollbar estilizado */
         .lista-asistentes {
             display: flex;
             flex-direction: column;
@@ -365,19 +313,9 @@
             padding-right: 4px;
         }
 
-        .lista-asistentes::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .lista-asistentes::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-        }
-
-        .lista-asistentes::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 8px;
-        }
+        .lista-asistentes::-webkit-scrollbar { width: 6px; }
+        .lista-asistentes::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.15); border-radius: 8px; }
+        .lista-asistentes::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 8px; }
 
         .item-asistente {
             display: flex;
@@ -392,11 +330,7 @@
             border: 1px solid rgba(188, 151, 49, 0.15);
         }
 
-        .icono-estado {
-            font-size: 22px !important;
-            flex-shrink: 0;
-        }
-
+        .icono-estado { font-size: 22px !important; flex-shrink: 0; }
         .icono-estado.asistira { color: #2ec4b6; }
         .icono-estado.duda { color: #f5c518; }
         .icono-estado.no_asistira { color: #e71d36; }
@@ -419,21 +353,9 @@
             margin: 0 auto;
         }
 
-        @media (min-width: 600px) {
-            .lista-canciones-repertorio { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 900px) {
-            .lista-canciones-repertorio { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (min-width: 1200px) {
-            .lista-canciones-repertorio { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        @keyframes popWiiU {
-            0% { opacity: 0; transform: translate(-15px, -15px) scale(0.75); }
-            75% { opacity: 1; transform: translate(2px, 2px) scale(1.03); }
-            100% { opacity: 1; transform: translate(0, 0) scale(1); }
-        }
+        @media (min-width: 600px) { .lista-canciones-repertorio { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px) { .lista-canciones-repertorio { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1200px) { .lista-canciones-repertorio { grid-template-columns: repeat(4, 1fr); } }
 
         .fila-cancion {
             background-color: var(--card-bg);
@@ -476,11 +398,7 @@
             justify-content: space-between;
         }
 
-        .contenedor-iconos-header {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .contenedor-iconos-header { display: inline-flex; align-items: center; gap: 8px; }
 
         .icono-grabacion {
             font-family: 'Material Symbols Outlined' !important;
@@ -494,47 +412,15 @@
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
         }
 
-        .estado-icono {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
+        .estado-icono { display: inline-block; width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .estado-icono.terminada { background-color: #2ec4b6; box-shadow: 0 0 8px rgba(46, 196, 182, 0.5); }
+        .estado-icono.revisar { background-color: #f5c518; box-shadow: 0 0 8px rgba(245, 197, 24, 0.5); }
+        .estado-icono.pendiente { background-color: #e71d36; box-shadow: 0 0 8px rgba(231, 29, 54, 0.5); }
 
-        .estado-icono.terminada {
-            background-color: #2ec4b6;
-            box-shadow: 0 0 8px rgba(46, 196, 182, 0.5);
-        }
+        .fila-cancion .meta { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-sec); }
+        .cargando { text-align: center; color: var(--accent); padding: 40px; font-family: 'Sono', monospace; }
 
-        .estado-icono.revisar {
-            background-color: #f5c518;
-            box-shadow: 0 0 8px rgba(245, 197, 24, 0.5);
-        }
-
-        .estado-icono.pendiente {
-            background-color: #e71d36;
-            box-shadow: 0 0 8px rgba(231, 29, 54, 0.5);
-        }
-
-        .fila-cancion .meta {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 13px;
-            color: var(--text-sec);
-        }
-
-        .cargando {
-            text-align: center;
-            color: var(--accent);
-            padding: 40px;
-            font-family: 'Sono', monospace;
-        }
-
-        @media (max-width: 1300px) {
-            body { padding-left: 23px; padding-right: 23px; }
-        }
+        @media (max-width: 1300px) { body { padding-left: 23px; padding-right: 23px; } }
     </style>
 </head>
 <body>
