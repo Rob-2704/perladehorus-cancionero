@@ -9,10 +9,8 @@ const FORMULAS_TEORICAS = {
     "9sus4":  [0, 5, 7, 10, 14], "9sus": [0, 5, 7, 10, 14]
 };
 
-// Intervalo base (en semitonos) de cada grado, usado para calcular alteraciones entre paréntesis
 const GRADOS_BASE = { 2: 2, 3: 4, 4: 5, 5: 7, 6: 9, 7: 10, 9: 14, 11: 17, 13: 21 };
 
-// Para cada grado "alterable", qué intervalos existentes debe reemplazar una alteración
 const GRADOS_A_REEMPLAZAR = {
     5:  [6, 7, 8],
     9:  [13, 14, 15],
@@ -20,34 +18,33 @@ const GRADOS_A_REEMPLAZAR = {
     13: [20, 21, 22]
 };
 
-// Mapa a Cifrado Latino (Notas base SIEMPRE en Mayúsculas)
 const MAPA_A_LATINO = {
     'C': 'DO', 'D': 'RE', 'E': 'MI', 'F': 'FA', 'G': 'SOL', 'A': 'LA', 'B': 'SI'
 };
 
-// Mapa a Cifrado Anglosajón (Notas base SIEMPRE en Mayúsculas)
 const MAPA_A_ANGLO = {
     'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
 };
 
-/**
- * Convierte un acorde individual garantizando que la nota base SIEMPRE sea Mayúscula (DO, RE, MI... / C, D, E...).
- */
 export function convertirAcordeASistema(acordeStr, sistema = 'ANGLOSAJON') {
     if (!acordeStr) return acordeStr;
     
-    return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])/gi, (match) => {
-        const upper = match.toUpperCase();
+    // Solo procesa notas base estrictamente en MAYÚSCULAS
+    return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?/g, (match) => {
+        const m = match.match(/^(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?/);
+        if (!m) return match;
+        const base = m[1];
+        const alt = m[2] || '';
+        
         if (sistema === 'LATINO' || sistema === 'ESPAÑOL') {
-            const notaAnglo = MAPA_A_ANGLO[upper] || upper;
-            return MAPA_A_LATINO[notaAnglo] || upper;
+            const notaAnglo = MAPA_A_ANGLO[base] || base;
+            return (MAPA_A_LATINO[notaAnglo] || base) + alt;
         } else {
-            return MAPA_A_ANGLO[upper] || upper;
+            return (MAPA_A_ANGLO[base] || base) + alt;
         }
     });
 }
 
-// Aplica las alteraciones entre paréntesis (b5, #9, add9, etc.) a una fórmula base de intervalos.
 function aplicarAlteraciones(formulaBase, textoAlteracion) {
     if (!textoAlteracion) return formulaBase;
 
@@ -56,8 +53,8 @@ function aplicarAlteraciones(formulaBase, textoAlteracion) {
     let formula = [...formulaBase];
 
     tokens.forEach(token => {
-        const coincideAdd = token.match(/^add(\d+)$/);
-        const coincideAlt = token.match(/^([#b]?)(\d+)$/);
+        const coincideAdd = token.match(/^add(\d+)\$/);
+        const coincideAlt = token.match(/^([#b]?)(\d+)\$/);
 
         if (coincideAdd) {
             const grado = parseInt(coincideAdd[1]);
@@ -94,7 +91,9 @@ const traductorAcordes = {
 };
 
 export function crearRegexAcordes() {
-    const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|m|dim|aug)?)(5|6|7|8|9|10|11|12|13)?(sus4|sus2|sus)?`;
+    // Ordenamos las cualidades estricta y prioritariamente de mayor a menor longitud (ej. 'maj' antes que 'm')
+    // Y exigimos que la raíz esté estrictamente en MAYÚSCULAS.
+    const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|dim|aug|m)?)(5|6|7|8|9|10|11|12|13)?(sus4|sus2|sus)?`;
     const bajoAcorde = `(\\/(([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?))?`;
 
     const conAlteracion = `${nucleoAcorde}(\\((?:add)?[#b]?\\d+(?:\\s*,\\s*(?:add)?[#b]?\\d+)*\\))${bajoAcorde}(?![a-zA-ZáéíóúüñÁÉÍÓÚÜÑ])`;
@@ -130,7 +129,6 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
 
         ultimoIndice = coincidencia.index + acorde.length;
 
-        // Compensación de espacios para preservar la alineación de columnas al cambiar cifrado
         const diff = acordeMostrar.length - acorde.length;
         if (diff !== 0) {
             const resto = textoProcesado.slice(ultimoIndice);
@@ -139,12 +137,10 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
 
             if (numEspacios > 1) {
                 if (diff > 0) {
-                    // El acorde creció: absorbemos espacios sobrantes
                     const recorte = Math.min(numEspacios - 1, diff);
                     ultimoIndice += recorte;
                     regexAcordes.lastIndex += recorte;
                 } else if (diff < 0) {
-                    // El acorde se acortó: añadimos espacios de relleno
                     resultado += ' '.repeat(-diff);
                 }
             }
@@ -211,7 +207,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
         raiz += alteraciones.substring(0, 1);
-        alteraciones = alteraciones.substring(1);
+        alteraciones = alterations.substring(1);
     }
 
     if (notaBajoRaw) {
@@ -235,7 +231,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         sufijoJson = "";
     }
 
-    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?$/);
+    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?\$/);
     let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
     const textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
 
@@ -258,7 +254,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         || (!notaBajo && diccionario[llaveAcordeBusqueda])
     ) : null;
 
-    // --- RENDERIZADO Y PREPARACIÓN ---
     caja.style.display = "block";
     caja.style.position = "fixed"; 
 
@@ -334,7 +329,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         }
     }
 
-    // --- POSICIONAMIENTO UNIVERSAL ---
     const esMovil = window.innerWidth <= 600;
     const rect = caja.getBoundingClientRect();
     const padding = 12;

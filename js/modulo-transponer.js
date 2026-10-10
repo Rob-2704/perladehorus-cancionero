@@ -1,6 +1,3 @@
-// modulo-transponer.js — transpone los acordes del texto crudo de una canción.
-// Reutiliza la MISMA regex que modulo-acordes.js usa para pintar acordes
-// (crearRegexAcordes), así que solo se transpone lo que ahí se resalta.
 import { crearRegexAcordes } from './modulo-acordes.js';
 
 const NATURAL_ESPANOL_SEMI = { DO: 0, RE: 2, MI: 4, FA: 5, SOL: 7, LA: 9, SI: 11 };
@@ -11,13 +8,12 @@ const BEMOL_INGLES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb"
 const SOST_ESPANOL = ["DO", "DO#", "RE", "RE#", "MI", "FA", "FA#", "SOL", "SOL#", "LA", "LA#", "SI"];
 const BEMOL_ESPANOL = ["DO", "REb", "RE", "MIb", "MI", "FA", "SOLb", "SOL", "LAb", "LA", "SIb", "SI"];
 
-// Analiza una raíz de acorde ("C", "C#", "Db", "DO", "SOLb"...) y devuelve su semitono,
-// si estaba escrita en español y si usaba sostenido o bemol (para conservar el estilo al transponer).
+// Analiza una raíz de acorde exigiendo estrictamente MAYÚSCULAS
 function analizarRaiz(token) {
-    const m = token.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?$/i);
+    const m = token.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?$/);
     if (!m) return null;
 
-    const base = m[1].toUpperCase();
+    const base = m[1];
     const alt = m[2] ? m[2].toLowerCase() : '';
     const esEspanol = base in NATURAL_ESPANOL_SEMI;
     const tabla = esEspanol ? NATURAL_ESPANOL_SEMI : NATURAL_INGLES_SEMI;
@@ -36,13 +32,10 @@ function nombreDesdeSemitono(semitono, esEspanol, preferirBemol) {
     return preferirBemol ? BEMOL_INGLES[semitono] : SOST_INGLES[semitono];
 }
 
-// Transpone un acorde completo (ej: "Do#m7(b5)/SOL"), moviendo solo su raíz y,
-// si tiene, la nota del bajo tras la "/". Todo lo demás (calidad, extensión,
-// alteraciones entre paréntesis) se deja exactamente igual.
 function transponerAcorde(acordeCompleto, semitonos) {
     if (!semitonos) return acordeCompleto;
 
-    const mRaiz = acordeCompleto.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/i);
+    const mRaiz = acordeCompleto.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/);
     if (!mRaiz) return acordeCompleto;
 
     const infoRaiz = analizarRaiz(mRaiz[0]);
@@ -51,7 +44,7 @@ function transponerAcorde(acordeCompleto, semitonos) {
     let resto = acordeCompleto.slice(mRaiz[0].length);
     const nuevaRaiz = nombreDesdeSemitono(infoRaiz.semitono + semitonos, infoRaiz.esEspanol, infoRaiz.preferirBemol);
 
-    const mBajo = resto.match(/\/(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?$/i);
+    const mBajo = resto.match(/\/(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?$/);
     if (mBajo) {
         const infoBajo = analizarRaiz(mBajo[0].slice(1));
         if (infoBajo) {
@@ -63,9 +56,6 @@ function transponerAcorde(acordeCompleto, semitonos) {
     return nuevaRaiz + resto;
 }
 
-// Transpone una línea completa, ajustando los espacios que siguen a cada acorde
-// cuando su longitud cambia, para no desplazar el resto de acordes/letra que
-// vienen después en la misma línea (importante: el texto va en <pre>, alineado por columnas).
 function transponerLinea(linea, semitonos) {
     const regex = crearRegexAcordes();
     let resultado = '';
@@ -80,18 +70,14 @@ function transponerLinea(linea, semitonos) {
         let nuevo = transponerAcorde(acordeOriginal, semitonos);
         const diff = nuevo.length - acordeOriginal.length;
 
-        // Contamos cuántos espacios hay inmediatamente después del acorde
         const restoLinea = linea.slice(m.index + acordeOriginal.length);
         const matchEspacios = restoLinea.match(/^ */);
         const numEspacios = matchEspacios ? matchEspacios[0].length : 0;
 
-        // Si están separados por exactamente 1 espacio, ignoramos la alineación de columnas
-        // y conservamos estrictamente ese espacio de 1.
         if (numEspacios === 1) {
             resultado += nuevo;
             ultimoIndice = m.index + acordeOriginal.length;
         } else if (diff > 0) {
-            // Si el acorde creció y hay más de 1 espacio, recortamos los espacios sobrantes
             if (numEspacios >= diff) {
                 resultado += nuevo;
                 ultimoIndice = m.index + acordeOriginal.length + diff;
@@ -101,7 +87,6 @@ function transponerLinea(linea, semitonos) {
                 ultimoIndice = m.index + acordeOriginal.length;
             }
         } else if (diff < 0) {
-            // Si el acorde se acortó y hay varios espacios, rellenamos para mantener la columna
             if (numEspacios > 1) {
                 nuevo += ' '.repeat(-diff);
             }
@@ -117,14 +102,11 @@ function transponerLinea(linea, semitonos) {
     return resultado;
 }
 
-// Transpone el texto crudo completo (antes de pasarlo por procesarLetraYAcordes).
 export function transponerTexto(texto, semitonos) {
     if (!texto || !semitonos) return texto;
     return texto.split(/\r?\n/).map(linea => transponerLinea(linea, semitonos)).join('\n');
 }
 
-// Detecta la tonalidad de la canción: la raíz de acorde más frecuente en el texto original.
-// Devuelve un semitono (0-11) o null si no se detectó ningún acorde.
 export function detectarTonalidad(texto) {
     if (!texto) return null;
     const regex = crearRegexAcordes();
@@ -133,7 +115,7 @@ export function detectarTonalidad(texto) {
 
     while ((m = regex.exec(texto)) !== null) {
         if (m[0].length === 0) { regex.lastIndex++; continue; }
-        const mRaiz = m[0].match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/i);
+        const mRaiz = m[0].match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/);
         if (!mRaiz) continue;
         const info = analizarRaiz(mRaiz[0]);
         if (!info) continue;
@@ -147,19 +129,11 @@ export function detectarTonalidad(texto) {
     return mejorSemi;
 }
 
-// Nombre de un semitono para mostrarlo en el círculo de tonalidad (siempre en español, con sostenidos).
 export function nombreTonalidad(semitono) {
     if (semitono === null || semitono === undefined) return '—';
     return SOST_ESPANOL[((semitono % 12) + 12) % 12];
 }
 
-// Conecta los botones del panel de transposición y re-renderiza la letra en cada cambio.
-// opciones: {
-//   contenidoOriginal: texto crudo de la canción (sin transponer),
-//   onRetransponer: (textoTranspuesto) => void   — debe volver a pintar la letra,
-//   tonalidadLabelId, btnSubirTonoId, btnSubirMedioId, btnBajarMedioId, btnBajarTonoId, btnResetId,
-//   btnToggleId, panelId  — para el menú expandible
-// }
 export function inicializarTransponer(opciones) {
     const {
         contenidoOriginal,
