@@ -29,7 +29,6 @@ const MAPA_A_ANGLO = {
 export function convertirAcordeASistema(acordeStr, sistema = 'ANGLOSAJON') {
     if (!acordeStr) return acordeStr;
     
-    // Solo procesa notas base estrictamente en MAYÚSCULAS
     return acordeStr.replace(/(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?/g, (match) => {
         const m = match.match(/^(DO|RE|MI|FA|SOL|LA|SI|[CDEFGAB])(#|b)?/);
         if (!m) return match;
@@ -91,8 +90,6 @@ const traductorAcordes = {
 };
 
 export function crearRegexAcordes() {
-    // Ordenamos las cualidades estricta y prioritariamente de mayor a menor longitud (ej. 'maj' antes que 'm')
-    // Y exigimos que la raíz esté estrictamente en MAYÚSCULAS.
     const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|dim|aug|m)?)(5|6|7|8|9|10|11|12|13)?(sus4|sus2|sus)?`;
     const bajoAcorde = `(\\/(([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?))?`;
 
@@ -205,9 +202,10 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         alteraciones = acordeEstructura.substring(1);
     }
 
+    // CORREGIDO: Se usa 'alteraciones' con 'c' en lugar de 'alterations'
     if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
         raiz += alteraciones.substring(0, 1);
-        alteraciones = alterations.substring(1);
+        alteraciones = alteraciones.substring(1);
     }
 
     if (notaBajoRaw) {
