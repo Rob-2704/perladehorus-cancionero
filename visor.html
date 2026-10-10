@@ -148,6 +148,24 @@
             70% { opacity: 1; transform: translateY(-4px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+        /* Animación de rotación exclusiva para el icono interno */
+        @keyframes girarSpinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-audio-ctrl span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-audio-ctrl.cargando span {
+            animation: girarSpinner 0.8s linear infinite;
+        }
         
         .btn-volver { 
             display: inline-block;
@@ -220,11 +238,6 @@
             cursor: pointer;
             flex-shrink: 0;
             user-select: none;
-            font-family: 'Material Symbols Outlined' !important;
-            font-weight: normal !important;
-            font-style: normal !important;
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
-            -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
         }
 
         .audio-slider {
@@ -675,7 +688,10 @@
 
         <div id="contenedor-audio" class="contenedor-audio" style="display: none;">
             <audio id="reproductor-audio" preload="metadata"></audio>
-            <button id="btn-audio-play" class="btn-audio-ctrl material-symbols-outlined" title="Reproducir/Pausar">play_arrow</button>
+            <!-- Botón con estructura interna en span para separar la animación de entrada de la de carga -->
+            <button id="btn-audio-play" class="btn-audio-ctrl cargando" title="Cargando audio...">
+                <span class="material-symbols-outlined">progress_activity</span>
+            </button>
             <span id="audio-tiempo-actual" class="audio-time">0:00</span>
             <div class="audio-slider-wrapper">
                 <input type="range" id="audio-progress" class="audio-slider" min="0" max="100" value="0">
@@ -762,21 +778,45 @@
         function inicializarControladorAudio() {
             const reproductorAudio = document.getElementById('reproductor-audio');
             const btnPlay = document.getElementById('btn-audio-play');
+            const iconoSpan = btnPlay.querySelector('span');
             const btnMute = document.getElementById('btn-audio-mute');
             const sliderProgress = document.getElementById('audio-progress');
             const txtActual = document.getElementById('audio-tiempo-actual');
             const txtTotal = document.getElementById('audio-tiempo-total');
 
-            if (!reproductorAudio || !btnPlay) return;
+            if (!reproductorAudio || !btnPlay || !iconoSpan) return;
+
+            // Mantener el estado de carga al inicializar
+            iconoSpan.textContent = 'progress_activity';
+            btnPlay.classList.add('cargando');
+            btnPlay.title = 'Cargando audio...';
+
+            reproductorAudio.addEventListener('canplaythrough', () => {
+                iconoSpan.textContent = reproductorAudio.paused ? 'play_arrow' : 'pause';
+                btnPlay.classList.remove('cargando');
+                btnPlay.title = 'Reproducir/Pausar';
+            });
+
+            reproductorAudio.addEventListener('waiting', () => {
+                iconoSpan.textContent = 'progress_activity';
+                btnPlay.classList.add('cargando');
+                btnPlay.title = 'Cargando audio...';
+            });
+
+            reproductorAudio.addEventListener('playing', () => {
+                iconoSpan.textContent = 'pause';
+                btnPlay.classList.remove('cargando');
+                btnPlay.title = 'Reproducir/Pausar';
+            });
 
             btnPlay.addEventListener('click', () => {
                 if (reproductorAudio.paused) {
                     reproductorAudio.play().then(() => {
-                        btnPlay.textContent = 'pause';
+                        iconoSpan.textContent = 'pause';
                     }).catch(e => console.log('Error de reproducción:', e));
                 } else {
                     reproductorAudio.pause();
-                    btnPlay.textContent = 'play_arrow';
+                    iconoSpan.textContent = 'play_arrow';
                 }
             });
 
@@ -798,7 +838,7 @@
             });
 
             reproductorAudio.addEventListener('ended', () => {
-                btnPlay.textContent = 'play_arrow';
+                iconoSpan.textContent = 'play_arrow';
                 sliderProgress.value = 0;
                 txtActual.textContent = "0:00";
             });
