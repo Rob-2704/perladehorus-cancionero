@@ -17,6 +17,7 @@ body {
     margin: 0;
     padding: 40px;
     position: relative;
+    max-width: 80%;
 }
 
 /* Fondo de pantalla global compartido */
