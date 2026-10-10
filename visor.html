@@ -547,7 +547,7 @@
         }
 
         #btn-toggle-transponer::before {
-            content: 'tune';
+            content: 'music_note_2';
             font-family: 'Material Symbols Outlined' !important;
             font-size: 16px;
             font-weight: normal;
@@ -557,7 +557,7 @@
         }
 
         #btn-toggle-cifrado::before {
-            content: 'language';
+            content: 'swap_horiz';
             font-family: 'Material Symbols Outlined' !important;
             font-size: 16px;
             font-weight: normal;
@@ -737,7 +737,7 @@
 
         function actualizarBotonCifrado() {
             if (btnToggleCifrado) {
-                btnToggleCifrado.lastChild.textContent = sistemaCifrado === 'LATINO' ? 'Do' : 'C';
+                btnToggleCifrado.lastChild.textContent = sistemaCifrado === 'LATINO' ? 'C' : 'DO';
             }
         }
 
