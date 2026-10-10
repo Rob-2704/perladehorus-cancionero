@@ -130,6 +130,10 @@
             gap: 4px;
             position: relative;
             -webkit-tap-highlight-color: transparent;
+            border: 2px solid transparent;
+        }
+
+        .tarjeta-evento.proximo {
             border: 2px solid var(--accent);
         }
 
@@ -537,7 +541,7 @@
         }
 
         function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
-            if (!stringFecha) return '';
+            if (!stringFecha || stringFecha.trim() === '') return 'Fecha por confirmar';
             const partes = stringFecha.split('-');
             let textoFecha = stringFecha;
 
@@ -584,11 +588,22 @@
 
                 const ordenados = eventos
                     .map(e => {
-                        const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
-                        const f = e.fecha ? e.fecha.split('-') : [2000, 1, 1];
-                        return { ...e, fechaObj: new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0) };
+                        const tieneFecha = e.fecha && e.fecha.trim() !== '';
+                        let fechaObj;
+                        if (tieneFecha) {
+                            const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
+                            const f = e.fecha.split('-');
+                            fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
+                        } else {
+                            fechaObj = new Date(8640000000000000); // Fecha máxima para enviarlos al final
+                        }
+                        return { ...e, fechaObj, tieneFecha };
                     })
-                    .sort((a, b) => a.fechaObj - b.fechaObj);
+                    .sort((a, b) => {
+                        if (a.tieneFecha && !b.tieneFecha) return -1;
+                        if (!a.tieneFecha && b.tieneFecha) return 1;
+                        return a.fechaObj - b.fechaObj;
+                    });
 
                 contenedorEventos.innerHTML = '';
                 let desplegado = false;
@@ -596,14 +611,15 @@
 
                 ordenados.forEach((evento, idx) => {
                     const tarjeta = document.createElement('div');
-                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''}`;
+                    const esProximo = idx === 0 && evento.tieneFecha;
+                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''} ${esProximo ? 'proximo' : ''}`;
 
                     tarjeta.onclick = () => {
                         window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
                     };
 
-                    const esProximo = idx === 0;
                     const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
+                    const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
 
                     tarjeta.innerHTML = `
                         <div class="tarjeta-evento-header">
@@ -617,7 +633,7 @@
                             </span>
                             <span class="meta-item">
                                 <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                ${evento.lugar || '—'}
+                                ${textoLugar}
                             </span>
                             <span class="meta-item">
                                 <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
