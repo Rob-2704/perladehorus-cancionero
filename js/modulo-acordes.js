@@ -90,7 +90,7 @@ const traductorAcordes = {
 };
 
 export function crearRegexAcordes() {
-    const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|dim|aug|m)?)(5|6|7|8|9|10|11|12|13)?(sus4|sus2|sus)?`;
+    const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|dim|aug|m)?)(?:(sus4|sus2|sus(?:[#b]?\\d+)?|add\\d+|5|6|7|8|9|10|11|12|13)+)?`;
     const bajoAcorde = `(\\/(([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?))?`;
 
     const conAlteracion = `${nucleoAcorde}(\\((?:add)?[#b]?\\d+(?:\\s*,\\s*(?:add)?[#b]?\\d+)*\\))${bajoAcorde}(?![a-zA-ZáéíóúüñÁÉÍÓÚÜÑ])`;
@@ -202,7 +202,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         alteraciones = acordeEstructura.substring(1);
     }
 
-    // CORREGIDO: Se usa 'alteraciones' con 'c' en lugar de 'alterations'
     if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
         raiz += alteraciones.substring(0, 1);
         alteraciones = alteraciones.substring(1);
@@ -231,7 +230,20 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?\$/);
     let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
-    const textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
+    let textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
+
+    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)\$/i);
+    if (matchSusAlt) {
+        sufijoBase = matchSusAlt[1];
+        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchSusAlt[2]})`) : `(${matchSusAlt[2]})`;
+    }
+
+    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)\$/i);
+    if (matchAddDirecto) {
+        sufijoBase = matchAddDirecto[1];
+        const tokenAdd = matchAddDirecto[2];
+        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${tokenAdd})`) : `(${tokenAdd})`;
+    }
 
     if (sufijoBase.toLowerCase() === "min" || sufijoBase.toLowerCase() === "m") {
         sufijoBase = "m";
@@ -276,6 +288,11 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
                 semitonoBajo = NOMBRES_NOTAS.indexOf(bajoNormalizado);
             }
 
+            // REGLA: Si el acorde tiene alteraciones, sus, add, séptimas, etc., evitamos usar cuerdas al aire (0)
+            // para que no genere un diagrama idéntico al acorde base abierto.
+            let permitirAlAire = (sufijoBase === "" || sufijoBase === "m") && !textoAlteracion && !notaBajo;
+            let trasteMinimoBusqueda = permitirAlAire ? 0 : 1;
+
             let trastesCalculados = [];
             let trasteMinimo = 24, trasteMaximo = 0;
 
@@ -283,7 +300,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
                 let notaCuerdaAlAire = AFINACION_GUITARRA[i];
                 let trasteOptimo = "X";
 
-                for (let traste = 0; traste <= 12; traste++) {
+                for (let traste = trasteMinimoBusqueda; traste <= 12; traste++) {
                     let notaEnTraste = (notaCuerdaAlAire + traste) % 12;
                     
                     if (i === 0 && semitonoBajo !== null) {
