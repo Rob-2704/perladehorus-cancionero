@@ -353,6 +353,10 @@
             pointer-events: none;
             z-index: 0;
             will-change: opacity;
+
+            /* Añade esto para suavizar/difuminar los bordes */
+            -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 90%);
+            mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 90%);
         }
 
         .letra-contenedor.fondo-activo::before {
