@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="img/icono.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
+
+    <link href="style.css" rel="stylesheet">
+    <title>Diccionario de Acordes</title>
+    <style>
+        body {
+            max-width: 90%;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .btn-volver {
+            color: var(--text-sec);
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .contenedor-filtro {
+            margin: 15px 0 20px 0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .select-filtro {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 36px 10px 16px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .select-filtro:hover { transform: translateY(-1px); }
+        .select-filtro:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
+
+        .select-filtro option {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .btn-cifrado {
+            background-color: var(--card-bg);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.15s, color 0.15s, transform 0.15s;
+        }
+
+        .btn-cifrado:hover {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            transform: translateY(-1px);
+        }
+
+        .btn-cifrado:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .grid-acordes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .tarjeta-acorde-catalogo {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .tarjeta-acorde-catalogo h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .render-canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .cargando {
+            text-align: center;
+            color: var(--accent);
+            padding: 40px;
+            grid-column: 1 / -1;
+            font-family: 'Sono', monospace;
+        }
+
+        @media (max-width: 600px) {
+            body { 
+                max-width: 100%; 
+                padding: 20px 12px; 
+            }
+            h1 { font-size: 26px; }
+            .contenedor-filtro { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="btn-volver">← Volver al cancionero</a>
+    
+    <header>
+        <div>
+            <h1>Diccionario de Acordes</h1>
+            <p style="margin:5px 0 0 0; font-size:13px; color:var(--text-sec);">Catálogo interactivo de guitarra</p>
+        </div>
+        <button id="btn-toggle-cifrado" class="btn-cifrado">Sistema: Inglés (C)</button>
+    </header>
+
+    <main>
+        <div class="contenedor-filtro">
+            <select id="select-raiz" class="select-filtro">
+                <option value="">Todas las notas base</option>
+            </select>
+            <select id="select-sufijo" class="select-filtro">
+                <option value="">Todas las alteraciones</option>
+            </select>
+        </div>
+
+        <div id="grid-acordes" class="grid-acordes">
+            <div class="cargando">Cargando diccionario de acordes...</div>
+        </div>
+    </main>
+
+    <script src="js/acordes.js"></script>
+
+    <script type="module">
+        import { convertirAcordeASistema, dibujarAcordeCanvasExpandido } from './js/modulo-acordes.js';
+
+        const selectRaiz = document.getElementById('select-raiz');
+        const selectSufijo = document.getElementById('select-sufijo');
+        const gridAcordes = document.getElementById('grid-acordes');
+        const btnToggleCifrado = document.getElementById('btn-toggle-cifrado');
+
+        let sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'ANGLOSAJON';
+
+        function actualizarTextoBotonCifrado() {
+            btnToggleCifrado.textContent = sistemaCifrado === 'LATINO' ? 'Sistema: Latino (DO)' : 'Sistema: Inglés (C)';
+        }
+
+        function descomponerAcorde(clave) {
+            const limpia = clave.split('_')[0];
+            const match = limpia.match(/^([A-G](?:#|b)?)(.*)$/i);
+            if (!match) return { raiz: limpia, sufijo: '' };
+            return { raiz: match[1].toUpperCase(), sufijo: match[2] };
+        }
+
+        function poblarSelectores() {
+            const diccionario = window.DICCIONARIO_ACORDES || (typeof DICCIONARIO_ACORDES !== 'undefined' ? DICCIONARIO_ACORDES : null);
+            if (!diccionario) return;
+
+            const raicesSet = new Set();
+            const sufijosSet = new Set();
+
+            Object.keys(diccionario).forEach(clave => {
+                const { raiz, sufijo } = descomponerAcorde(clave);
+                if (raiz) raicesSet.add(raiz);
+                sufijosSet.add(sufijo);
+            });
+
+            // Orden lógico de notas base
+            const ordenNotas = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const raicesOrdenadas = Array.from(raicesSet).sort((a, b) => {
+                let idxA = ordenNotas.indexOf(a.toUpperCase());
+                let idxB = ordenNotas.indexOf(b.toUpperCase());
+                if (idxA === -1) idxA = 99;
+                if (idxB === -1) idxB = 99;
+                return idxA - idxB;
+            });
+
+            // Ordenar sufijos (dejando el vacío al principio)
+            const sufijosOrdenados = Array.from(sufijosSet).sort((a, b) => {
+                if (a === '') return -1;
+                if (b === '') return 1;
+                return a.localeCompare(b);
+            });
+
+            // Guardar selecciones actuales si existen
+            const raizActual = selectRaiz.value;
+            const sufijoActual = selectSufijo.value;
+
+            // Poblar select raiz
+            selectRaiz.innerHTML = '<option value="">Todas las notas base</option>';
+            raicesOrdenadas.forEach(raiz => {
+                const opt = document.createElement('option');
+                opt.value = raiz;
+                opt.textContent = convertirAcordeASistema(raiz, sistemaCifrado);
+                selectRaiz.appendChild(opt);
+            });
+            selectRaiz.value = raizActual;
+
+            // Poblar select sufijo
+            selectSufijo.innerHTML = '<option value="">Todas las alteraciones</option>';
+            sufijosOrdenados.forEach(sufijo => {
+                const opt = document.createElement('option');
+                opt.value = sufijo;
+                opt.textContent = sufijo === '' ? '(Mayor / Natural)' : sufijo;
+                selectSufijo.appendChild(opt);
+            });
+            selectSufijo.value = sufijoActual;
+        }
+
+        function renderizarCatalogo() {
+            gridAcordes.innerHTML = '';
+            
+            const diccionario = window.DICCIONARIO_ACORDES || (typeof DICCIONARIO_ACORDES !== 'undefined' ? DICCIONARIO_ACORDES : null);
+
+            if (!diccionario) {
+                gridAcordes.innerHTML = '<div class="cargando">No se encontró el diccionario de acordes.</div>';
+                return;
+            }
+
+            const raizSeleccionada = selectRaiz.value;
+            const sufijoSeleccionado = selectSufijo.value;
+
+            const claves = Object.keys(diccionario).filter(clave => {
+                const { raiz, sufijo } = descomponerAcorde(clave);
+                
+                const coincideRaiz = !raizSeleccionada || raiz.toUpperCase() === raizSeleccionada.toUpperCase();
+                const coincideSufijo = sufijoSeleccionado === '' ? (sufijo === '') : (sufijo === sufijoSeleccionado);
+
+                return coincideRaiz && coincideSufijo;
+            });
+
+            if (claves.length === 0) {
+                gridAcordes.innerHTML = '<div class="cargando">No se encontraron acordes con esta combinación.</div>';
+                return;
+            }
+
+            const fragmento = document.createDocumentFragment();
+
+            claves.forEach(clave => {
+                const datosAcorde = diccionario[clave];
+                const nombreMostrar = convertirAcordeASistema(clave.replace('_', '/'), sistemaCifrado);
+
+                const tarjeta = document.createElement('div');
+                tarjeta.className = 'tarjeta-acorde-catalogo';
+
+                const titulo = document.createElement('h3');
+                titulo.textContent = nombreMostrar;
+                tarjeta.appendChild(titulo);
+
+                const wrapperCanvas = document.createElement('div');
+                wrapperCanvas.className = 'render-canvas-container';
+                tarjeta.appendChild(wrapperCanvas);
+
+                fragmento.appendChild(tarjeta);
+
+                try {
+                    dibujarAcordeCanvasExpandido(wrapperCanvas, datosAcorde);
+                } catch (e) {
+                    console.error("Error al renderizar acorde:", clave, e);
+                }
+            });
+
+            gridAcordes.appendChild(fragmento);
+        }
+
+        btnToggleCifrado.addEventListener('click', () => {
+            sistemaCifrado = sistemaCifrado === 'ANGLOSAJON' ? 'LATINO' : 'ANGLOSAJON';
+            localStorage.setItem('sistemaCifrado', sistemaCifrado);
+            actualizarTextoBotonCifrado();
+            poblarSelectores();
+            renderizarCatalogo();
+        });
+
+        selectRaiz.addEventListener('change', renderizarCatalogo);
+        selectSufijo.addEventListener('change', renderizarCatalogo);
+
+        actualizarTextoBotonCifrado();
+        poblarSelectores();
+        renderizarCatalogo();
+    </script>
+</body>
+</html>

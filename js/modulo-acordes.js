@@ -288,8 +288,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
                 semitonoBajo = NOMBRES_NOTAS.indexOf(bajoNormalizado);
             }
 
-            // REGLA: Si el acorde tiene alteraciones, sus, add, séptimas, etc., evitamos usar cuerdas al aire (0)
-            // para que no genere un diagrama idéntico al acorde base abierto.
             let permitirAlAire = (sufijoBase === "" || sufijoBase === "m") && !textoAlteracion && !notaBajo;
             let trasteMinimoBusqueda = permitirAlAire ? 0 : 1;
 
@@ -375,7 +373,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
     }
 }
 
-function dibujarAcordeCanvasExpandido(wrapper, datos) {
+export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     wrapper.innerHTML = ""; 
 
     const esMovil = window.innerWidth <= 600;
