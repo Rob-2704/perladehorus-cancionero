@@ -109,44 +109,73 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
 
     const envolverBarras = (fragmento) => fragmento.replace(regexBarras, (barra) => `<span class="barra-compas">${barra}</span>`);
 
-    let resultado = "";
-    let ultimoIndice = 0;
-    let coincidencia;
-
+    let matches = [];
+    let match;
     regexAcordes.lastIndex = 0;
-    while ((coincidencia = regexAcordes.exec(textoProcesado)) !== null) {
-        const tramoPlano = textoProcesado.slice(ultimoIndice, coincidencia.index);
+    while ((match = regexAcordes.exec(textoProcesado)) !== null) {
+        matches.push({
+            index: match.index,
+            length: match[0].length,
+            acorde: match[0]
+        });
+    }
+
+    if (matches.length === 0) {
+        return envolverBarras(textoProcesado);
+    }
+
+    let resultado = "";
+    let cursor = 0;
+
+    for (let i = 0; i < matches.length; i++) {
+        let m = matches[i];
+        
+        let tramoPlano = textoProcesado.slice(cursor, m.index);
         resultado += envolverBarras(tramoPlano);
 
-        const acorde = coincidencia[0];
-        const idAcordeDiccionario = acorde.replace('/', '_');
-        const acordeMostrar = convertirAcordeASistema(acorde, sistema);
+        let acordeOriginal = m.acorde;
+        let idAcordeDiccionario = acordeOriginal.replace('/', '_');
+        let acordeMostrar = convertirAcordeASistema(acordeOriginal, sistema);
 
         resultado += `<a class="acorde-link" data-acorde="${idAcordeDiccionario}">${acordeMostrar}</a>`;
 
-        ultimoIndice = coincidencia.index + acorde.length;
+        let diff = acordeMostrar.length - acordeOriginal.length;
+        let finAcordeOriginal = m.index + acordeOriginal.length;
 
-        const diff = acordeMostrar.length - acorde.length;
         if (diff !== 0) {
-            const resto = textoProcesado.slice(ultimoIndice);
-            const matchEspacios = resto.match(/^ */);
-            const numEspacios = matchEspacios ? matchEspacios[0].length : 0;
+            let distanciaAlSiguiente = Infinity;
+            let textoEntreAcordes = "";
+            
+            if (i + 1 < matches.length) {
+                distanciaAlSiguiente = matches[i + 1].index - finAcordeOriginal;
+                textoEntreAcordes = textoProcesado.slice(finAcordeOriginal, matches[i + 1].index);
+            }
 
-            if (numEspacios > 1) {
+            // Prevención de colisión: si el acorde creció y no hay espacio suficiente, agregamos un respiro
+            if (distanciaAlSiguiente <= 3 && diff > 0 && textoEntreAcordes.length < diff + 1) {
+                resultado += ' ';
+            }
+
+            if (distanciaAlSiguiente <= 3) {
+                // Mantiene el espaciado original entre acordes cercanos
+            } else {
+                let restoTexto = textoProcesado.slice(finAcordeOriginal);
+                let matchEspacios = restoTexto.match(/^ */);
+                let numEspaciosOriginales = matchEspacios ? matchEspacios[0].length : 0;
+
                 if (diff > 0) {
-                    const recorte = Math.min(numEspacios - 1, diff);
-                    ultimoIndice += recorte;
-                    regexAcordes.lastIndex += recorte;
+                    let espaciosAComer = Math.min(numEspaciosOriginales, diff);
+                    finAcordeOriginal += espaciosAComer;
                 } else if (diff < 0) {
                     resultado += ' '.repeat(-diff);
                 }
             }
         }
 
-        if (acorde.length === 0) regexAcordes.lastIndex++;
+        cursor = finAcordeOriginal;
     }
 
-    resultado += envolverBarras(textoProcesado.slice(ultimoIndice));
+    resultado += envolverBarras(textoProcesado.slice(cursor));
 
     return resultado;
 }
@@ -204,7 +233,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
         raiz += alteraciones.substring(0, 1);
-        alteraciones = alteraciones.substring(1);
+        alteraciones = alterations.substring(1);
     }
 
     if (notaBajoRaw) {
