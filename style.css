@@ -17,7 +17,6 @@ body {
     margin: 0;
     padding: 40px;
     position: relative;
-    max-width: 80%;
 }
 
 /* Fondo de pantalla global compartido */
@@ -62,5 +61,12 @@ body::before {
     body {
         padding-left: 23px;
         padding-right: 23px;
+    }
+}
+
+/* Ajuste de ancho y márgenes para móviles y tablets */
+@media (max-width: 600px) {
+    body {
+        max-width: 90% !important;
     }
 }
