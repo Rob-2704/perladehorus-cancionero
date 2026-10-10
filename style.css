@@ -55,3 +55,11 @@ body::before {
     75% { opacity: 1; transform: translate(2px, 2px) scale(1.03); }
     100% { opacity: 1; transform: translate(0, 0) scale(1); }
 }
+
+/* Reducción de padding lateral en dispositivos móviles / pantallas menores a 1300px */
+@media (max-width: 1300px) {
+    body {
+        padding-left: 23px;
+        padding-right: 23px;
+    }
+}
