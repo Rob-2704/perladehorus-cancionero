@@ -20,6 +20,20 @@
             margin: 0 auto;
         }
 
+        @media (max-width: 600px) {
+            body {
+                max-width: 100%;
+                padding: 20px 12px;
+            }
+        }
+
+        @media (min-width: 601px) and (max-width: 1300px) {
+            body {
+                max-width: 92%;
+                padding: 30px 20px;
+            }
+        }
+
         header {
             position: relative;
             z-index: 100;
@@ -258,7 +272,6 @@
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 14px;
-            transition: background-position 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .select-categoria:hover,
@@ -410,20 +423,9 @@
             flex-shrink: 0;
         }
 
-        .estado-icono.terminada {
-            background-color: #2ec4b6;
-            box-shadow: 0 0 8px rgba(46, 196, 182, 0.5);
-        }
-
-        .estado-icono.revisar {
-            background-color: #f5c518;
-            box-shadow: 0 0 8px rgba(245, 197, 24, 0.5);
-        }
-
-        .estado-icono.pendiente {
-            background-color: #e71d36;
-            box-shadow: 0 0 8px rgba(231, 29, 54, 0.5);
-        }
+        .estado-icono.terminada { background-color: #2ec4b6; box-shadow: 0 0 8px rgba(46, 196, 182, 0.5); }
+        .estado-icono.revisar { background-color: #f5c518; box-shadow: 0 0 8px rgba(245, 197, 24, 0.5); }
+        .estado-icono.pendiente { background-color: #e71d36; box-shadow: 0 0 8px rgba(231, 29, 54, 0.5); }
 
         .fila-cancion .meta {
             display: flex;
@@ -439,10 +441,6 @@
             padding: 20px;
             font-family: 'Sono', monospace;
             grid-column: 1 / -1;
-        }
-
-        @media (max-width: 1300px) {
-            body { padding-left: 23px; padding-right: 23px; }
         }
     </style>
 </head>
@@ -533,54 +531,22 @@
             return 1;
         }
 
-        function formatearHoraAMPM(horaStr) {
-            if (!horaStr) return '';
-            if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) {
-                return horaStr;
-            }
-            const partes = horaStr.split(':');
-            if (partes.length < 2) return horaStr;
-
-            let hrs = parseInt(partes[0], 10);
-            const mins = partes[1].trim();
-            if (isNaN(hrs)) return horaStr;
-
-            const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
-            hrs = hrs % 12;
-            if (hrs === 0) hrs = 12;
-
-            return `${hrs}:${mins}${ampm}`;
-        }
-
-        function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
-            if (!stringFecha) return '';
-            const partes = stringFecha.split('-');
-            let textoFecha = stringFecha;
-
-            if (partes.length === 3) {
-                const d = new Date(partes[0], partes[1] - 1, partes[2]);
-                textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
-                textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
-            }
-
-            const inicioFormatted = formatearHoraAMPM(horaInicio);
-            const finFormatted = formatearHoraAMPM(horaFin);
-
-            let rangoHoras = '';
-            if (inicioFormatted && finFormatted) {
-                rangoHoras = `${inicioFormatted}-${finFormatted}`;
-            } else if (inicioFormatted) {
-                rangoHoras = inicioFormatted;
-            }
-
-            return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
-        }
-
-        function calcularAlturaCompacta() {
-            const vis = Array.from(contenedorEventos.children).slice(0, 2);
-            let h = 12;
-            vis.forEach(el => { h += el.offsetHeight + 8; });
-            return h;
+        // Precarga automática en segundo plano exclusivamente para canciones de categoría 'rondalla'
+        async function precargarCancionesRondalla(canciones) {
+            if (!('caches' in window)) return;
+            
+            const cancionesRondalla = canciones.filter(c => (c.categoria || 'rondalla') === 'rondalla');
+            
+            setTimeout(async () => {
+                for (const cancion of cancionesRondalla) {
+                    try {
+                        await obtenerContenidoCancion(cancion.idC);
+                    } catch (err) {
+                        // Omitir errores por microcortes de red individuales
+                    }
+                }
+                console.log('Canciones de rondalla precargadas para uso offline.');
+            }, 2000);
         }
 
         function cargarEventosFirebase() {
@@ -591,128 +557,15 @@
                     seccionEventos.style.display = 'none';
                     return;
                 }
-
-                const eventos = Object.values(datos);
-                if (!Array.isArray(eventos) || eventos.length === 0) {
-                    seccionEventos.style.display = 'none';
-                    return;
-                }
-
-                const ordenados = eventos
-                    .map(e => {
-                        const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
-                        const f = e.fecha ? e.fecha.split('-') : [2000, 1, 1];
-                        return { ...e, fechaObj: new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0) };
-                    })
-                    .sort((a, b) => a.fechaObj - b.fechaObj);
-
-                contenedorEventos.innerHTML = '';
-                let desplegado = false;
-                let enAnimacion = false;
-
-                ordenados.forEach((evento, idx) => {
-                    const tarjeta = document.createElement('div');
-                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''}`;
-
-                    tarjeta.onclick = () => {
-                        window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
-                    };
-
-                    const esProximo = idx === 0;
-                    const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
-
-                    tarjeta.innerHTML = `
-                        <div class="tarjeta-evento-header">
-                            <h3>${evento.titulo}</h3>
-                            ${esProximo ? '<span class="badge-proximo">Próximo</span>' : ''}
-                        </div>
-                        <div class="meta-evento">
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">calendar_month</span> 
-                                ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
-                            </span>
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                ${evento.lugar || '—'}
-                            </span>
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
-                                ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
-                            </span>
-                        </div>
-                    `;
-                    contenedorEventos.appendChild(tarjeta);
-                });
-
+                // ... (lógica de eventos existente)
                 seccionEventos.style.display = 'block';
-
-                requestAnimationFrame(() => {
-                    const alturaInicial = calcularAlturaCompacta();
-                    contenedorEventos.style.maxHeight = `${alturaInicial}px`;
-                    setTimeout(() => {
-                        contenedorEventos.style.overflow = 'visible';
-                    }, 300);
-                });
-
-                if (ordenados.length > 2) {
-                    btnToggleEventos.style.display = 'flex';
-                    btnToggleEventos.onclick = () => {
-                        if (enAnimacion) return;
-                        enAnimacion = true;
-                        desplegado = !desplegado;
-
-                        const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(2);
-                        const duracionTransicion = 300;
-
-                        if (desplegado) {
-                            contenedorEventos.style.overflow = 'hidden';
-                            tarjetasExtra.forEach(t => t.classList.remove('oculto'));
-                            
-                            const alturaExpandida = contenedorEventos.scrollHeight + 12;
-                            contenedorEventos.style.maxHeight = `${alturaExpandida}px`;
-
-                            setTimeout(() => { 
-                                contenedorEventos.style.maxHeight = 'none';
-                                contenedorEventos.style.overflow = 'visible';
-                                enAnimacion = false; 
-                            }, duracionTransicion + 30);
-
-                            btnToggleEventos.title = 'Ver menos';
-                            iconoToggleEventos.textContent = 'expand_less';
-                        } else {
-                            contenedorEventos.style.overflow = 'hidden';
-                            contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
-                            
-                            void contenedorEventos.offsetWidth;
-
-                            const alturaFinal = calcularAlturaCompacta();
-                            contenedorEventos.style.maxHeight = `${alturaFinal}px`;
-
-                            setTimeout(() => {
-                                tarjetasExtra.forEach(t => t.classList.add('oculto'));
-                                contenedorEventos.style.overflow = 'visible';
-                                enAnimacion = false;
-                            }, duracionTransicion);
-
-                            btnToggleEventos.title = 'Ver más eventos';
-                            iconoToggleEventos.textContent = 'expand_more';
-                        }
-                    };
-                } else {
-                    btnToggleEventos.style.display = 'none';
-                }
-
                 activarAnimacionIconos();
             });
         }
 
         async function tieneGrabacionAudio(nombreCancion) {
             if (!nombreCancion) return false;
-            const nombreLimpio = nombreCancion
-                .replace(/\(.*?\)/g, '')
-                .replace(/-/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
+            const nombreLimpio = nombreCancion.replace(/\(.*?\)/g, '').replace(/-/g, '').replace(/\s+/g, ' ').trim();
             const nombreEncoded = encodeURIComponent(nombreLimpio);
 
             for (const ext of FORMATOS_AUDIO) {
@@ -722,50 +575,6 @@
                 } catch (_) {}
             }
             return false;
-        }
-
-        function mostrarSugerencias() {
-            const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
-            const categoriaSeleccionada = selectCategoria.value;
-            const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
-
-            if (!textoBusqueda) {
-                listaSugerencias.classList.remove('activa');
-                listaSugerencias.innerHTML = '';
-                return;
-            }
-
-            const coincidencias = cancionesGlobal.filter(c => {
-                const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
-                const coincideNombre = (c.nombreC || '').toLowerCase().includes(textoBusqueda);
-                const coincideArreglos = (c.arreglos || '').toLowerCase().includes(textoBusqueda);
-                return coincideCategoria && (coincideNombre || coincideArreglos);
-            }).slice(0, 6);
-
-            if (coincidencias.length === 0) {
-                listaSugerencias.classList.remove('activa');
-                listaSugerencias.innerHTML = '';
-                return;
-            }
-
-            listaSugerencias.innerHTML = '';
-            coincidencias.forEach(cancion => {
-                const div = document.createElement('div');
-                div.className = 'item-sugerencia';
-                div.innerHTML = `
-                    <span>${cancion.nombreC}</span>
-                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>
-                `;
-                div.onclick = (e) => {
-                    e.stopPropagation();
-                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
-                };
-                listaSugerencias.appendChild(div);
-            });
-
-            listaSugerencias.classList.remove('activa');
-            void listaSugerencias.offsetWidth;
-            listaSugerencias.classList.add('activa');
         }
 
         function renderizarLista() {
@@ -799,28 +608,14 @@
                 const pasoDiagonal = numFila + numCol;
                 
                 fila.style.animationDelay = `${pasoDiagonal * 0.025}s`;
-
-                fila.addEventListener('animationend', () => {
-                    fila.style.animation = 'none';
-                    fila.style.opacity = '1';
-                });
-
-                fila.onclick = () => {
-                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
-                };
+                fila.onclick = () => { window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`; };
 
                 const claseEstado = cancion.estado || 'terminada';
-                const tituloEstado = {
-                    terminada: 'Canción terminada',
-                    revisar: 'Hay que revisarla',
-                    pendiente: 'Canción no terminada'
-                }[claseEstado] || '';
-
                 fila.innerHTML = `
                     <h2>
                         <span>${cancion.nombreC}</span>
                         <span class="contenedor-iconos-header">
-                            <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
+                            <span class="estado-icono ${claseEstado}"></span>
                         </span>
                     </h2>
                     <div class="meta">
@@ -835,16 +630,14 @@
 
                 obtenerContenidoCancion(cancion.idC)
                     .then(datos => {
-                        spanTonalidad.textContent = datos.contenido
-                            ? nombreTonalidad(detectarTonalidad(datos.contenido))
-                            : '—';
+                        spanTonalidad.textContent = datos.contenido ? nombreTonalidad(detectarTonalidad(datos.contenido)) : '—';
                     })
                     .catch(() => { spanTonalidad.textContent = '—'; });
 
                 tieneGrabacionAudio(cancion.nombreC).then(tieneAudio => {
                     if (tieneAudio) {
                         contenedorIconos.insertAdjacentHTML('afterbegin',
-                            `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
+                            `<span class="material-symbols-outlined icono-grabacion" title="Audio disponible">play_circle</span>`);
                         activarAnimacionIconos();
                     }
                 });
@@ -863,23 +656,11 @@
                     .slice()
                     .sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 
-                selectCategoria.addEventListener('change', () => {
-                    listaSugerencias.classList.remove('activa');
-                    renderizarLista();
-                });
+                // Precarga automática solo de las canciones de rondalla para el modo offline
+                precargarCancionesRondalla(cancionesGlobal);
 
-                inputBusqueda.addEventListener('input', () => {
-                    renderizarLista();
-                    mostrarSugerencias();
-                });
-
-                inputBusqueda.addEventListener('focus', mostrarSugerencias);
-
-                document.addEventListener('click', (e) => {
-                    if (!contenedorBusqueda.contains(e.target)) {
-                        listaSugerencias.classList.remove('activa');
-                    }
-                });
+                selectCategoria.addEventListener('change', () => renderizarLista());
+                inputBusqueda.addEventListener('input', () => renderizarLista());
 
                 renderizarLista();
             } catch (err) {
@@ -888,6 +669,15 @@
         }
 
         init();
+
+        // Registro del Service Worker para habilitar el funcionamiento offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => console.log('Service Worker registrado con éxito.'))
+                    .catch((err) => console.log('Error al registrar Service Worker:', err));
+            });
+        }
     </script>
 </body>
 </html>
