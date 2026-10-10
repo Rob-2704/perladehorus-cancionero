@@ -148,6 +148,11 @@
             70% { opacity: 1; transform: translateY(-4px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes rotarCargando {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         
         .btn-volver { 
             display: inline-block;
@@ -182,6 +187,7 @@
         }
 
         .audio-slider-wrapper {
+            position: relative;
             flex: 1;
             min-width: 0;
             display: flex;
@@ -189,6 +195,31 @@
             opacity: 0;
             will-change: clip-path, opacity;
             animation: expandirSliderAncho 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
+            height: 20px;
+        }
+
+        /* Barra gris de progreso de carga (Buffer) */
+        .audio-buffer-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 0%;
+            height: 4px;
+            background-color: rgba(150, 150, 150, 0.45);
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .audio-slider {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+            border-radius: 3px;
+            background: transparent;
         }
 
         .contenedor-audio .icono-pista-audio,
@@ -225,13 +256,11 @@
             font-style: normal !important;
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
             -webkit-font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+            transition: transform 0.05s;
         }
 
-        .audio-slider {
-            width: 100%;
-            accent-color: var(--accent);
-            cursor: pointer;
-            border-radius: 3px;
+        .btn-audio-ctrl.is-loading {
+            animation: rotarCargando 1s linear infinite !important;
         }
 
         .audio-time {
@@ -678,6 +707,7 @@
             <button id="btn-audio-play" class="btn-audio-ctrl material-symbols-outlined" title="Reproducir/Pausar">play_arrow</button>
             <span id="audio-tiempo-actual" class="audio-time">0:00</span>
             <div class="audio-slider-wrapper">
+                <div id="audio-buffer-bar" class="audio-buffer-bar"></div>
                 <input type="range" id="audio-progress" class="audio-slider" min="0" max="100" value="0">
             </div>
             <span id="audio-tiempo-total" class="audio-time">0:00</span>
@@ -764,15 +794,47 @@
             const btnPlay = document.getElementById('btn-audio-play');
             const btnMute = document.getElementById('btn-audio-mute');
             const sliderProgress = document.getElementById('audio-progress');
+            const bufferBar = document.getElementById('audio-buffer-bar');
             const txtActual = document.getElementById('audio-tiempo-actual');
             const txtTotal = document.getElementById('audio-tiempo-total');
 
             if (!reproductorAudio || !btnPlay) return;
 
+            const actualizarEstadoCarga = (cargando) => {
+                if (cargando) {
+                    btnPlay.textContent = 'progress_activity';
+                    btnPlay.classList.add('is-loading');
+                } else {
+                    btnPlay.classList.remove('is-loading');
+                    btnPlay.textContent = reproductorAudio.paused ? 'play_arrow' : 'pause';
+                }
+            };
+
+            // Eventos de estado de carga
+            reproductorAudio.addEventListener('loadstart', () => actualizarEstadoCarga(true));
+            reproductorAudio.addEventListener('waiting', () => actualizarEstadoCarga(true));
+            reproductorAudio.addEventListener('stalled', () => actualizarEstadoCarga(true));
+            reproductorAudio.addEventListener('canplay', () => actualizarEstadoCarga(false));
+            reproductorAudio.addEventListener('playing', () => actualizarEstadoCarga(false));
+            reproductorAudio.addEventListener('loadeddata', () => actualizarEstadoCarga(false));
+
+            // Cálculo de progreso de carga (Buffer)
+            reproductorAudio.addEventListener('progress', () => {
+                if (reproductorAudio.buffered.length > 0 && reproductorAudio.duration) {
+                    const bufferedEnd = reproductorAudio.buffered.end(reproductorAudio.buffered.length - 1);
+                    const porcentajeBuffer = (bufferedEnd / reproductorAudio.duration) * 100;
+                    if (bufferBar) {
+                        bufferBar.style.width = `${porcentajeBuffer}%`;
+                    }
+                }
+            });
+
             btnPlay.addEventListener('click', () => {
                 if (reproductorAudio.paused) {
                     reproductorAudio.play().then(() => {
-                        btnPlay.textContent = 'pause';
+                        if (!btnPlay.classList.contains('is-loading')) {
+                            btnPlay.textContent = 'pause';
+                        }
                     }).catch(e => console.log('Error de reproducción:', e));
                 } else {
                     reproductorAudio.pause();
