@@ -887,7 +887,7 @@
             });
         }
 
-        async function buscarYCarGarGrabacion(nombreCancion) {
+        async function buscarYCarGarGrabacion(nombreCancion, categoria) {
             const contenedorAudio = document.getElementById('contenedor-audio');
             const reproductorAudio = document.getElementById('reproductor-audio');
             
@@ -898,9 +898,10 @@
                 .trim();
 
             const nombreEncoded = encodeURIComponent(nombreLimpio);
+            const subcarpetaGrabacion = (categoria === 'general') ? 'Grabaciones/General' : 'Grabaciones';
 
             for (const formato of FORMATOS_AUDIO) {
-                const rutaArchivo = `Grabaciones/${nombreEncoded}.${formato.ext}`;
+                const rutaArchivo = `${subcarpetaGrabacion}/${nombreEncoded}.${formato.ext}`;
                 try {
                     const respuesta = await fetch(rutaArchivo, { method: 'HEAD' });
                     if (respuesta.ok) {
@@ -932,7 +933,7 @@
                 document.getElementById('nombre-artista').textContent = data.arreglos ? `${etiquetaMeta}: ${data.arreglos}` : '';
 
                 if (data.nombreC) {
-                    buscarYCarGarGrabacion(data.nombreC);
+                    buscarYCarGarGrabacion(data.nombreC, data.categoria);
                 }
 
                 let contenidoProcesar = data.contenido || "";

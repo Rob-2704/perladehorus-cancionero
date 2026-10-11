@@ -714,7 +714,7 @@
             });
         }
 
-        async function tieneGrabacionAudio(nombreCancion) {
+        async function tieneGrabacionAudio(nombreCancion, categoria) {
             if (!nombreCancion) return false;
             const nombreLimpio = nombreCancion
                 .replace(/\(.*?\)/g, '')
@@ -722,10 +722,11 @@
                 .replace(/\s+/g, ' ')
                 .trim();
             const nombreEncoded = encodeURIComponent(nombreLimpio);
+            const subcarpetaGrabacion = (categoria === 'general') ? 'Grabaciones/General' : 'Grabaciones';
 
             for (const ext of FORMATOS_AUDIO) {
                 try {
-                    const res = await fetch(`Grabaciones/${nombreEncoded}.${ext}`, { method: 'HEAD' });
+                    const res = await fetch(`${subcarpetaGrabacion}/${nombreEncoded}.${ext}`, { method: 'HEAD' });
                     if (res.ok) return true;
                 } catch (_) {}
             }
@@ -849,7 +850,7 @@
                     })
                     .catch(() => { spanTonalidad.textContent = '—'; });
 
-                tieneGrabacionAudio(cancion.nombreC).then(tieneAudio => {
+                tieneGrabacionAudio(cancion.nombreC, cancion.categoria).then(tieneAudio => {
                     if (tieneAudio) {
                         contenedorIconos.insertAdjacentHTML('afterbegin',
                             `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
