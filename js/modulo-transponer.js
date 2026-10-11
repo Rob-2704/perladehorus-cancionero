@@ -1,4 +1,4 @@
-import { crearRegexAcordes } from './modulo-acordes.js';
+import { crearRegexAcordes, convertirAcordeASistema } from './modulo-acordes.js';
 
 const NATURAL_ESPANOL_SEMI = { DO: 0, RE: 2, MI: 4, FA: 5, SOL: 7, LA: 9, SI: 11 };
 const NATURAL_INGLES_SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -140,7 +140,8 @@ export function inicializarTransponer(opciones) {
         onRetransponer,
         tonalidadLabelId,
         btnSubirTonoId, btnSubirMedioId, btnBajarMedioId, btnBajarTonoId, btnResetId,
-        btnToggleId, panelId
+        btnToggleId, panelId,
+        obtenerSistema = () => 'LATINO'
     } = opciones;
 
     let offset = 0;
@@ -148,7 +149,14 @@ export function inicializarTransponer(opciones) {
     const labelEl = document.getElementById(tonalidadLabelId);
 
     function actualizar() {
-        if (labelEl) labelEl.textContent = semitonoBase === null ? '—' : nombreTonalidad(semitonoBase + offset);
+        if (labelEl) {
+            if (semitonoBase === null) {
+                labelEl.textContent = '—';
+            } else {
+                const tonNombreBase = nombreTonalidad(semitonoBase + offset);
+                labelEl.textContent = convertirAcordeASistema(tonNombreBase, obtenerSistema());
+            }
+        }
         onRetransponer(transponerTexto(contenidoOriginal, offset));
     }
 
@@ -175,4 +183,6 @@ export function inicializarTransponer(opciones) {
     }
 
     actualizar();
+
+    return { actualizar };
 }
