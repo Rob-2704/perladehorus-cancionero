@@ -217,20 +217,20 @@
       "archivo": "Ven (Ciro Vega González)"
     },
     {
-      "idC": "101",
-      "nombreC": "Wendolyne",
-      "arreglos": "",
-      "estado": "pendiente",
-      "categoria": "general",
-      "archivo": "--Wendolyne"
-    },
-    {
       "idC": "81",
       "nombreC": "Mujeres Divinas",
       "arreglos": "Vicente Fernández",
       "estado": "revisar",
       "categoria": "general",
       "archivo": "-Mujeres Divinas (Vicente Fernández)"
+    },
+    {
+      "idC": "101",
+      "nombreC": "Wendolyne",
+      "arreglos": "",
+      "estado": "revisar",
+      "categoria": "general",
+      "archivo": "-Wendolyne"
     },
     {
       "idC": "52",
