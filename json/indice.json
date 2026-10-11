@@ -41,14 +41,6 @@
       "archivo": "-Ansiedad (Ciro Vega González)"
     },
     {
-      "idC": "31",
-      "nombreC": "Cuando Yo Quería Ser Grande",
-      "arreglos": "",
-      "estado": "revisar",
-      "categoria": "rondalla",
-      "archivo": "-Cuando Yo Quería Ser Grande ()"
-    },
-    {
       "idC": "32",
       "nombreC": "Esperando La Madrugada",
       "arreglos": "Emmanuel León Apolinar",
@@ -73,12 +65,12 @@
       "archivo": "-La Flor De La Canela (Ciro Vega González, Emmanuel León Apolinar)"
     },
     {
-      "idC": "100",
+      "idC": "102",
       "nombreC": "Las Flores Del Camposanto",
-      "arreglos": "",
+      "arreglos": "Osvaldo Daniel Barrera",
       "estado": "revisar",
       "categoria": "rondalla",
-      "archivo": "-Las Flores Del Camposanto ()"
+      "archivo": "-Las Flores Del Camposanto (Osvaldo Daniel Barrera)"
     },
     {
       "idC": "35",
@@ -119,6 +111,14 @@
       "estado": "terminada",
       "categoria": "rondalla",
       "archivo": "Bonita (Joel Carrillo Cuenca, Osvaldo Daniel Barrera)"
+    },
+    {
+      "idC": "103",
+      "nombreC": "Cuando Yo Quería Ser Grande",
+      "arreglos": "Osvaldo Daniel Barrera",
+      "estado": "terminada",
+      "categoria": "rondalla",
+      "archivo": "Cuando Yo Quería Ser Grande (Osvaldo Daniel Barrera)"
     },
     {
       "idC": "40",
@@ -169,12 +169,12 @@
       "archivo": "Nochecita (Ciro Vega González)"
     },
     {
-      "idC": "98",
+      "idC": "104",
       "nombreC": "Nunca",
-      "arreglos": "",
+      "arreglos": "Osvaldo Daniel Barrera",
       "estado": "terminada",
       "categoria": "rondalla",
-      "archivo": "Nunca ()"
+      "archivo": "Nunca (Osvaldo Daniel Barrera)"
     },
     {
       "idC": "46",
@@ -193,12 +193,12 @@
       "archivo": "Perfume De Gardénias (Ciro Vega González)"
     },
     {
-      "idC": "99",
+      "idC": "105",
       "nombreC": "Presentimiento",
-      "arreglos": "",
+      "arreglos": "Osvaldo Daniel Barrera",
       "estado": "terminada",
       "categoria": "rondalla",
-      "archivo": "Presentimiento ()"
+      "archivo": "Presentimiento (Osvaldo Daniel Barrera)"
     },
     {
       "idC": "48",
@@ -265,12 +265,12 @@
       "archivo": "Bohemio De Afición (Vicente Fernández)"
     },
     {
-      "idC": "56",
-      "nombreC": "Buenos Días Amor",
+      "idC": "106",
+      "nombreC": "Buenos Días, Amor",
       "arreglos": "José José",
       "estado": "terminada",
       "categoria": "general",
-      "archivo": "Buenos Días Amor (José José)"
+      "archivo": "Buenos Días, Amor (José José)"
     },
     {
       "idC": "57",
