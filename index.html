@@ -763,7 +763,7 @@
                 div.className = 'item-sugerencia';
                 div.innerHTML = `
                     <span>${cancion.nombreC}</span>
-                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>
+                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}: ${cancion.arreglos}` : ''}</span>
                 `;
                 div.onclick = (e) => {
                     e.stopPropagation();
