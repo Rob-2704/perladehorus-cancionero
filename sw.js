@@ -1,76 +1,88 @@
-const CACHE_ESTATICO = 'cancionero-estatico-v2';
-const CACHE_DINAMICO = 'cancionero-dinamico-v2';
+const CACHE_NAME = 'cancionero-perla-v2';
 
-// Archivos principales de la interfaz base
-const ARCHIVOS_A_CACHEAR = [
-    './',
-    './index.html',
-    './acordes.html',
-    './visor.html',
-    './evento.html',
-    './404.html',
-    './style.css',
-    './js/acordes.js',
-    './js/api-cliente.js',
-    './js/modulo-acordes.js',
-    './js/modulo-autoscroll.js',
-    './js/modulo-transponer.js',
-    './img/icono.png',
-    './img/fondo.png'
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './visor_2.html',
+  './evento.html',
+  './acordes.html',
+  './404.html',
+  './style.css',
+  './js/acordes.js',
+  './js/api-cliente.js',
+  './js/modulo-acordes.js',
+  './js/modulo-autoscroll.js',
+  './js/modulo-transponer.js',
+  './json/indice.json',
+  './json/ids-canciones.json',
+  './img/icono.png',
+  './img/fondo.png'
 ];
 
-// Evento de instalación: guarda los archivos estáticos base
-self.addEventListener('install', (evento) => {
-    evento.waitUntil(
-        caches.open(CACHE_ESTATICO)
-            .then((cache) => cache.addAll(ARCHIVOS_A_CACHEAR))
-    );
-    self.skipWaiting();
+// Instalación y precarga automática de la app y todo el cancionero
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // 1. Guardar la estructura base y recursos estáticos
+      await cache.addAll(ASSETS_TO_CACHE);
+
+      // 2. Leer el índice de canciones y precargar todos los archivos .txt automáticamente
+      try {
+        const respuestaIndice = await fetch('./json/indice.json');
+        if (respuestaIndice.ok) {
+          const datos = await respuestaIndice.json();
+          if (datos && Array.isArray(datos.canciones)) {
+            const promesasTxt = datos.canciones.map(async (info) => {
+              const subcarpeta = info.categoria === 'general' ? 'Canciones/General' : 'Canciones';
+              const rutaTxt = `${subcarpeta}/${encodeURIComponent(info.archivo)}.txt`;
+              try {
+                const resTxt = await fetch(rutaTxt);
+                if (resTxt.ok) {
+                  await cache.put(rutaTxt, resTxt);
+                }
+              } catch (err) {
+                // Silenciar errores individuales si alguna petición falla temporalmente
+              }
+            });
+            await Promise.all(promesasTxt);
+          }
+        }
+      } catch (error) {
+        console.error('Error al precargar las canciones en segundo plano:', error);
+      }
+    })
+  );
+  self.skipWaiting();
 });
 
-// Evento de activación: limpia cachés obsoletos
-self.addEventListener('activate', (evento) => {
-    evento.waitUntil(
-        caches.keys().then((nombresCaches) => {
-            return Promise.all(
-                nombresCaches.map((nombre) => {
-                    if (nombre !== CACHE_ESTATICO && nombre !== CACHE_DINAMICO) {
-                        return caches.delete(nombre);
-                    }
-                })
-            );
+// Activación y limpieza de versiones antiguas de caché
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
-    );
-    self.clients.claim();
+      );
+    })
+  );
+  self.clients.claim();
 });
 
-// Evento fetch: intercepta peticiones locales y de Firebase
-self.addEventListener('fetch', (evento) => {
-    const url = new URL(evento.request.url);
-
-    if (url.origin === location.origin || url.hostname.includes('firebaseio.com')) {
-        evento.respondWith(
-            fetch(evento.request)
-                .then((respuestaRed) => {
-                    return caches.open(CACHE_DINAMICO).then((cache) => {
-                        cache.put(evento.request, respuestaRed.clone());
-                        return respuestaRed;
-                    });
-                })
-                .catch(() => {
-                    return caches.match(evento.request).then((respuestaCache) => {
-                        if (respuestaCache) return respuestaCache;
-                        if (evento.request.mode === 'navigate') {
-                            return caches.match('./404.html');
-                        }
-                    });
-                })
-        );
-    } else {
-        evento.respondWith(
-            caches.match(evento.request).then((respuesta) => {
-                return respuesta || fetch(evento.request);
-            })
-        );
-    }
+// Estrategia de respuesta: Buscar primero en caché, si no, ir a la red
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).then((networkResponse) => {
+        return networkResponse;
+      }).catch(() => {
+        // Si no hay red y el recurso no está en caché
+      });
+    })
+  );
 });
