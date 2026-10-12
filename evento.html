@@ -560,8 +560,8 @@
                 rangoHoras = inicioFormatted;
             }
 
-            if (!stringFecha) {
-                return rangoHoras ? rangoHoras : '—';
+            if (!stringFecha || stringFecha.trim() === '') {
+                return rangoHoras ? `Fecha por confirmar (${rangoHoras})` : 'Fecha por confirmar';
             }
 
             const partes = stringFecha.split('-');
@@ -729,7 +729,7 @@
                 const tieneLugarTexto = evento.lugar && evento.lugar.trim() !== '';
                 const tieneLugarLink = evento.linkLugar && evento.linkLugar.trim() !== '';
 
-                let htmlLugar = '<span>—</span>';
+                let htmlLugar = '<span>Lugar por definir</span>';
                 if (tieneLugarTexto && tieneLugarLink) {
                     htmlLugar = `<a href="${normalizarUrl(evento.linkLugar)}" target="_blank" rel="noopener noreferrer" class="link-lugar">${evento.lugar}</a>`;
                 } else if (tieneLugarLink) {
@@ -763,7 +763,7 @@
                             <span class="material-symbols-outlined">checkroom</span>
                             <div class="item-info-contenido">
                                 <span class="item-info-etiqueta">Vestimenta</span>
-                                <span>${evento.vestimenta || '—'}</span>
+                                <span>${evento.vestimenta && evento.vestimenta.trim() !== '' ? evento.vestimenta : 'Vestimenta por definir'}</span>
                             </div>
                         </div>
 
@@ -781,6 +781,7 @@
 
                 contenedorDetalleEl.innerHTML = htmlDetalle;
                 seccionAsistenciaEl.style.display = 'flex';
+                seccionRepertorioEl.style.display = 'block';
                 
                 conectarAsistenciasFirebase();
                 activarAnimacionIconos();
@@ -860,16 +861,16 @@
                             });
 
                             listaRepertorioEl.appendChild(fragmento);
-                            seccionRepertorioEl.style.display = 'block';
                             activarAnimacionIconos();
                         } else {
-                            seccionRepertorioEl.style.display = 'none';
+                            listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
                         }
                     } catch (e) {
                         console.error("Error al cargar repertorio:", e);
+                        listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
                     }
                 } else {
-                    seccionRepertorioEl.style.display = 'none';
+                    listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
                 }
             });
         }
