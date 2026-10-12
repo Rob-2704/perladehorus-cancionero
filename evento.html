@@ -300,17 +300,71 @@
             font-size: 13px;
             color: var(--text-sec);
             font-weight: 600;
-            margin-top: 6px;
-            margin-bottom: -4px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .etiqueta-respuestas-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sec);
+            background-color: var(--bg-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(188, 151, 49, 0.15);
+        }
+
+        .etiqueta-respuestas-badge .material-symbols-outlined {
+            color: var(--accent);
+            font-size: 18px !important;
+            display: inline-block;
+        }
+
+        .contador-resumen-asistencia {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: var(--bg-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(188, 151, 49, 0.15);
+        }
+
+        .contador-item-asistencia {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .lista-asistentes {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 10px;
-            max-height: 240px;
+            max-height: 280px;
             overflow-y: auto;
             padding-right: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .lista-asistentes {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .lista-asistentes {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .lista-asistentes::-webkit-scrollbar { width: 6px; }
@@ -455,7 +509,24 @@
             </div>
 
             <div class="seccion-respuestas-titulo">
-                Respuestas (<span id="num-respuestas">0</span>):
+                <div class="etiqueta-respuestas-badge" title="Total de respuestas">
+                    <span class="material-symbols-outlined">group</span>
+                    <span id="num-respuestas">0</span>
+                </div>
+                <div class="contador-resumen-asistencia">
+                    <span class="contador-item-asistencia" title="Asistirán">
+                        <span class="material-symbols-outlined icono-estado asistira" style="font-size: 15px !important;">check_circle</span>
+                        <span id="count-asistira">0</span>
+                    </span>
+                    <span class="contador-item-asistencia" title="En duda">
+                        <span class="material-symbols-outlined icono-estado duda" style="font-size: 15px !important;">help</span>
+                        <span id="count-duda">0</span>
+                    </span>
+                    <span class="contador-item-asistencia" title="No irán">
+                        <span class="material-symbols-outlined icono-estado no_asistira" style="font-size: 15px !important;">cancel</span>
+                        <span id="count-no-asistira">0</span>
+                    </span>
+                </div>
             </div>
 
             <div id="lista-asistentes" class="lista-asistentes"></div>
@@ -503,6 +574,9 @@
         const btnDuda = document.getElementById('btn-duda');
         const btnNoIre = document.getElementById('btn-no-ire');
         const numRespuestasEl = document.getElementById('num-respuestas');
+        const countAsistiraEl = document.getElementById('count-asistira');
+        const countDudaEl = document.getElementById('count-duda');
+        const countNoAsistiraEl = document.getElementById('count-no-asistira');
         const listaAsistentesEl = document.getElementById('lista-asistentes');
 
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
@@ -614,9 +688,16 @@
 
                 if (!datos) {
                     numRespuestasEl.textContent = '0';
+                    countAsistiraEl.textContent = '0';
+                    countDudaEl.textContent = '0';
+                    countNoAsistiraEl.textContent = '0';
                     listaAsistentesEl.innerHTML = '<div style="font-size:12px; color:var(--text-sec); padding: 6px 0;">Aún no hay respuestas registradas.</div>';
                     return;
                 }
+
+                let cAsistira = 0;
+                let cDuda = 0;
+                let cNoAsistira = 0;
 
                 const prioridadEstado = { asistira: 0, duda: 1, no_asistira: 2 };
                 const lista = Object.values(datos).sort((a, b) => {
@@ -628,6 +709,10 @@
                 numRespuestasEl.textContent = lista.length;
 
                 lista.forEach(item => {
+                    if (item.estado === 'asistira') cAsistira++;
+                    else if (item.estado === 'duda') cDuda++;
+                    else if (item.estado === 'no_asistira') cNoAsistira++;
+
                     const div = document.createElement('div');
                     div.className = 'item-asistente';
 
@@ -648,6 +733,10 @@
                     `;
                     listaAsistentesEl.appendChild(div);
                 });
+
+                countAsistiraEl.textContent = cAsistira;
+                countDudaEl.textContent = cDuda;
+                countNoAsistiraEl.textContent = cNoAsistira;
 
                 activarAnimacionIconos();
             });
