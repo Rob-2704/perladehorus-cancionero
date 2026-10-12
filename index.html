@@ -138,16 +138,68 @@
             border: 2px solid var(--accent);
         }
 
+        .tarjeta-evento.hoy {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border: 2px solid var(--accent);
+        }
+
+        .tarjeta-evento.hoy h3 {
+            color: var(--bg-color) !important;
+        }
+
+        .tarjeta-evento.hoy .meta-evento,
+        .tarjeta-evento.hoy .meta-item {
+            color: var(--bg-color) !important;
+            opacity: 0.9;
+        }
+
+        .tarjeta-evento.hoy .material-symbols-outlined {
+            color: var(--bg-color) !important;
+        }
+
+        .tarjeta-evento.pasado {
+            background-color: var(--card-bg);
+            position: relative;
+        }
+
+        .tarjeta-evento.pasado::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.38);
+            pointer-events: none;
+            border-radius: 16px;
+            transition: background-color 0.2s ease;
+            z-index: 1;
+        }
+
+        .tarjeta-evento.pasado h3,
+        .tarjeta-evento.pasado .meta-evento,
+        .tarjeta-evento.pasado .meta-item,
+        .tarjeta-evento.pasado .material-symbols-outlined {
+            color: var(--text-sec) !important;
+            position: relative;
+            z-index: 2;
+            transition: color 0.2s ease;
+        }
+
         .tarjeta-evento.oculto { display: none !important; }
 
         @media (hover: hover) {
             .tarjeta-evento:hover { 
-                transform: scale(1.015); 
+                transform: scale(1.03); 
                 box-shadow: 0 6px 16px rgba(0,0,0,0.25);
                 z-index: 2;
             }
+            .tarjeta-evento.pasado:hover::after {
+                background-color: rgba(0, 0, 0, 0);
+            }
+            .tarjeta-evento.pasado:hover h3 {
+                color: var(--text-main) !important;
+            }
         }
-        .tarjeta-evento:active { transform: scale(1.015); }
+        .tarjeta-evento:active { transform: scale(1.03); }
 
         .tarjeta-evento-header {
             display: flex;
@@ -166,6 +218,18 @@
         .badge-proximo {
             background-color: var(--accent);
             color: var(--bg-color);
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .badge-hoy {
+            background-color: var(--bg-color);
+            color: var(--accent);
             font-size: 9px;
             font-weight: 700;
             padding: 2px 7px;
@@ -594,6 +658,13 @@
                     return;
                 }
 
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const anioHoy = hoy.getFullYear();
+                const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
+                const diaHoy = String(hoy.getDate()).padStart(2, '0');
+                const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
+
                 const ordenados = eventos
                     .map(e => {
                         const tieneFecha = e.fecha && e.fecha.trim() !== '';
@@ -603,15 +674,26 @@
                             const f = e.fecha.split('-');
                             fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
                         } else {
-                            fechaObj = new Date(8640000000000000);
+                            fechaObj = null;
                         }
-                        return { ...e, fechaObj, tieneFecha };
+
+                        const esPasado = tieneFecha && e.fecha < fechaHoyStr;
+                        const esHoy = tieneFecha && e.fecha === fechaHoyStr;
+                        return { ...e, fechaObj, tieneFecha, esHoy, esPasado };
                     })
                     .sort((a, b) => {
-                        if (a.tieneFecha && !b.tieneFecha) return -1;
-                        if (!a.tieneFecha && b.tieneFecha) return 1;
-                        return a.fechaObj - b.fechaObj;
+                        const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
+                        const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
+
+                        if (grupoA !== grupoB) return grupoA - grupoB;
+
+                        if (a.tieneFecha && b.tieneFecha) {
+                            return a.fechaObj - b.fechaObj;
+                        }
+                        return 0;
                     });
+
+                const primerFuturoIdx = ordenados.findIndex(e => !e.esPasado && !e.esHoy && e.tieneFecha);
 
                 contenedorEventos.innerHTML = '';
                 let desplegado = false;
@@ -619,8 +701,14 @@
 
                 ordenados.forEach((evento, idx) => {
                     const tarjeta = document.createElement('div');
-                    const esProximo = idx === 0 && evento.tieneFecha;
-                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''} ${esProximo ? 'proximo' : ''}`;
+                    const esProximo = idx === primerFuturoIdx;
+                    
+                    let claseExtra = '';
+                    if (evento.esHoy) claseExtra = 'hoy';
+                    else if (esProximo) claseExtra = 'proximo';
+                    else if (evento.esPasado) claseExtra = 'pasado';
+
+                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''} ${claseExtra}`;
 
                     tarjeta.onclick = () => {
                         window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
@@ -629,10 +717,17 @@
                     const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
                     const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
 
+                    let badgeHtml = '';
+                    if (evento.esHoy) {
+                        badgeHtml = '<span class="badge-hoy">Hoy</span>';
+                    } else if (esProximo) {
+                        badgeHtml = '<span class="badge-proximo">Próximo</span>';
+                    }
+
                     tarjeta.innerHTML = `
                         <div class="tarjeta-evento-header">
                             <h3>${evento.titulo}</h3>
-                            ${esProximo ? '<span class="badge-proximo">Próximo</span>' : ''}
+                            ${badgeHtml}
                         </div>
                         <div class="meta-evento">
                             <span class="meta-item">
@@ -763,7 +858,7 @@
                 div.className = 'item-sugerencia';
                 div.innerHTML = `
                     <span>${cancion.nombreC}</span>
-                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}: ${cancion.arreglos}` : ''}</span>
+                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>
                 `;
                 div.onclick = (e) => {
                     e.stopPropagation();

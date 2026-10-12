@@ -22,32 +22,54 @@
         }
 
         header {
-            margin-bottom: 25px;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            position: relative;
+            z-index: 100;
+            isolation: isolate;
+            margin: 0 auto 20px auto;
         }
 
         h1 {
             margin: 0;
-            font-size: 40px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        .subtitulo { margin: 5px 0 0 0; font-size: 13px; color: var(--text-sec); }
+
+        p.subtitulo {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: var(--text-sec);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
+        }
+
+        @keyframes extenderContenedor {
+            0% { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
+            70% { opacity: 1; transform: scaleY(1.015); transform-origin: top; }
+            100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+        }
 
         .tarjeta-formulario {
             background-color: var(--card-bg);
             border-radius: 20px;
-            border: none;
             padding: 24px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             margin-bottom: 35px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: extenderContenedor 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
         }
 
         .tarjeta-formulario h2 {
@@ -66,7 +88,7 @@
         }
 
         @media (max-width: 600px) {
-            h1 { font-size: 32px; }
+            h1 { font-size: 26px; }
         }
 
         @media (min-width: 600px) {
@@ -81,42 +103,50 @@
         }
 
         .campo-grupo label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-sec);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .input-admin, .textarea-admin {
-            background-color: #121215;
+            background-color: var(--card-bg);
             color: var(--text-main);
-            border: 1px solid var(--accent);
-            border-radius: 10px;
-            padding: 10px 14px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 16px;
             font-family: 'Sono', monospace;
             font-size: 14px;
             outline: none;
             width: 100%;
             box-sizing: border-box;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .input-admin:hover, .textarea-admin:hover { transform: translateY(-1px); }
+        .input-admin:focus, .textarea-admin:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
 
         .textarea-admin {
             resize: vertical;
-            min-height: 70px;
+            min-height: 80px;
         }
 
-        /* Contenedor con Scroll para la lista de canciones */
         .contenedor-selector-canciones {
-            background-color: #121215;
-            border: 1px solid var(--accent);
+            background-color: var(--bg-color);
+            border: 2px solid var(--accent);
             border-radius: 12px;
-            padding: 12px;
+            padding: 14px;
             max-height: 240px;
             overflow-y: auto;
             box-sizing: border-box;
         }
 
-        /* Grid interno para tarjetas de canciones */
+        .contenedor-selector-canciones::-webkit-scrollbar { width: 6px; }
+        .contenedor-selector-canciones::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.15); border-radius: 8px; }
+        .contenedor-selector-canciones::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 8px; }
+
         .grid-canciones-selector {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -124,7 +154,7 @@
         }
 
         .tarjeta-cancion-selector {
-            background-color: #1a1a20;
+            background-color: var(--card-bg);
             border: 1.5px solid rgba(188, 151, 49, 0.3);
             border-radius: 12px;
             padding: 10px 14px;
@@ -136,15 +166,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .tarjeta-cancion-selector:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
+        @media (hover: hover) {
+            .tarjeta-cancion-selector:hover {
+                transform: translateY(-2px);
+                border-color: var(--accent);
+            }
         }
+        .tarjeta-cancion-selector:active { transform: scale(0.97); }
 
         .tarjeta-cancion-selector.seleccionada {
             background-color: #2ec4b6;
@@ -165,28 +198,30 @@
 
         .acciones-form {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
             margin-top: 10px;
         }
 
         .btn-accion {
             border: none;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 12px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: transform 0.15s;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-accion:active { transform: scale(0.96); }
         .btn-guardar { background-color: var(--accent); color: var(--bg-color); }
-        .btn-cancelar { background-color: transparent; color: var(--text-sec); border: 1px solid var(--text-sec); }
+        .btn-guardar:hover { box-shadow: 0 0 10px rgba(188, 151, 49, 0.4); }
+        .btn-cancelar { background-color: transparent; color: var(--text-sec); border: 2px solid var(--text-sec); }
 
         .titulo-lista {
             font-size: 18px;
@@ -195,27 +230,26 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-main);
         }
 
-        /* Lista de Eventos centrada verticalmente */
         .lista-eventos-admin {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .tarjeta-evento-admin {
             background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 14px 18px;
+            border-radius: 20px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            border: 2px solid var(--accent);
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
             position: relative;
             flex-wrap: wrap;
         }
@@ -261,8 +295,8 @@
 
         .btn-mini {
             border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
+            padding: 8px 14px;
+            border-radius: 10px;
             font-family: 'Sono', monospace;
             font-size: 12px;
             font-weight: 700;
@@ -270,28 +304,56 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            transition: transform 0.15s;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-mini:active { transform: scale(0.95); }
+        .btn-mini:active { transform: scale(0.94); }
+
+        @media (hover: hover) {
+            .btn-mini:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        }
+
         .btn-editar { background-color: #2ec4b6; color: #fff; }
         .btn-eliminar { background-color: #e71d36; color: #fff; }
 
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
-            font-weight: normal;
-            font-style: normal;
+            user-select: none;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-feature-settings: 'liga';
+            -webkit-font-feature-settings: 'liga';
+            visibility: hidden;
+            opacity: 0;
+            width: 1em;
+            height: 1em;
             display: inline-block;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            will-change: transform, opacity, visibility;
+        }
+
+        .fuente-cargada {
+            visibility: visible !important;
+            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+
+        @keyframes popIconoPlay {
+            0% { opacity: 0; transform: scale(0.2); }
+            70% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
     <header>
-        <div>
-            <h1>Gestor de Eventos</h1>
-            <p class="subtitulo">Rondalla Perla De Horus</p>
-        </div>
+        <h1>Gestor de Eventos</h1>
+        <p class="subtitulo">Rondalla Perla De Horus</p>
     </header>
 
     <main>
@@ -307,7 +369,7 @@
                 <div class="grid-campos">
                     <div class="campo-grupo col-full">
                         <label for="form-titulo">Título del Evento</label>
-                        <input type="text" id="form-titulo" class="input-admin" required>
+                        <input type="text" id="form-titulo" class="input-admin" required autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
@@ -317,7 +379,7 @@
 
                     <div class="campo-grupo">
                         <label for="form-vestimenta">Vestimenta</label>
-                        <input type="text" id="form-vestimenta" class="input-admin">
+                        <input type="text" id="form-vestimenta" class="input-admin" autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
@@ -332,12 +394,12 @@
 
                     <div class="campo-grupo">
                         <label for="form-lugar">Lugar del evento</label>
-                        <input type="text" id="form-lugar" class="input-admin">
+                        <input type="text" id="form-lugar" class="input-admin" autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
                         <label for="form-link-lugar">Enlace Google Maps</label>
-                        <input type="url" id="form-link-lugar" class="input-admin" placeholder="https://maps.google.com/...">
+                        <input type="url" id="form-link-lugar" class="input-admin" placeholder="https://maps.google.com/..." autocomplete="off">
                     </div>
 
                     <div class="campo-grupo col-full">
@@ -414,6 +476,14 @@
         let cancionesSeleccionadas = [];
         let eventosGlobalMap = {};
 
+        function activarAnimacionIconos() {
+            document.fonts.ready.then(() => {
+                document.querySelectorAll('.material-symbols-outlined').forEach(icono => {
+                    icono.classList.add('fuente-cargada');
+                });
+            });
+        }
+
         function formatearHoraAMPM(horaStr) {
             if (!horaStr) return '';
             if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) return horaStr;
@@ -429,23 +499,24 @@
         }
 
         function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
-            const inicioFormatted = formatearHoraAMPM(horaInicio);
-            const finFormatted = formatearHoraAMPM(horaFin);
-
-            let rangoHoras = '';
-            if (inicioFormatted && finFormatted) rangoHoras = `${inicioFormatted}-${finFormatted}`;
-            else if (inicioFormatted) rangoHoras = inicioFormatted;
-
-            if (!stringFecha) {
-                return rangoHoras || '—';
-            }
-
+            if (!stringFecha || stringFecha.trim() === '') return 'Fecha por confirmar';
             const partes = stringFecha.split('-');
             let textoFecha = stringFecha;
+
             if (partes.length === 3) {
                 const d = new Date(partes[0], partes[1] - 1, partes[2]);
                 textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
                 textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
+            }
+
+            const inicioFormatted = formatearHoraAMPM(horaInicio);
+            const finFormatted = formatearHoraAMPM(horaFin);
+
+            let rangoHoras = '';
+            if (inicioFormatted && finFormatted) {
+                rangoHoras = `${inicioFormatted}-${finFormatted}`;
+            } else if (inicioFormatted) {
+                rangoHoras = inicioFormatted;
             }
 
             return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
@@ -506,6 +577,8 @@
                 };
                 contenedorCancionesSelector.appendChild(tarjeta);
             });
+
+            activarAnimacionIconos();
         }
 
         function resetearFormulario() {
@@ -524,6 +597,7 @@
 
             tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Evento';
             btnCancelarForm.style.display = 'none';
+            activarAnimacionIconos();
         }
 
         function escucharEventosFirebase() {
@@ -538,12 +612,33 @@
                     return;
                 }
 
-                Object.keys(datos).forEach(idE => {
-                    const evento = datos[idE];
+                const eventosArray = Object.keys(datos).map(idE => ({ ...datos[idE], idE }));
+                const ordenados = eventosArray
+                    .map(e => {
+                        const tieneFecha = e.fecha && e.fecha.trim() !== '';
+                        let fechaObj;
+                        if (tieneFecha) {
+                            const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
+                            const f = e.fecha.split('-');
+                            fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
+                        } else {
+                            fechaObj = new Date(8640000000000000);
+                        }
+                        return { ...e, fechaObj, tieneFecha };
+                    })
+                    .sort((a, b) => {
+                        if (a.tieneFecha && !b.tieneFecha) return -1;
+                        if (!a.tieneFecha && b.tieneFecha) return 1;
+                        return a.fechaObj - b.fechaObj;
+                    });
+
+                ordenados.forEach(evento => {
+                    const idE = evento.idE;
                     const div = document.createElement('div');
                     div.className = 'tarjeta-evento-admin';
 
                     const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
+                    const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
 
                     div.innerHTML = `
                         <div class="info-evento-admin">
@@ -555,7 +650,7 @@
                                 </span>
                                 <span class="meta-item-admin">
                                     <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                    ${evento.lugar || '—'}
+                                    ${textoLugar}
                                 </span>
                                 <span class="meta-item-admin">
                                     <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
@@ -582,6 +677,8 @@
                 document.querySelectorAll('.btn-eliminar').forEach(btn => {
                     btn.onclick = () => borrarEvento(btn.getAttribute('data-id'));
                 });
+
+                activarAnimacionIconos();
             });
         }
 
@@ -604,6 +701,7 @@
 
             tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">edit_note</span> Editar Evento';
             btnCancelarForm.style.display = 'inline-flex';
+            activarAnimacionIconos();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -665,6 +763,7 @@
         async function init() {
             await cargarCanciones();
             escucharEventosFirebase();
+            activarAnimacionIconos();
         }
 
         init();
