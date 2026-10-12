@@ -688,7 +688,7 @@
                         if (grupoA !== grupoB) return grupoA - grupoB;
 
                         if (a.tieneFecha && b.tieneFecha) {
-                            return a.fechaObj - b.fechaObj;
+                            return b.fechaObj - a.fechaObj;
                         }
                         return 0;
                     });
