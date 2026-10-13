@@ -217,12 +217,28 @@
       "archivo": "Ven (Ciro Vega González)"
     },
     {
+      "idC": "111",
+      "nombreC": "Alma Llanera",
+      "arreglos": "",
+      "estado": "pendiente",
+      "categoria": "general",
+      "archivo": "--Alma Llanera"
+    },
+    {
       "idC": "81",
       "nombreC": "Mujeres Divinas",
       "arreglos": "Vicente Fernández",
       "estado": "revisar",
       "categoria": "general",
       "archivo": "-Mujeres Divinas (Vicente Fernández)"
+    },
+    {
+      "idC": "110",
+      "nombreC": "Te Deseo Amor",
+      "arreglos": "",
+      "estado": "revisar",
+      "categoria": "general",
+      "archivo": "-Te Deseo Amor ()"
     },
     {
       "idC": "109",
@@ -551,14 +567,6 @@
       "estado": "terminada",
       "categoria": "general",
       "archivo": "Sublime Mujer (Vicente Fernández)"
-    },
-    {
-      "idC": "110",
-      "nombreC": "Te Deseo Amor",
-      "arreglos": "",
-      "estado": "terminada",
-      "categoria": "general",
-      "archivo": "Te Deseo Amor ()"
     },
     {
       "idC": "92",
