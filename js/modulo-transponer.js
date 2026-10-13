@@ -154,7 +154,7 @@ export function inicializarTransponer(opciones) {
                 labelEl.textContent = '—';
             } else {
                 const tonNombreBase = nombreTonalidad(semitonoBase + offset);
-                labelEl.textContent = convertirAcordeASistema(tonNameBase, obtenerSistema());
+                labelEl.textContent = convertirAcordeASistema(tonNombreBase, obtenerSistema());
             }
         }
         onRetransponer(transponerTexto(contenidoOriginal, offset));
