@@ -220,11 +220,21 @@
             animation: expandirSliderAncho 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
         }
 
+        .volume-slider-wrapper {
+            width: 70px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s forwards;
+        }
+
         .contenedor-audio .icono-pista-audio,
         .contenedor-audio #btn-audio-play,
         .contenedor-audio #audio-tiempo-actual,
         .contenedor-audio #audio-tiempo-total,
-        .contenedor-audio #btn-audio-mute {
+        .contenedor-audio #btn-audio-mute,
+        .contenedor-audio .volume-slider-wrapper {
             opacity: 0;
             will-change: transform, opacity;
             animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -235,6 +245,7 @@
         .contenedor-audio #audio-tiempo-actual { animation-delay: 0.15s; }
         .contenedor-audio #audio-tiempo-total { animation-delay: 0.22s; }
         .contenedor-audio #btn-audio-mute { animation-delay: 0.25s; }
+        .contenedor-audio .volume-slider-wrapper { animation-delay: 0.28s; }
         
         .btn-audio-ctrl {
             background: var(--accent);
@@ -662,6 +673,10 @@
             .audio-time {
                 font-size: 10px;
             }
+
+            .volume-slider-wrapper {
+                width: 50px;
+            }
         }
         
         @media (max-width: 1300px) {
@@ -709,6 +724,9 @@
             </div>
             <span id="audio-tiempo-total" class="audio-time">0:00</span>
             <button id="btn-audio-mute" class="btn-audio-ctrl material-symbols-outlined" title="Silenciar">volume_up</button>
+            <div class="volume-slider-wrapper">
+                <input type="range" id="audio-volume" class="audio-slider" min="0" max="1" step="0.01" value="1">
+            </div>
         </div>
 
         <div class="workspace">
@@ -817,10 +835,41 @@
             const iconoSpan = btnPlay.querySelector('span');
             const btnMute = document.getElementById('btn-audio-mute');
             const sliderProgress = document.getElementById('audio-progress');
+            const sliderVolume = document.getElementById('audio-volume');
             const txtActual = document.getElementById('audio-tiempo-actual');
             const txtTotal = document.getElementById('audio-tiempo-total');
 
             if (!reproductorAudio || !btnPlay || !iconoSpan) return;
+
+            // Cargar volumen guardado en localStorage
+            const volumenGuardado = localStorage.getItem('volumenAudio');
+            if (volumenGuardado !== null) {
+                const vol = parseFloat(volumenGuardado);
+                reproductorAudio.volume = vol;
+                if (sliderVolume) sliderVolume.value = vol;
+                if (vol === 0) {
+                    reproductorAudio.muted = true;
+                    btnMute.textContent = 'volume_off';
+                }
+            } else {
+                reproductorAudio.volume = 1;
+                if (sliderVolume) sliderVolume.value = 1;
+            }
+
+            if (sliderVolume) {
+                sliderVolume.addEventListener('input', () => {
+                    const vol = parseFloat(sliderVolume.value);
+                    reproductorAudio.volume = vol;
+                    reproductorAudio.muted = (vol === 0);
+                    localStorage.setItem('volumenAudio', vol);
+
+                    if (vol === 0) {
+                        btnMute.textContent = 'volume_off';
+                    } else {
+                        btnMute.textContent = 'volume_up';
+                    }
+                });
+            }
 
             iconoSpan.textContent = 'progress_activity';
             btnPlay.classList.add('cargando');
@@ -856,8 +905,18 @@
             });
 
             btnMute.addEventListener('click', () => {
-                reproductorAudio.muted = !reproductorAudio.muted;
-                btnMute.textContent = reproductorAudio.muted ? 'no_sound' : 'volume_up';
+                if (reproductorAudio.muted || reproductorAudio.volume === 0) {
+                    reproductorAudio.muted = false;
+                    const volPrevio = parseFloat(localStorage.getItem('volumenAudio')) || 0.5;
+                    reproductorAudio.volume = volPrevio > 0 ? volPrevio : 0.5;
+                    if (sliderVolume) sliderVolume.value = reproductorAudio.volume;
+                    btnMute.textContent = 'volume_up';
+                } else {
+                    reproductorAudio.muted = true;
+                    reproductorAudio.volume = 0;
+                    if (sliderVolume) sliderVolume.value = 0;
+                    btnMute.textContent = 'volume_off';
+                }
             });
 
             reproductorAudio.addEventListener('loadedmetadata', () => {
