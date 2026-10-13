@@ -220,21 +220,11 @@
             animation: expandirSliderAncho 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0.18s forwards;
         }
 
-        .volume-slider-wrapper {
-            width: 70px;
-            display: flex;
-            align-items: center;
-            opacity: 0;
-            will-change: transform, opacity;
-            animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s forwards;
-        }
-
         .contenedor-audio .icono-pista-audio,
         .contenedor-audio #btn-audio-play,
         .contenedor-audio #audio-tiempo-actual,
         .contenedor-audio #audio-tiempo-total,
-        .contenedor-audio #btn-audio-mute,
-        .contenedor-audio .volume-slider-wrapper {
+        .contenedor-audio .contenedor-btn-volumen {
             opacity: 0;
             will-change: transform, opacity;
             animation: popControlAudio 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -244,8 +234,7 @@
         .contenedor-audio #btn-audio-play { animation-delay: 0.12s; }
         .contenedor-audio #audio-tiempo-actual { animation-delay: 0.15s; }
         .contenedor-audio #audio-tiempo-total { animation-delay: 0.22s; }
-        .contenedor-audio #btn-audio-mute { animation-delay: 0.25s; }
-        .contenedor-audio .volume-slider-wrapper { animation-delay: 0.28s; }
+        .contenedor-audio .contenedor-btn-volumen { animation-delay: 0.25s; }
         
         .btn-audio-ctrl {
             background: var(--accent);
@@ -260,6 +249,31 @@
             cursor: pointer;
             flex-shrink: 0;
             user-select: none;
+        }
+
+        .contenedor-btn-volumen {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .indicador-vol-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            font-size: 11px !important;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-color);
+            color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
         }
 
         .audio-slider {
@@ -673,10 +687,6 @@
             .audio-time {
                 font-size: 10px;
             }
-
-            .volume-slider-wrapper {
-                width: 50px;
-            }
         }
         
         @media (max-width: 1300px) {
@@ -723,9 +733,9 @@
                 <input type="range" id="audio-progress" class="audio-slider" min="0" max="100" value="0">
             </div>
             <span id="audio-tiempo-total" class="audio-time">0:00</span>
-            <button id="btn-audio-mute" class="btn-audio-ctrl material-symbols-outlined" title="Silenciar">volume_up</button>
-            <div class="volume-slider-wrapper">
-                <input type="range" id="audio-volume" class="audio-slider" min="0" max="1" step="0.01" value="1">
+            <div class="contenedor-btn-volumen">
+                <button id="btn-audio-mute" class="btn-audio-ctrl material-symbols-outlined" title="Volumen">counter_5</button>
+                <span class="material-symbols-outlined indicador-vol-badge">volume_up</span>
             </div>
         </div>
 
@@ -835,51 +845,71 @@
             const iconoSpan = btnPlay.querySelector('span');
             const btnMute = document.getElementById('btn-audio-mute');
             const sliderProgress = document.getElementById('audio-progress');
-            const sliderVolume = document.getElementById('audio-volume');
             const txtActual = document.getElementById('audio-tiempo-actual');
             const txtTotal = document.getElementById('audio-tiempo-total');
 
             if (!reproductorAudio || !btnPlay || !iconoSpan) return;
 
+            // Definir los 5 niveles de volumen + mute (0%, 20%, 40%, 60%, 80%, 100%)
+            const nivelesVolumen = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+            const iconosVolumen = ['cancel', 'counter_1', 'counter_2', 'counter_3', 'counter_4', 'counter_5'];
+
+            function actualizarIconoVolumen(vol) {
+                const porcentaje = Math.round(vol * 100);
+                const indice = nivelesVolumen.findIndex(n => Math.abs(n - vol) < 0.05);
+                const idxVal = indice !== -1 ? indice : 0;
+
+                btnMute.textContent = iconosVolumen[idxVal];
+                btnMute.title = vol === 0 ? 'Silencio (0%)' : `Volumen: ${porcentaje}%`;
+            }
+
             // Cargar volumen guardado en localStorage
             const volumenGuardado = localStorage.getItem('volumenAudio');
-            if (volumenGuardado !== null) {
-                const vol = parseFloat(volumenGuardado);
-                reproductorAudio.volume = vol;
-                if (sliderVolume) sliderVolume.value = vol;
-                if (vol === 0) {
-                    reproductorAudio.muted = true;
-                    btnMute.textContent = 'volume_off';
+            let volInicial = volumenGuardado !== null ? parseFloat(volumenGuardado) : 1;
+            reproductorAudio.volume = volInicial;
+            reproductorAudio.muted = (volInicial === 0);
+            actualizarIconoVolumen(volInicial);
+
+            // Alternar entre los niveles de volumen con el botón
+            btnMute.addEventListener('click', () => {
+                let volActual = reproductorAudio.volume;
+                let indiceActual = nivelesVolumen.findIndex(n => Math.abs(n - volActual) < 0.05);
+
+                if (indiceActual === -1) {
+                    indiceActual = nivelesVolumen.findIndex(n => n > volActual);
+                    if (indiceActual === -1) indiceActual = 0;
+                } else {
+                    indiceActual = (indiceActual + 1) % nivelesVolumen.length;
                 }
-            } else {
-                reproductorAudio.volume = 1;
-                if (sliderVolume) sliderVolume.value = 1;
-            }
 
-            if (sliderVolume) {
-                sliderVolume.addEventListener('input', () => {
-                    const vol = parseFloat(sliderVolume.value);
-                    reproductorAudio.volume = vol;
-                    reproductorAudio.muted = (vol === 0);
-                    localStorage.setItem('volumenAudio', vol);
+                const nuevoVol = nivelesVolumen[indiceActual];
+                reproductorAudio.volume = nuevoVol;
+                reproductorAudio.muted = (nuevoVol === 0);
+                localStorage.setItem('volumenAudio', nuevoVol);
+                actualizarIconoVolumen(nuevoVol);
+            });
 
-                    if (vol === 0) {
-                        btnMute.textContent = 'volume_off';
-                    } else {
-                        btnMute.textContent = 'volume_up';
-                    }
-                });
-            }
-
+            // Estado inicial de carga
             iconoSpan.textContent = 'progress_activity';
             btnPlay.classList.add('cargando');
             btnPlay.title = 'Cargando audio...';
 
-            reproductorAudio.addEventListener('canplaythrough', () => {
-                iconoSpan.textContent = reproductorAudio.paused ? 'play_arrow' : 'pause';
-                btnPlay.classList.remove('cargando');
-                btnPlay.title = 'Reproducir/Pausar';
-            });
+            function habilitarReproductor() {
+                if (btnPlay.classList.contains('cargando')) {
+                    iconoSpan.textContent = reproductorAudio.paused ? 'play_arrow' : 'pause';
+                    btnPlay.classList.remove('cargando');
+                    btnPlay.title = 'Reproducir/Pausar';
+                }
+            }
+
+            // Si el navegador ya tiene el audio listo o en caché (muy común en PC), habilitarlo de inmediato
+            if (reproductorAudio.readyState >= 3) {
+                habilitarReproductor();
+            }
+
+            reproductorAudio.addEventListener('canplay', habilitarReproductor);
+            reproductorAudio.addEventListener('canplaythrough', habilitarReproductor);
+            reproductorAudio.addEventListener('loadeddata', habilitarReproductor);
 
             reproductorAudio.addEventListener('waiting', () => {
                 iconoSpan.textContent = 'progress_activity';
@@ -888,9 +918,14 @@
             });
 
             reproductorAudio.addEventListener('playing', () => {
+                habilitarReproductor();
                 iconoSpan.textContent = 'pause';
-                btnPlay.classList.remove('cargando');
-                btnPlay.title = 'Reproducir/Pausar';
+            });
+
+            reproductorAudio.addEventListener('pause', () => {
+                if (!btnPlay.classList.contains('cargando')) {
+                    iconoSpan.textContent = 'play_arrow';
+                }
             });
 
             btnPlay.addEventListener('click', () => {
@@ -901,21 +936,6 @@
                 } else {
                     reproductorAudio.pause();
                     iconoSpan.textContent = 'play_arrow';
-                }
-            });
-
-            btnMute.addEventListener('click', () => {
-                if (reproductorAudio.muted || reproductorAudio.volume === 0) {
-                    reproductorAudio.muted = false;
-                    const volPrevio = parseFloat(localStorage.getItem('volumenAudio')) || 0.5;
-                    reproductorAudio.volume = volPrevio > 0 ? volPrevio : 0.5;
-                    if (sliderVolume) sliderVolume.value = reproductorAudio.volume;
-                    btnMute.textContent = 'volume_up';
-                } else {
-                    reproductorAudio.muted = true;
-                    reproductorAudio.volume = 0;
-                    if (sliderVolume) sliderVolume.value = 0;
-                    btnMute.textContent = 'volume_off';
                 }
             });
 
