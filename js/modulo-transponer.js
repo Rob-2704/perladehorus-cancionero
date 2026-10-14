@@ -107,31 +107,107 @@ export function transponerTexto(texto, semitonos) {
     return texto.split(/\r?\n/).map(linea => transponerLinea(linea, semitonos)).join('\n');
 }
 
+// ---------------------------------------------------------------------------
+// Detección de tonalidad (mayor / menor)
+// Cada acorde se clasifica por raíz y calidad (M, m, d, D = dominante 7, p = neutro).
+// Para las 24 tonalidades posibles se suma cuánto encaja cada acorde en su campo
+// armónico; la tónica, el primer acorde, el último acorde y la dominante (V / V7)
+// pesan más. Devuelve { semitono, menor } o null si no hay acordes.
+// ---------------------------------------------------------------------------
+const CAMPO_MAYOR = { 0: ['M'], 2: ['m'], 4: ['m'], 5: ['M'], 7: ['M'], 9: ['m'], 11: ['d'] };
+// Menor natural + armónica (V mayor y vii° incluidos)
+const CAMPO_MENOR = { 0: ['m'], 2: ['d'], 3: ['M'], 5: ['m'], 7: ['m', 'M'], 8: ['M'], 10: ['M'], 11: ['d'] };
+
+const TONICA_MAYOR = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
+const TONICA_MENOR = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
+
+function clasificarAcorde(texto) {
+    const m = texto.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?(.*)$/);
+    if (!m) return null;
+    const info = analizarRaiz(m[1] + (m[2] || ''));
+    if (!info) return null;
+
+    const resto = m[3].replace(/\/.*$/, ''); // sin el bajo
+    let calidad = 'M';
+    if (/^(dim|°|ø|m7b5)/.test(resto)) calidad = 'd';
+    else if (/^(m(?!aj)|min)/.test(resto)) calidad = 'm';
+    else if (/^(7|9|11|13)/.test(resto)) calidad = 'D';
+    else if (/^(5|sus|2|4|aug|\+)/.test(resto)) calidad = 'p';
+
+    return { semitono: info.semitono, calidad };
+}
+
+function puntuarTonalidad(acordes, tonica, menor) {
+    const campo = menor ? CAMPO_MENOR : CAMPO_MAYOR;
+    const calidadTonica = menor ? 'm' : 'M';
+    const ultimo = acordes.length - 1;
+    let total = 0;
+
+    acordes.forEach((ac, i) => {
+        const g = (ac.semitono - tonica + 12) % 12;
+        const permitidas = campo[g];
+        let p;
+
+        if (ac.calidad === 'p') {
+            p = permitidas ? 0.5 : -0.5;
+        } else if (ac.calidad === 'D') {
+            if (g === 7) p = 1.2;                                        // V7
+            else if (permitidas && permitidas.includes('M')) p = 0.2;    // I7, IV7...
+            else p = campo[(g + 5) % 12] ? 0.3 : -0.8;                   // dominante secundaria
+        } else if (permitidas) {
+            p = permitidas.includes(ac.calidad) ? 1 : -0.5;
+        } else {
+            p = -1;
+        }
+
+        const esTonica = g === 0 && (ac.calidad === calidadTonica || (!menor && ac.calidad === 'D'));
+        if (esTonica) {
+            p += 0.8;
+            if (i === 0) p += 2;
+            if (i === ultimo) p += 3;
+        }
+        total += p;
+    });
+
+    return total;
+}
+
 export function detectarTonalidad(texto) {
     if (!texto) return null;
     const regex = crearRegexAcordes();
-    const conteo = {};
+    const acordes = [];
     let m;
+
+    // El regex descarta un acorde si tras el salto de línea viene una minúscula;
+    // un espacio antes de cada salto evita perder el último acorde de cada línea.
+    texto = texto.replace(/\r?\n/g, ' \n');
 
     while ((m = regex.exec(texto)) !== null) {
         if (m[0].length === 0) { regex.lastIndex++; continue; }
-        const mRaiz = m[0].match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/);
-        if (!mRaiz) continue;
-        const info = analizarRaiz(mRaiz[0]);
-        if (!info) continue;
-        conteo[info.semitono] = (conteo[info.semitono] || 0) + 1;
+        const ac = clasificarAcorde(m[0]);
+        if (ac) acordes.push(ac);
     }
+    if (acordes.length === 0) return null;
 
-    let mejorSemi = null, mejorCuenta = 0;
-    for (const s in conteo) {
-        if (conteo[s] > mejorCuenta) { mejorCuenta = conteo[s]; mejorSemi = Number(s); }
+    let mejor = null, mejorPuntaje = -Infinity;
+    for (const menor of [false, true]) {
+        for (let tonica = 0; tonica < 12; tonica++) {
+            const puntaje = puntuarTonalidad(acordes, tonica, menor);
+            if (puntaje > mejorPuntaje) {
+                mejorPuntaje = puntaje;
+                mejor = { semitono: tonica, menor };
+            }
+        }
     }
-    return mejorSemi;
+    return mejor;
 }
 
-export function nombreTonalidad(semitono) {
-    if (semitono === null || semitono === undefined) return '—';
-    return SOST_ESPANOL[((semitono % 12) + 12) % 12];
+// ton = { semitono, menor } (resultado de detectarTonalidad). Ej.: "LA", "LAm" / "A", "Am"
+export function nombreTonalidad(ton, sistema = 'LATINO') {
+    if (!ton || typeof ton.semitono !== 'number') return '—';
+    const i = ((ton.semitono % 12) + 12) % 12;
+    const nombre = ton.menor ? TONICA_MENOR[i] + 'm' : TONICA_MAYOR[i];
+    return convertirAcordeASistema(nombre, sistema);
 }
 
 export function inicializarTransponer(opciones) {
@@ -145,17 +221,14 @@ export function inicializarTransponer(opciones) {
     } = opciones;
 
     let offset = 0;
-    const semitonoBase = detectarTonalidad(contenidoOriginal);
+    const tonalidadBase = detectarTonalidad(contenidoOriginal);
     const labelEl = document.getElementById(tonalidadLabelId);
 
     function actualizar() {
         if (labelEl) {
-            if (semitonoBase === null) {
-                labelEl.textContent = '—';
-            } else {
-                const tonNombreBase = nombreTonalidad(semitonoBase + offset);
-                labelEl.textContent = convertirAcordeASistema(tonNombreBase, obtenerSistema());
-            }
+            labelEl.textContent = tonalidadBase === null
+                ? '—'
+                : nombreTonalidad({ semitono: tonalidadBase.semitono + offset, menor: tonalidadBase.menor }, obtenerSistema());
         }
         onRetransponer(transponerTexto(contenidoOriginal, offset));
     }

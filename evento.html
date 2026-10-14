@@ -945,8 +945,9 @@
                                 obtenerContenidoCancion(cancion.idC)
                                     .then(datos => {
                                         const contenidoTexto = typeof datos === 'string' ? datos : (datos?.contenido || '');
-                                        const tonDetectada = detectarTonalidad(contenidoTexto);
-                                        spanTonalidad.textContent = tonDetectada ? nombreTonalidad(tonDetectada) : '—';
+                                        let sistemaCifrado = 'LATINO';
+                                        try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
+                                        spanTonalidad.textContent = nombreTonalidad(detectarTonalidad(contenidoTexto), sistemaCifrado);
                                     })
                                     .catch(() => { spanTonalidad.textContent = '—'; });
 

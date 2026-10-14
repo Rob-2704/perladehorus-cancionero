@@ -939,8 +939,10 @@
 
                 obtenerContenidoCancion(cancion.idC)
                     .then(datos => {
+                        let sistemaCifrado = 'LATINO';
+                        try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
                         spanTonalidad.textContent = datos.contenido
-                            ? nombreTonalidad(detectarTonalidad(datos.contenido))
+                            ? nombreTonalidad(detectarTonalidad(datos.contenido), sistemaCifrado)
                             : '—';
                     })
                     .catch(() => { spanTonalidad.textContent = '—'; });
