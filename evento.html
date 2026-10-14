@@ -555,7 +555,7 @@
         import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         import { obtenerCanciones, obtenerContenidoCancion } from './js/api-cliente.js';
-        import { detectarTonalidad, nombreTonalidad } from './js/modulo-transponer.js';
+        import { detectarTonalidad, nombreTonalidad, leerAlteracionGuardada } from './js/modulo-transponer.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
@@ -947,7 +947,7 @@
                                         const contenidoTexto = typeof datos === 'string' ? datos : (datos?.contenido || '');
                                         let sistemaCifrado = 'LATINO';
                                         try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
-                                        spanTonalidad.textContent = nombreTonalidad(detectarTonalidad(contenidoTexto), sistemaCifrado);
+                                        spanTonalidad.textContent = nombreTonalidad(detectarTonalidad(contenidoTexto), sistemaCifrado, leerAlteracionGuardada());
                                     })
                                     .catch(() => { spanTonalidad.textContent = '—'; });
 

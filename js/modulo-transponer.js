@@ -32,8 +32,9 @@ function nombreDesdeSemitono(semitono, esEspanol, preferirBemol) {
     return preferirBemol ? BEMOL_INGLES[semitono] : SOST_INGLES[semitono];
 }
 
-function transponerAcorde(acordeCompleto, semitonos) {
-    if (!semitonos) return acordeCompleto;
+// alteracion: 'SOSTENIDO' | 'BEMOL' | null (null = respetar cómo está escrito cada acorde)
+function transponerAcorde(acordeCompleto, semitonos, alteracion = null) {
+    if (!semitonos && !alteracion) return acordeCompleto;
 
     const mRaiz = acordeCompleto.match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/);
     if (!mRaiz) return acordeCompleto;
@@ -41,14 +42,16 @@ function transponerAcorde(acordeCompleto, semitonos) {
     const infoRaiz = analizarRaiz(mRaiz[0]);
     if (!infoRaiz) return acordeCompleto;
 
+    const bemolDe = (info) => alteracion ? alteracion === 'BEMOL' : info.preferirBemol;
+
     let resto = acordeCompleto.slice(mRaiz[0].length);
-    const nuevaRaiz = nombreDesdeSemitono(infoRaiz.semitono + semitonos, infoRaiz.esEspanol, infoRaiz.preferirBemol);
+    const nuevaRaiz = nombreDesdeSemitono(infoRaiz.semitono + semitonos, infoRaiz.esEspanol, bemolDe(infoRaiz));
 
     const mBajo = resto.match(/\/(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?$/);
     if (mBajo) {
         const infoBajo = analizarRaiz(mBajo[0].slice(1));
         if (infoBajo) {
-            const nuevoBajo = nombreDesdeSemitono(infoBajo.semitono + semitonos, infoBajo.esEspanol, infoBajo.preferirBemol);
+            const nuevoBajo = nombreDesdeSemitono(infoBajo.semitono + semitonos, infoBajo.esEspanol, bemolDe(infoBajo));
             resto = resto.slice(0, mBajo.index) + '/' + nuevoBajo;
         }
     }
@@ -56,7 +59,7 @@ function transponerAcorde(acordeCompleto, semitonos) {
     return nuevaRaiz + resto;
 }
 
-function transponerLinea(linea, semitonos) {
+function transponerLinea(linea, semitonos, alteracion = null) {
     const regex = crearRegexAcordes();
     let resultado = '';
     let ultimoIndice = 0;
@@ -67,7 +70,7 @@ function transponerLinea(linea, semitonos) {
         if (acordeOriginal.length === 0) { regex.lastIndex++; continue; }
 
         resultado += linea.slice(ultimoIndice, m.index);
-        let nuevo = transponerAcorde(acordeOriginal, semitonos);
+        let nuevo = transponerAcorde(acordeOriginal, semitonos, alteracion);
         const diff = nuevo.length - acordeOriginal.length;
 
         const restoLinea = linea.slice(m.index + acordeOriginal.length);
@@ -102,9 +105,39 @@ function transponerLinea(linea, semitonos) {
     return resultado;
 }
 
-export function transponerTexto(texto, semitonos) {
-    if (!texto || !semitonos) return texto;
-    return texto.split(/\r?\n/).map(linea => transponerLinea(linea, semitonos)).join('\n');
+export function transponerTexto(texto, semitonos, alteracion = null) {
+    if (!texto || (!semitonos && !alteracion)) return texto;
+    return texto.split(/\r?\n/).map(linea => transponerLinea(linea, semitonos, alteracion)).join('\n');
+}
+
+// Si la canción solo usa bemoles se muestra con bemoles; en cualquier otro caso, con sostenidos.
+function detectarAlteracion(texto) {
+    if (!texto) return 'SOSTENIDO';
+    const regex = crearRegexAcordes();
+    let sostenidos = 0, bemoles = 0, m;
+
+    while ((m = regex.exec(texto)) !== null) {
+        if (m[0].length === 0) { regex.lastIndex++; continue; }
+        const r = m[0].match(/^(DO|RE|MI|FA|SOL|LA|SI|[A-G])(#|b)?/);
+        if (!r) continue;
+        if (r[2] === '#') sostenidos++;
+        else if (r[2] === 'b') bemoles++;
+    }
+    return bemoles > sostenidos ? 'BEMOL' : 'SOSTENIDO';
+}
+
+const CLAVE_ALTERACION = 'preferenciaAlteracion';
+
+// Preferencia ♯/♭ guardada por el usuario ('SOSTENIDO' | 'BEMOL'), o null si nunca la eligió.
+export function leerAlteracionGuardada() {
+    try {
+        const v = localStorage.getItem(CLAVE_ALTERACION);
+        return v === 'BEMOL' || v === 'SOSTENIDO' ? v : null;
+    } catch (_) { return null; }
+}
+
+function guardarAlteracion(valor) {
+    try { localStorage.setItem(CLAVE_ALTERACION, valor); } catch (_) {}
 }
 
 // ---------------------------------------------------------------------------
@@ -202,11 +235,20 @@ export function detectarTonalidad(texto) {
     return mejor;
 }
 
-// ton = { semitono, menor } (resultado de detectarTonalidad). Ej.: "LA", "LAm" / "A", "Am"
-export function nombreTonalidad(ton, sistema = 'LATINO') {
+// ton = { semitono, menor } (resultado de detectarTonalidad).
+// alteracion: 'SOSTENIDO' → "LA#", 'BEMOL' → "SIb"; null → ambos nombres "LA#/SIb".
+// Las tonalidades naturales ("LA", "LAm") no cambian.
+export function nombreTonalidad(ton, sistema = 'LATINO', alteracion = null) {
     if (!ton || typeof ton.semitono !== 'number') return '—';
     const i = ((ton.semitono % 12) + 12) % 12;
-    const nombre = ton.menor ? TONICA_MENOR[i] + 'm' : TONICA_MAYOR[i];
+    const sufijo = ton.menor ? 'm' : '';
+    const sostenido = SOST_INGLES[i] + sufijo;
+    const bemol = BEMOL_INGLES[i] + sufijo;
+    let nombre;
+    if (sostenido === bemol) nombre = sostenido;
+    else if (alteracion === 'SOSTENIDO') nombre = sostenido;
+    else if (alteracion === 'BEMOL') nombre = bemol;
+    else nombre = `${sostenido}/${bemol}`;
     return convertirAcordeASistema(nombre, sistema);
 }
 
@@ -217,20 +259,45 @@ export function inicializarTransponer(opciones) {
         tonalidadLabelId,
         btnSubirTonoId, btnSubirMedioId, btnBajarMedioId, btnBajarTonoId, btnResetId,
         btnToggleId, panelId,
+        btnAlteracionId,
         obtenerSistema = () => 'LATINO'
     } = opciones;
 
     let offset = 0;
+    let alteracion = leerAlteracionGuardada() || detectarAlteracion(contenidoOriginal);
     const tonalidadBase = detectarTonalidad(contenidoOriginal);
     const labelEl = document.getElementById(tonalidadLabelId);
+    const btnAlteracion = btnAlteracionId ? document.getElementById(btnAlteracionId) : null;
+
+    function actualizarBotonAlteracion() {
+        if (!btnAlteracion) return;
+        const esBemol = alteracion === 'BEMOL';
+        btnAlteracion.textContent = esBemol ? '♯' : '♭';
+        btnAlteracion.title = esBemol
+            ? 'Usar sostenidos (♯)'
+            : 'Usar bemoles (♭)';
+    }
 
     function actualizar() {
         if (labelEl) {
             labelEl.textContent = tonalidadBase === null
                 ? '—'
-                : nombreTonalidad({ semitono: tonalidadBase.semitono + offset, menor: tonalidadBase.menor }, obtenerSistema());
+                : nombreTonalidad(
+                    { semitono: tonalidadBase.semitono + offset, menor: tonalidadBase.menor },
+                    obtenerSistema(),
+                    alteracion
+                );
         }
-        onRetransponer(transponerTexto(contenidoOriginal, offset));
+        actualizarBotonAlteracion();
+        onRetransponer(transponerTexto(contenidoOriginal, offset, alteracion));
+    }
+
+    if (btnAlteracion) {
+        btnAlteracion.addEventListener('click', () => {
+            alteracion = alteracion === 'BEMOL' ? 'SOSTENIDO' : 'BEMOL';
+            guardarAlteracion(alteracion);
+            actualizar();
+        });
     }
 
     const conectar = (id, delta) => {
