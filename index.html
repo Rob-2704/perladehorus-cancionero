@@ -119,6 +119,32 @@
             box-sizing: border-box;
         }
 
+        /* Separador elegante para eventos anteriores */
+        .separador-eventos-pasados {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 4px 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            user-select: none;
+        }
+
+        .separador-eventos-pasados.oculto {
+            display: none !important;
+        }
+
+        .separador-eventos-pasados::before,
+        .separador-eventos-pasados::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(188, 151, 49, 0.25);
+        }
+
         .tarjeta-evento {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -631,12 +657,12 @@
         }
 
         function calcularAlturaCompacta() {
-            const vis = Array.from(contenedorEventos.children).slice(0, 2);
-            if (vis.length === 0) return 12;
+            const tarjetasVisibles = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(0, 2);
+            if (tarjetasVisibles.length === 0) return 12;
             let h = 12;
-            vis.forEach((el, idx) => {
+            tarjetasVisibles.forEach((el, idx) => {
                 h += el.offsetHeight;
-                if (idx < vis.length - 1) {
+                if (idx < tarjetasVisibles.length - 1) {
                     h += 8;
                 }
             });
@@ -688,7 +714,10 @@
                         if (grupoA !== grupoB) return grupoA - grupoB;
 
                         if (a.tieneFecha && b.tieneFecha) {
-                            return a.fechaObj - b.fechaObj;
+                            if (a.esPasado) {
+                                return b.fechaObj - a.fechaObj; // Eventos pasados del más reciente al más antiguo
+                            }
+                            return a.fechaObj - b.fechaObj;     // Eventos futuros del más cercano al lejano
                         }
                         return 0;
                     });
@@ -698,8 +727,18 @@
                 contenedorEventos.innerHTML = '';
                 let desplegado = false;
                 let enAnimacion = false;
+                let separadorEl = null;
+                let separadorInsertado = false;
 
                 ordenados.forEach((evento, idx) => {
+                    if (evento.esPasado && !separadorInsertado) {
+                        separadorEl = document.createElement('div');
+                        separadorEl.className = 'separador-eventos-pasados oculto'; // Oculto por defecto en vista compacta
+                        separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
+                        contenedorEventos.appendChild(separadorEl);
+                        separadorInsertado = true;
+                    }
+
                     const tarjeta = document.createElement('div');
                     const esProximo = idx === primerFuturoIdx;
                     
@@ -708,7 +747,10 @@
                     else if (esProximo) claseExtra = 'proximo';
                     else if (evento.esPasado) claseExtra = 'pasado';
 
-                    tarjeta.className = `tarjeta-evento ${idx >= 2 ? 'oculto' : ''} ${claseExtra}`;
+                    const tarjetasActualesCount = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
+                    const esOculto = tarjetasActualesCount >= 2;
+
+                    tarjeta.className = `tarjeta-evento ${esOculto ? 'oculto' : ''} ${claseExtra}`;
 
                     tarjeta.onclick = () => {
                         window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
@@ -757,7 +799,9 @@
                     }, 300);
                 });
 
-                if (ordenados.length > 2) {
+                const totalTarjetas = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
+
+                if (totalTarjetas > 2) {
                     btnToggleEventos.style.display = 'flex';
                     btnToggleEventos.onclick = () => {
                         if (enAnimacion) return;
@@ -769,7 +813,8 @@
 
                         if (desplegado) {
                             contenedorEventos.style.overflow = 'hidden';
-                            tarjetasExtra.forEach(t => t.classList.remove('oculto'));
+                            tarjetasExtra.forEach(el => el.classList.remove('oculto'));
+                            if (separadorEl) separadorEl.classList.remove('oculto');
                             
                             const alturaExpandida = contenedorEventos.scrollHeight + 12;
                             contenedorEventos.style.maxHeight = `${alturaExpandida}px`;
@@ -792,7 +837,8 @@
                             contenedorEventos.style.maxHeight = `${alturaFinal}px`;
 
                             setTimeout(() => {
-                                tarjetasExtra.forEach(t => t.classList.add('oculto'));
+                                tarjetasExtra.forEach(el => el.classList.add('oculto'));
+                                if (separadorEl) separadorEl.classList.add('oculto');
                                 contenedorEventos.style.overflow = 'visible';
                                 enAnimacion = false;
                             }, duracionTransicion);

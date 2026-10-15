@@ -110,6 +110,17 @@
             font-weight: 600;
         }
 
+        .label-repertorio-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .label-repertorio-container label {
+            margin: 0 !important;
+        }
+
         .input-admin, .textarea-admin {
             background-color: var(--card-bg);
             color: var(--text-main);
@@ -166,9 +177,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .tarjeta-cancion-selector span:first-child {
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
         }
 
         @media (hover: hover) {
@@ -189,6 +207,7 @@
         .tarjeta-cancion-selector .icono-chk {
             font-size: 18px;
             opacity: 0;
+            flex-shrink: 0;
             transition: opacity 0.15s;
         }
 
@@ -237,6 +256,28 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+        }
+
+        /* Separador elegante para eventos anteriores en el admin */
+        .separador-eventos-pasados {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0 4px 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            user-select: none;
+        }
+
+        .separador-eventos-pasados::before,
+        .separador-eventos-pasados::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(188, 151, 49, 0.25);
         }
 
         .tarjeta-evento-admin {
@@ -408,7 +449,12 @@
                     </div>
 
                     <div class="campo-grupo col-full">
-                        <label>Repertorio</label>
+                        <div class="label-repertorio-container">
+                            <label>Repertorio</label>
+                            <button type="button" id="btn-seleccionar-todas" class="btn-mini btn-editar" style="font-size: 11px; padding: 4px 10px;">
+                                <span class="material-symbols-outlined" style="font-size:14px;">done_all</span> Seleccionar todas
+                            </button>
+                        </div>
                         <div class="contenedor-selector-canciones">
                             <div id="contenedor-canciones-selector" class="grid-canciones-selector">
                                 <span style="color:var(--text-sec); font-size:12px;">Cargando canciones...</span>
@@ -467,6 +513,7 @@
         const formNotas = document.getElementById('form-notas');
         
         const contenedorCancionesSelector = document.getElementById('contenedor-canciones-selector');
+        const btnSeleccionarTodas = document.getElementById('btn-seleccionar-todas');
         const btnGuardarEvento = document.getElementById('btn-guardar-evento');
         const btnCancelarForm = document.getElementById('btn-cancelar-form');
         const tituloForm = document.getElementById('titulo-form');
@@ -532,6 +579,19 @@
             }
         }
 
+        function actualizarBotonSeleccionarTodas() {
+            if (!listaCancionesGlobal.length) return;
+            const todosIds = listaCancionesGlobal.map(c => String(c.idC));
+            const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
+            
+            if (todasSeleccionadas) {
+                btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">remove_done</span> Quitar todas`;
+            } else {
+                btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">done_all</span> Seleccionar todas`;
+            }
+            activarAnimacionIconos();
+        }
+
         function renderizarSelectorCanciones() {
             contenedorCancionesSelector.innerHTML = '';
 
@@ -578,8 +638,22 @@
                 contenedorCancionesSelector.appendChild(tarjeta);
             });
 
+            actualizarBotonSeleccionarTodas();
             activarAnimacionIconos();
         }
+
+        btnSeleccionarTodas.addEventListener('click', () => {
+            if (!listaCancionesGlobal || listaCancionesGlobal.length === 0) return;
+            const todosIds = listaCancionesGlobal.map(c => String(c.idC));
+            const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
+
+            if (todasSeleccionadas) {
+                cancionesSeleccionadas = [];
+            } else {
+                cancionesSeleccionadas = [...todosIds];
+            }
+            renderizarSelectorCanciones();
+        });
 
         function resetearFormulario() {
             formIdE.value = '';
@@ -612,6 +686,13 @@
                     return;
                 }
 
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const anioHoy = hoy.getFullYear();
+                const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
+                const diaHoy = String(hoy.getDate()).padStart(2, '0');
+                const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
+
                 const eventosArray = Object.keys(datos).map(idE => ({ ...datos[idE], idE }));
                 const ordenados = eventosArray
                     .map(e => {
@@ -622,17 +703,39 @@
                             const f = e.fecha.split('-');
                             fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
                         } else {
-                            fechaObj = new Date(8640000000000000);
+                            fechaObj = null;
                         }
-                        return { ...e, fechaObj, tieneFecha };
+
+                        const esPasado = tieneFecha && e.fecha < fechaHoyStr;
+                        const esHoy = tieneFecha && e.fecha === fechaHoyStr;
+                        return { ...e, fechaObj, tieneFecha, esHoy, esPasado };
                     })
                     .sort((a, b) => {
-                        if (a.tieneFecha && !b.tieneFecha) return -1;
-                        if (!a.tieneFecha && b.tieneFecha) return 1;
-                        return a.fechaObj - b.fechaObj;
+                        const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
+                        const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
+
+                        if (grupoA !== grupoB) return grupoA - grupoB;
+
+                        if (a.tieneFecha && b.tieneFecha) {
+                            if (a.esPasado) {
+                                return b.fechaObj - a.fechaObj;
+                            }
+                            return a.fechaObj - b.fechaObj;
+                        }
+                        return 0;
                     });
 
+                let separadorInsertado = false;
+
                 ordenados.forEach(evento => {
+                    if (evento.esPasado && !separadorInsertado) {
+                        const separador = document.createElement('div');
+                        separador.className = 'separador-eventos-pasados';
+                        separador.innerHTML = `<span>Eventos anteriores</span>`;
+                        listaEventosAdmin.appendChild(separador);
+                        separadorInsertado = true;
+                    }
+
                     const idE = evento.idE;
                     const div = document.createElement('div');
                     div.className = 'tarjeta-evento-admin';
