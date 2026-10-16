@@ -276,7 +276,6 @@
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
         }
 
-        /* Estilo mejorado para la píldora: fondo elegante acorde al tema y borde sutil */
         .contenedor-grupo-pildora {
             position: relative;
             background: rgba(13, 13, 13, 0.55);
@@ -295,7 +294,6 @@
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(188, 151, 49, 0.15);
         }
 
-        /* Insignia unificada superior derecha */
         .indicador-grupo-badge {
             position: absolute;
             top: -5px;
@@ -575,7 +573,6 @@
             animation: deslizarPanelTransponerSalida 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
         }
 
-        /* Animación escalonada (staggered) y fluida para los controles del panel superior */
         #panel-transponer.panel-transponer-entrada .btn-transponer,
         #panel-transponer.panel-transponer-entrada #btn-reset-tono,
         #panel-transponer.panel-transponer-entrada .contenedor-grupo-pildora {
@@ -631,11 +628,111 @@
             background: var(--accent);
         }
 
-        #btn-alteracion {
-            font-family: system-ui, 'Segoe UI Symbol', sans-serif;
-            font-size: 20px;
+        /* ============================================================
+           Botones duales (♭/♯ y DO/C)
+           Círculo blanco con dos símbolos en diagonal:
+             · ACTIVO   → arriba a la izquierda, grande y oscuro
+             · INACTIVO → abajo a la derecha, pequeño y gris
+           data-a / data-b  = los dos símbolos
+           data-activo      = "a" o "b": cuál de los dos está activo
+           Todo se escala a partir de --dual-size.
+           ============================================================ */
+        .btn-dual {
+            --dual-size: 44px;
+            --dual-color-activo: var(--bg-color);
+            --dual-color-inactivo: #9d9d9d;
+
+            /* Centro de cada símbolo, en % del círculo (el activo sube a la izquierda, el inactivo baja a la derecha) */
+            --dual-cx-activo: 38%;
+            --dual-cy-activo: 40%;
+            --dual-cx-inactivo: 68%;
+            --dual-cy-inactivo: 68%;
+
+            position: relative;
+            width: var(--dual-size);
+            height: var(--dual-size);
+            padding: 0;
+            border: none;
+            overflow: hidden;
+            font-size: 0;            /* el texto interno se oculta; los símbolos se dibujan con ::before / ::after */
+            color: transparent;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+
+        @media (max-width: 420px) {
+            .btn-dual { --dual-size: 40px; }
+        }
+
+        .btn-dual::before,
+        .btn-dual::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
             line-height: 1;
-            padding: 0 0 2px 0;
+            font-weight: 700;
+            font-family: 'Sono', system-ui, sans-serif;
+            font-variation-settings: 'MONO' 0;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .btn-dual::before {
+            left: var(--dual-cx-activo);
+            top: var(--dual-cy-activo);
+            transform: translate(-50%, -50%);
+            color: var(--dual-color-activo);
+        }
+
+        .btn-dual::after {
+            left: var(--dual-cx-inactivo);
+            top: var(--dual-cy-inactivo);
+            transform: translate(-50%, -50%);
+            color: var(--dual-color-inactivo);
+        }
+
+        /* Los dos símbolos se escriben como texto y se intercambian según data-activo */
+        .btn-dual::before { content: attr(data-a); font-size: var(--dual-fs-activo); }
+        .btn-dual::after  { content: attr(data-b); font-size: var(--dual-fs-inactivo); }
+
+        .btn-dual[data-activo="b"]::before { content: attr(data-b); }
+        .btn-dual[data-activo="b"]::after  { content: attr(data-a); }
+
+        /* ♭ / ♯ */
+        .btn-dual--musical {
+            --dual-fs-activo: calc(var(--dual-size) * 0.52);
+            --dual-fs-inactivo: calc(var(--dual-size) * 0.30);
+            --dual-cx-activo: 36%;
+            --dual-cy-activo: 38%;
+            --dual-cx-inactivo: 66%;
+            --dual-cy-inactivo: 68%;
+        }
+
+        .btn-dual--musical::before,
+        .btn-dual--musical::after {
+            font-family: system-ui, 'Segoe UI Symbol', 'Sono', sans-serif;
+        }
+
+        /* DO / C */
+        .btn-dual--texto {
+            --dual-fs-activo: calc(var(--dual-size) * 0.32);
+            --dual-fs-inactivo: calc(var(--dual-size) * 0.22);
+            --dual-borde: 18%;      /* margen lateral: el activo se ancla a la izquierda y el inactivo a la derecha */
+            --dual-cy-activo: 40%;
+            --dual-cy-inactivo: 68%;
+        }
+
+        /* Cifrado: "DO" y "C" miden distinto, así que se anclan por sus bordes (no por su centro).
+           Con el mismo margen a cada lado, el par queda centrado en ambos estados. */
+        .btn-dual--texto::before {
+            left: var(--dual-borde);
+            top: var(--dual-cy-activo);
+            transform: translate(0, -50%);
+        }
+
+        .btn-dual--texto::after {
+            left: auto;
+            right: var(--dual-borde);
+            top: var(--dual-cy-inactivo);
+            transform: translate(0, -50%);
         }
 
         .btn-toggle-transponer {
@@ -657,14 +754,22 @@
             line-height: 1;
         }
 
+        /* Ícono de flecha triangular que apunta hacia arriba por defecto (cerrado) */
         #btn-toggle-transponer::before {
-            content: 'music_note_2';
+            content: 'arrow_drop_down_circle';
+            transform: rotate(180deg);
             font-family: 'Material Symbols Outlined' !important;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: normal;
             font-style: normal;
             color: var(--accent);
             line-height: 1;
+        }
+
+        /* Ícono de flecha triangular que apunta hacia abajo cuando el panel está abierto */
+        #btn-toggle-transponer.abierto::before {
+            content: 'arrow_drop_down_circle';
+            transform: rotate(0deg);
         }
 
         .btn-toggle-transponer.abierto {
@@ -679,7 +784,6 @@
             accent-color: var(--accent); 
         }
 
-        /* Transiciones suaves y continuas para todos los botones sin saltos bruscos */
         .btn-audio-ctrl,        
         .btn-scroll,
         .btn-transponer,
@@ -814,10 +918,9 @@
             <button id="btn-reset-tono" class="btn-scroll material-symbols-outlined" title="Volver a la tonalidad original">refresh</button>
 
             <div class="grupo-extra-transponer">
-                <!-- Píldora mejorada unificando alteración y cifrado -->
                 <div class="contenedor-grupo-pildora">
-                    <button id="btn-alteracion" class="btn-transponer" title="Cambiar entre sostenidos y bemoles">♭</button>
-                    <button id="btn-toggle-cifrado" class="btn-transponer" title="Cambiar cifrado (Inglés / Español)">C</button>
+                    <button id="btn-alteracion" class="btn-transponer btn-dual btn-dual--musical" data-a="♭" data-b="♯" data-activo="a" title="Cambiar entre sostenidos y bemoles">♭</button>
+                    <button id="btn-toggle-cifrado" class="btn-transponer btn-dual btn-dual--texto" data-a="DO" data-b="C" data-activo="a" title="Cambiar cifrado (Español / Inglés)"></button>
                     <span class="material-symbols-outlined indicador-grupo-badge">swap_horiz</span>
                 </div>
             </div>
@@ -842,7 +945,6 @@
         import { inicializarAutoscroll } from './js/modulo-autoscroll.js';
         import { inicializarTransponer } from './js/modulo-transponer.js';
 
-        // --- Control de Screen Wake Lock ---
         let wakeLock = null;
 
         async function solicitarWakeLock() {
@@ -872,6 +974,7 @@
         const letraCancionDiv = document.getElementById('letra-cancion');
         const letraContenedorEl = document.getElementById('letra-contenedor');
         const btnToggleCifrado = document.getElementById('btn-toggle-cifrado');
+        const btnToggleTransponer = document.getElementById('btn-toggle-transponer');
 
         let sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO';
         let contenidoActualTranspuesto = '';
@@ -879,8 +982,27 @@
 
         function actualizarBotonCifrado() {
             if (btnToggleCifrado) {
-                btnToggleCifrado.textContent = sistemaCifrado === 'LATINO' ? 'C' : 'DO';
+                // a = DO (latino), b = C (anglosajón)
+                btnToggleCifrado.dataset.activo = sistemaCifrado === 'LATINO' ? 'a' : 'b';
             }
+        }
+
+        // Botón bemol/sostenido: lee el símbolo que le pone modulo-transponer.js
+        // y lo traduce a data-activo (a = ♭, b = ♯) sin tocar ese módulo.
+        const btnAlteracion = document.getElementById('btn-alteracion');
+        const ALTERACION_MUESTRA_ACTUAL = true; // pon false si el botón muestra el modo al que va a cambiar
+        function sincronizarAlteracion() {
+            if (!btnAlteracion) return;
+            const t = btnAlteracion.textContent.trim();
+            if (!t) return;
+            const esBemol = (t === '♭' || t === 'b');
+            const bemolActivo = ALTERACION_MUESTRA_ACTUAL ? esBemol : !esBemol;
+            btnAlteracion.dataset.activo = bemolActivo ? 'a' : 'b';
+        }
+        sincronizarAlteracion();
+        if (btnAlteracion) {
+            new MutationObserver(sincronizarAlteracion)
+                .observe(btnAlteracion, { childList: true, characterData: true, subtree: true });
         }
 
         const FORMATOS_AUDIO = [
@@ -1169,6 +1291,7 @@
                             panelTranspon.style.display = ultimoDisplayPanel;
                             panelTranspon.classList.remove('panel-transponer-entrada');
                             panelTranspon.classList.add('panel-transponer-salida');
+                            if (btnToggleTransponer) btnToggleTransponer.classList.remove('abierto');
 
                             setTimeout(() => {
                                 panelTranspon.classList.remove('panel-transponer-salida');
@@ -1180,6 +1303,7 @@
                             ultimoDisplayPanel = displayActual;
                             panelTranspon.classList.remove('panel-transponer-salida');
                             panelTranspon.classList.add('panel-transponer-entrada');
+                            if (btnToggleTransponer) btnToggleTransponer.classList.add('abierto');
                         }
                     });
 
