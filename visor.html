@@ -486,7 +486,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            width: 300px;
+            width: 360px;
             max-width: 90vw;
         }
 
@@ -518,12 +518,12 @@
         }
 
         #panel-transponer {
-            width: auto;
+            width: 360px;
             max-width: 90vw;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 8px;
             padding: 10px 16px;
         }
 
@@ -555,6 +555,7 @@
         }
 
         @media (max-width: 380px) {
+            #panel-transponer, .fila-inferior { width: 90vw; }
             #panel-transponer { gap: 6px; padding: 10px 12px; }
         }
 
