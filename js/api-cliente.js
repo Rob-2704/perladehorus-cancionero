@@ -1,4 +1,4 @@
-// api-cliente.js — Conectado a Firebase Realtime Database
+// api-cliente.js — Conectado a Firebase con caché local automática para PWA
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -16,11 +16,13 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let cacheCanciones = null;
+const STORAGE_KEY = 'cache_canciones_perla_v1';
 
 async function cargarDatosFirebase() {
     if (cacheCanciones) return cacheCanciones;
 
     try {
+        // Al abrir el index, esto descarga de Firebase TODO el catálogo y sus letras en una sola petición
         const [snapshotCanciones, snapshotCustom] = await Promise.all([
             get(ref(db, 'canciones')),
             get(ref(db, 'canciones_custom'))
@@ -29,12 +31,29 @@ async function cargarDatosFirebase() {
         const datosCanciones = snapshotCanciones.val() || {};
         const datosCustom = snapshotCustom.val() || {};
 
-        // Combinar ambas fuentes (las modificaciones custom tienen prioridad)
         const combinadas = { ...datosCanciones, ...datosCustom };
         cacheCanciones = combinadas;
+
+        // GUARDADO AUTOMÁTICO LOCAL: Almacena todas las canciones y letras en la PWA
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
+        } catch (e) {
+            console.warn("No se pudo guardar en el almacenamiento local:", e);
+        }
+
         return combinadas;
     } catch (err) {
-        console.error("Error al cargar canciones desde Firebase:", err);
+        console.warn("Sin conexión a Internet. Cargando canciones desde el almacenamiento local...", err);
+        
+        // Si estás offline, recupera instantáneamente todo el catálogo guardado localmente
+        try {
+            const guardado = localStorage.getItem(STORAGE_KEY);
+            if (guardado) {
+                cacheCanciones = JSON.parse(guardado);
+                return cacheCanciones;
+            }
+        } catch (e) {}
+
         return {};
     }
 }
@@ -57,7 +76,7 @@ export async function obtenerContenidoCancion(idC) {
     const datos = await cargarDatosFirebase();
     let c = datos[idC];
 
-    // Si no está en caché, intentar consulta directa por ID
+    // Si por alguna razón no está en caché, intenta consultarlo directamente
     if (!c) {
         try {
             const snapCustom = await get(ref(db, `canciones_custom/${idC}`));
