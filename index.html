@@ -141,8 +141,16 @@
             will-change: transform, opacity, visibility;
         }
 
-        .icono-grabacion,
-        .icono-general {
+        .icono-grabacion {
+            font-family: 'Material Symbols Outlined' !important;
+            font-size: 20px;
+            color: var(--accent);
+            user-select: none;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-feature-settings: 'liga';
+            -webkit-font-feature-settings: 'liga';
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
             visibility: hidden;
             opacity: 0;
             width: 1em;
@@ -619,7 +627,7 @@
                 activarAnimacionIconos();
             } else if (estado === 'offline') {
                 iconoIndicador.textContent = 'offline_pin';
-                indicadorGuardado.title = 'Modo sin conexión (Usando copia local)';
+                iconoIndicador.title = 'Modo sin conexión (Usando copia local)';
                 activarAnimacionIconos();
             }
         });

@@ -1,4 +1,4 @@
-// api-cliente.js — Conectado a Firebase con importación dinámica y caché local offline
+// api-cliente.js — Conectado a Firebase con caché local automática al abrir index y control offline
 const STORAGE_KEY = 'cache_canciones_perla_v1';
 let cacheCanciones = null;
 
@@ -38,7 +38,6 @@ async function cargarDatosFirebase() {
     }
 
     try {
-        // Importación dinámica: si no hay red, esto falla de forma controlada sin romper la app
         const [appModule, dbModule] = await Promise.all([
             import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
             import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
@@ -57,7 +56,6 @@ async function cargarDatosFirebase() {
         const app = appModule.initializeApp(firebaseConfig);
         const db = dbModule.getDatabase(app);
 
-        // Timeout de seguridad de 3.5 segundos por si la red móvil es lenta o inestable
         const fetchConTimeout = (promise, ms = 3500) => {
             let timeoutId;
             const timeoutPromise = new Promise((_, reject) => {
@@ -79,7 +77,6 @@ async function cargarDatosFirebase() {
         const combinadas = { ...datosCanciones, ...datosCustom };
         cacheCanciones = combinadas;
 
-        // Guardar respaldo completo en localStorage para la PWA
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
         } catch (e) {
@@ -89,7 +86,7 @@ async function cargarDatosFirebase() {
         notificarEstadoGuardado('completado');
         return combinadas;
     } catch (err) {
-        console.warn("Modo offline o error de red en móvil. Cargando desde almacenamiento local...", err);
+        console.warn("Modo offline o error de red. Cargando desde almacenamiento local...", err);
         
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
@@ -103,6 +100,11 @@ async function cargarDatosFirebase() {
         notificarEstadoGuardado('offline');
         return {};
     }
+}
+
+// Iniciar la sincronización y guardado local en segundo plano tan pronto como se importe el módulo en index.html
+if (typeof window !== 'undefined') {
+    cargarDatosFirebase().catch(() => {});
 }
 
 export async function obtenerCanciones() {
