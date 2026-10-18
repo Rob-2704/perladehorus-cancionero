@@ -2,7 +2,7 @@
 <html lang="es-mx">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <meta name="color-scheme" content="dark">
 
@@ -17,6 +17,18 @@
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
+        }
+
+        /*
+         * La página no debe desplazarse nunca: así, ni el rebote de iOS ni un body con
+         * altura/padding heredado de style.css pueden mover el contenido en la PWA.
+         */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
         }
 
         /* Color de respaldo por si style.css no carga */
@@ -40,11 +52,9 @@
             isolation: isolate;
             display: flex;
             overflow: auto;
-            padding:
-                max(16px, env(safe-area-inset-top))
-                max(16px, env(safe-area-inset-right))
-                max(16px, env(safe-area-inset-bottom))
-                max(16px, env(safe-area-inset-left));
+            overscroll-behavior: none;
+            /* Padding simétrico: las áreas seguras (notch / barra inferior) son distintas arriba y abajo y descentraban la tarjeta en la PWA */
+            padding: 16px;
             font-family: 'Sono', monospace;
         }
 
