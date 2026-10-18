@@ -597,6 +597,17 @@
         const FORMATOS_AUDIO = ['mp3', 'm4a', 'wav', 'ogg', 'aac', 'flac', 'opus', 'webm'];
         let cancionesGlobal = [];
 
+        // Función para normalizar texto (elimina acentos, puntuación y pasa a minúsculas)
+        function normalizarTexto(texto) {
+            return (texto || '')
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Elimina acentos
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "") // Elimina puntuación
+                .replace(/\s+/g, " ") // Normaliza espacios múltiples
+                .trim();
+        }
+
         function activarAnimacionIconos() {
             document.fonts.ready.then(() => {
                 document.querySelectorAll('.material-symbols-outlined, .icono-grabacion').forEach(icono => {
@@ -715,9 +726,9 @@
 
                         if (a.tieneFecha && b.tieneFecha) {
                             if (a.esPasado) {
-                                return b.fechaObj - a.fechaObj; // Eventos pasados del más reciente al más antiguo
+                                return b.fechaObj - a.fechaObj; 
                             }
-                            return a.fechaObj - b.fechaObj;     // Eventos futuros del más cercano al lejano
+                            return a.fechaObj - b.fechaObj;     
                         }
                         return 0;
                     });
@@ -733,7 +744,7 @@
                 ordenados.forEach((evento, idx) => {
                     if (evento.esPasado && !separadorInsertado) {
                         separadorEl = document.createElement('div');
-                        separadorEl.className = 'separador-eventos-pasados oculto'; // Oculto por defecto en vista compacta
+                        separadorEl.className = 'separador-eventos-pasados oculto'; 
                         separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
                         contenedorEventos.appendChild(separadorEl);
                         separadorInsertado = true;
@@ -875,7 +886,7 @@
         }
 
         function mostrarSugerencias() {
-            const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+            const textoBusqueda = normalizarTexto(inputBusqueda.value);
             const categoriaSeleccionada = selectCategoria.value;
             const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
 
@@ -887,8 +898,8 @@
 
             const coincidencias = cancionesGlobal.filter(c => {
                 const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
-                const coincideNombre = (c.nombreC || '').toLowerCase().includes(textoBusqueda);
-                const coincideArreglos = (c.arreglos || '').toLowerCase().includes(textoBusqueda);
+                const coincideNombre = normalizarTexto(c.nombreC).includes(textoBusqueda);
+                const coincideArreglos = normalizarTexto(c.arreglos).includes(textoBusqueda);
                 return coincideCategoria && (coincideNombre || coincideArreglos);
             }).slice(0, 6);
 
@@ -920,15 +931,15 @@
 
         function renderizarLista() {
             const categoriaSeleccionada = selectCategoria.value;
-            const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+            const textoBusqueda = normalizarTexto(inputBusqueda.value);
             const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
 
             listaDiv.innerHTML = "";
 
             const filtradas = cancionesGlobal.filter(c => {
                 const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
-                const coincideNombre = (c.nombreC || '').toLowerCase().includes(textoBusqueda);
-                const coincideArreglos = (c.arreglos || '').toLowerCase().includes(textoBusqueda);
+                const coincideNombre = normalizarTexto(c.nombreC).includes(textoBusqueda);
+                const coincideArreglos = normalizarTexto(c.arreglos).includes(textoBusqueda);
                 return coincideCategoria && (coincideNombre || coincideArreglos);
             });
 
