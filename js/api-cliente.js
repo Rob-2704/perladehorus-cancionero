@@ -1,4 +1,4 @@
-// api-cliente.js — Conectado a Firebase con caché local automática para PWA
+// api-cliente.js — Conectado a Firebase con caché local y notificación de estado
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -18,11 +18,28 @@ const db = getDatabase(app);
 let cacheCanciones = null;
 const STORAGE_KEY = 'cache_canciones_perla_v1';
 
+// Suscriptores del estado de guardado
+let callbacksEstadoGuardado = [];
+let estadoActualGuardado = 'guardando'; // 'guardando' | 'completado' | 'offline'
+
+export function alCambiarEstadoGuardado(callback) {
+    callbacksEstadoGuardado.push(callback);
+    callback(estadoActualGuardado);
+}
+
+function notificarEstadoGuardado(nuevoEstado) {
+    estadoActualGuardado = nuevoEstado;
+    callbacksEstadoGuardado.forEach(cb => cb(nuevoEstado));
+}
+
 async function cargarDatosFirebase() {
-    if (cacheCanciones) return cacheCanciones;
+    if (cacheCanciones) {
+        return cacheCanciones;
+    }
+
+    notificarEstadoGuardado('guardando');
 
     try {
-        // Al abrir el index, esto descarga de Firebase TODO el catálogo y sus letras en una sola petición
         const [snapshotCanciones, snapshotCustom] = await Promise.all([
             get(ref(db, 'canciones')),
             get(ref(db, 'canciones_custom'))
@@ -34,26 +51,28 @@ async function cargarDatosFirebase() {
         const combinadas = { ...datosCanciones, ...datosCustom };
         cacheCanciones = combinadas;
 
-        // GUARDADO AUTOMÁTICO LOCAL: Almacena todas las canciones y letras en la PWA
+        // Guardar todas las letras en localStorage
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
         } catch (e) {
             console.warn("No se pudo guardar en el almacenamiento local:", e);
         }
 
+        notificarEstadoGuardado('completado');
         return combinadas;
     } catch (err) {
         console.warn("Sin conexión a Internet. Cargando canciones desde el almacenamiento local...", err);
         
-        // Si estás offline, recupera instantáneamente todo el catálogo guardado localmente
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
             if (guardado) {
                 cacheCanciones = JSON.parse(guardado);
+                notificarEstadoGuardado('offline');
                 return cacheCanciones;
             }
         } catch (e) {}
 
+        notificarEstadoGuardado('offline');
         return {};
     }
 }
@@ -76,14 +95,13 @@ export async function obtenerContenidoCancion(idC) {
     const datos = await cargarDatosFirebase();
     let c = datos[idC];
 
-    // Si por alguna razón no está en caché, intenta consultarlo directamente
     if (!c) {
         try {
-            const snapCustom = await get(ref(db, `canciones_custom/${idC}`));
+            const snapCustom = await get(ref(db, `canciones_custom/\${idC}`));
             if (snapCustom.exists()) {
                 c = snapCustom.val();
             } else {
-                const snapNorm = await get(ref(db, `canciones/${idC}`));
+                const snapNorm = await get(ref(db, `canciones/\${idC}`));
                 if (snapNorm.exists()) {
                     c = snapNorm.val();
                 }
