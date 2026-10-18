@@ -1,11 +1,14 @@
-const CACHE_NAME = 'cancionero-perla-0.5';
+const CACHE_NAME = 'cancionero-perla-0.6';
 
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './visor_2.html',
+  './visor.html',
   './evento.html',
   './acordes.html',
+  './admin-canciones.html',
+  './admin-eventos.html',
+  './editor-cancion.html',
   './404.html',
   './style.css',
   './js/acordes.js',
@@ -13,43 +16,15 @@ const ASSETS_TO_CACHE = [
   './js/modulo-acordes.js',
   './js/modulo-autoscroll.js',
   './js/modulo-transponer.js',
-  './json/indice.json',
-  './json/ids-canciones.json',
   './img/icono.png',
   './img/fondo.png'
 ];
 
-// Instalación y precarga automática de la app y todo el cancionero
+// Instalación y precarga de la app
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      // 1. Guardar la estructura base y recursos estáticos
-      await cache.addAll(ASSETS_TO_CACHE);
-
-      // 2. Leer el índice de canciones y precargar todos los archivos .txt automáticamente
-      try {
-        const respuestaIndice = await fetch('./json/indice.json');
-        if (respuestaIndice.ok) {
-          const datos = await respuestaIndice.json();
-          if (datos && Array.isArray(datos.canciones)) {
-            const promesasTxt = datos.canciones.map(async (info) => {
-              const subcarpeta = info.categoria === 'general' ? 'Canciones/General' : 'Canciones';
-              const rutaTxt = `${subcarpeta}/${encodeURIComponent(info.archivo)}.txt`;
-              try {
-                const resTxt = await fetch(rutaTxt);
-                if (resTxt.ok) {
-                  await cache.put(rutaTxt, resTxt);
-                }
-              } catch (err) {
-                // Silenciar errores individuales si alguna petición falla temporalmente
-              }
-            });
-            await Promise.all(promesasTxt);
-          }
-        }
-      } catch (error) {
-        console.error('Error al precargar las canciones en segundo plano:', error);
-      }
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
@@ -73,6 +48,11 @@ self.addEventListener('activate', (event) => {
 
 // Estrategia de respuesta: Buscar primero en caché, si no, ir a la red
 self.addEventListener('fetch', (event) => {
+  // Omitir peticiones a Firebase Realtime Database para que siempre obtengan datos frescos de la BD
+  if (event.request.url.includes('firebaseio.com')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {

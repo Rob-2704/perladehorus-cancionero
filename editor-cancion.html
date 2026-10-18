@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="img/icono.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
+    <link href="style.css" rel="stylesheet">
+    <title>Editor de Canción</title>
+    <style>
+        :root { --bg-color: #0d0d0d; --card-bg: #1E1E24; --text-main: #ffffff; --text-sec: #999999; --accent: #BC9731; }
+        body { padding: 30px; font-family: 'Sono', monospace; background-color: var(--bg-color); color: var(--text-main); }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 98%; margin: 0 auto; }
+        .panel-editor { background-color: var(--card-bg); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .input-admin, .textarea-admin, .select-admin { background-color: var(--bg-color); color: var(--text-main); border: 2px solid var(--accent); border-radius: 12px; padding: 10px 14px; font-family: 'Sono', monospace; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+        .textarea-admin { resize: vertical; min-height: 380px; white-space: pre; font-family: 'Sono', monospace; line-height: 1.4; }
+        .acciones-editor { display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px; }
+        .btn-accion { border: none; padding: 10px 20px; border-radius: 12px; font-family: 'Sono', monospace; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.15s; }
+        .btn-guardar { background-color: var(--accent); color: var(--bg-color); }
+        .btn-guardar:active { transform: scale(0.96); }
+        
+        /* Estilos idénticos al visor */
+        .panel-vista-previa { background-color: var(--bg-color); border-radius: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .letra-contenedor { position: relative; background: var(--text-main); padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); width: 100%; overflow: hidden; box-sizing: border-box; }
+        .letra-texto { position: relative; z-index: 1; display: block; font-family: 'Sono', monospace; font-size: 14px; color: var(--bg-color); margin: 0; white-space: pre; overflow-x: auto; width: 100%; line-height: 1.5; }
+        .acorde-link { color: #0066cc; font-weight: bold; text-decoration: none; cursor: pointer; }
+        .barra-compas { color: var(--bg-color); font-weight: bold; }
+
+        @media (max-width: 900px) { .editor-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <a href="admin-canciones.html" style="color: var(--text-sec); text-decoration: none; font-size: 13px; display: inline-block; margin-bottom: 15px;">← Volver al gestor</a>
+
+    <div class="editor-layout">
+        <!-- Formulario de Edición -->
+        <div class="panel-editor">
+            <h2 id="titulo-panel" style="margin: 0; font-size: 20px; color: var(--accent);">Crear Nueva Canción</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label style="font-size: 11px; color: var(--text-sec);">TÍTULO DE LA CANCIÓN</label>
+                    <input type="text" id="input-titulo" class="input-admin" placeholder="Ej. Por Mujeres Como Tú" required>
+                </div>
+                <div>
+                    <label style="font-size: 11px; color: var(--text-sec);">ARREGLOS / ARTISTA</label>
+                    <input type="text" id="input-arreglos" class="input-admin" placeholder="Ej. Roberto T.">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label style="font-size: 11px; color: var(--text-sec);">CATEGORÍA</label>
+                    <select id="select-categoria" class="select-admin">
+                        <option value="rondalla">Rondalla</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; color: var(--text-sec);">ESTADO</label>
+                    <select id="select-estado" class="select-admin">
+                        <option value="terminada">Terminada</option>
+                        <option value="revisar">Por Revisar</option>
+                        <option value="pendiente">Pendiente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size: 11px; color: var(--text-sec);">LETRA Y ACORDES (Formato Cancionero)</label>
+                <textarea id="input-contenido" class="textarea-admin" placeholder="Escribe aquí la letra con acordes...&#10;Ej:&#10;Capo: 2º traste&#10;&#10;   DO          SOL&#10;Se fue mi amor..."></textarea>
+            </div>
+
+            <div class="acciones-editor">
+                <button id="btn-guardar" class="btn-accion btn-guardar">
+                    <span class="material-symbols-outlined">save</span> Guardar Canción
+                </button>
+            </div>
+        </div>
+
+        <!-- Vista Previa estilo Visor -->
+        <div class="panel-vista-previa">
+            <div style="padding: 10px 0; border-bottom: 2px solid var(--accent);">
+                <h1 id="prev-titulo" style="margin:0; font-size: 24px;">Vista Previa</h1>
+                <h2 id="prev-arreglos" style="margin: 4px 0 0 0; font-size: 14px; font-weight: normal; color: var(--text-sec);">Arreglos: —</h2>
+            </div>
+
+            <article class="letra-contenedor">
+                <pre id="prev-letra" class="letra-texto">Escribe en el panel izquierdo para previsualizar...</pre>
+            </article>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { obtenerContenidoCancion } from './js/api-cliente.js';
+        import { procesarLetraYAcordes } from './js/modulo-acordes.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+            authDomain: "rondalla-f04a4.firebaseapp.com",
+            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+            projectId: "rondalla-f04a4",
+            storageBucket: "rondalla-f04a4.firebasestorage.app",
+            messagingSenderId: "835273996097",
+            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const params = new URLSearchParams(window.location.search);
+        const idC = params.get('idC');
+
+        const inputTitulo = document.getElementById('input-titulo');
+        const inputArreglos = document.getElementById('input-arreglos');
+        const selectCategoria = document.getElementById('select-categoria');
+        const selectEstado = document.getElementById('select-estado');
+        const inputContenido = document.getElementById('input-contenido');
+        const btnGuardar = document.getElementById('btn-guardar');
+
+        const prevTitulo = document.getElementById('prev-titulo');
+        const prevArreglos = document.getElementById('prev-arreglos');
+        const prevLetra = document.getElementById('prev-letra');
+
+        function actualizarVistaPrevia() {
+            prevTitulo.textContent = inputTitulo.value.trim() || 'Título de la canción';
+            prevArreglos.textContent = `Arreglos: ${inputArreglos.value.trim() || '—'}`;
+            const rawText = inputContenido.value || '';
+            prevLetra.innerHTML = procesarLetraYAcordes(rawText, 'LATINO');
+        }
+
+        [inputTitulo, inputArreglos, inputContenido].forEach(el => el.addEventListener('input', actualizarVistaPrevia));
+
+        async function cargarCancionExistente() {
+            if (!idC) return;
+            document.getElementById('titulo-panel').textContent = 'Editar Canción';
+
+            try {
+                // Buscar en Firebase primero
+                const snapshot = await get(ref(db, `canciones_custom/${idC}`));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    inputTitulo.value = data.nombreC || '';
+                    inputArreglos.value = data.arreglos || '';
+                    selectCategoria.value = data.categoria || 'rondalla';
+                    selectEstado.value = data.estado || 'terminada';
+                    inputContenido.value = data.contenido || '';
+                } else {
+                    // Cargar del archivo .txt existente vía api-cliente
+                    const data = await obtenerContenidoCancion(idC);
+                    if (!data.error) {
+                        inputTitulo.value = data.nombreC || '';
+                        inputArreglos.value = data.arreglos || '';
+                        selectCategoria.value = data.categoria || 'rondalla';
+                        inputContenido.value = data.contenido || '';
+                    }
+                }
+                actualizarVistaPrevia();
+            } catch (err) {
+                console.error("Error al cargar la canción:", err);
+            }
+        }
+
+        btnGuardar.onclick = async () => {
+            const titulo = inputTitulo.value.trim();
+            if (!titulo) {
+                alert("Por favor ingresa el título de la canción.");
+                return;
+            }
+
+            const targetId = idC || `c_${Date.now()}`;
+            const objetoCancion = {
+                idC: targetId,
+                nombreC: titulo,
+                arreglos: inputArreglos.value.trim(),
+                categoria: selectCategoria.value,
+                estado: selectEstado.value,
+                contenido: inputContenido.value
+            };
+
+            try {
+                await set(ref(db, `canciones_custom/${targetId}`), objetoCancion);
+                alert("Canción guardada con éxito en Firebase.");
+                window.location.href = 'admin-canciones.html';
+            } catch (err) {
+                console.error("Error guardando en Firebase:", err);
+                alert("Ocurrió un error al guardar la canción.");
+            }
+        };
+
+        cargarCancionExistente();
+    </script>
+</body>
+</html>

@@ -1,40 +1,86 @@
-// api-cliente.js — versión estática para GitHub Pages (sin PHP)
-// Datos: json/indice.json (generado por generar-indice.js) + archivos .txt de /Canciones y /Canciones/General
-const CARPETA = 'Canciones';
+// api-cliente.js — Conectado a Firebase Realtime Database
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-let indicePromise = null;
+const firebaseConfig = {
+    apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+    authDomain: "rondalla-f04a4.firebaseapp.com",
+    databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+    projectId: "rondalla-f04a4",
+    storageBucket: "rondalla-f04a4.firebasestorage.app",
+    messagingSenderId: "835273996097",
+    appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+};
 
-function cargarIndice() {
-    if (!indicePromise) {
-        indicePromise = fetch('json/indice.json', { cache: 'no-cache' }).then(r => {
-            if (!r.ok) throw new Error('No se pudo cargar json/indice.json');
-            return r.json();
-        });
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let cacheCanciones = null;
+
+async function cargarDatosFirebase() {
+    if (cacheCanciones) return cacheCanciones;
+
+    try {
+        const [snapshotCanciones, snapshotCustom] = await Promise.all([
+            get(ref(db, 'canciones')),
+            get(ref(db, 'canciones_custom'))
+        ]);
+
+        const datosCanciones = snapshotCanciones.val() || {};
+        const datosCustom = snapshotCustom.val() || {};
+
+        // Combinar ambas fuentes (las modificaciones custom tienen prioridad)
+        const combinadas = { ...datosCanciones, ...datosCustom };
+        cacheCanciones = combinadas;
+        return combinadas;
+    } catch (err) {
+        console.error("Error al cargar canciones desde Firebase:", err);
+        return {};
     }
-    return indicePromise;
 }
 
 export async function obtenerCanciones() {
-    const indice = await cargarIndice();
-    return indice.canciones;
+    const datos = await cargarDatosFirebase();
+    return Object.keys(datos).map(idC => {
+        const c = datos[idC];
+        return {
+            idC: String(idC),
+            nombreC: c.nombreC || '',
+            arreglos: c.arreglos || '',
+            estado: c.estado || 'terminada',
+            categoria: c.categoria || 'rondalla'
+        };
+    });
 }
 
 export async function obtenerContenidoCancion(idC) {
-    const indice = await cargarIndice();
-    const info = indice.canciones.find(c => c.idC === idC);
-    if (!info) return { error: 'Canción no encontrada' };
+    const datos = await cargarDatosFirebase();
+    let c = datos[idC];
 
-    const subcarpeta = info.categoria === 'general' ? 'Canciones/General' : CARPETA;
-    const ruta = `${subcarpeta}/${encodeURIComponent(info.archivo)}.txt`;
-    const r = await fetch(ruta);
-    if (!r.ok) return { error: `No se encontró el archivo (${r.status})` };
+    // Si no está en caché, intentar consulta directa por ID
+    if (!c) {
+        try {
+            const snapCustom = await get(ref(db, `canciones_custom/${idC}`));
+            if (snapCustom.exists()) {
+                c = snapCustom.val();
+            } else {
+                const snapNorm = await get(ref(db, `canciones/${idC}`));
+                if (snapNorm.exists()) {
+                    c = snapNorm.val();
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (!c) return { error: 'Canción no encontrada' };
 
     return {
         idC,
-        nombreC: info.nombreC,
-        contenido: await r.text(),
-        ytID: '',                       // pendiente: se definirá más adelante
-        arreglos: info.arreglos,
-        categoria: info.categoria || 'rondalla'
+        nombreC: c.nombreC || '',
+        contenido: c.contenido || '',
+        ytID: '',
+        arreglos: c.arreglos || '',
+        categoria: c.categoria || 'rondalla',
+        estado: c.estado || 'terminada'
     };
 }
