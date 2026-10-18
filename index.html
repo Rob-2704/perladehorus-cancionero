@@ -212,6 +212,37 @@
 
         .tarjeta-evento.oculto { display: none !important; }
 
+        /* Aviso cuando no hay eventos próximos */
+        .aviso-sin-proximos {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: 2px solid transparent; /* reserva el mismo espacio que tenía el borde punteado */
+            border-radius: 16px;
+            font-size: 13px;
+            font-family: 'Sono', monospace;
+            color: var(--text-sec);
+            user-select: none;
+        }
+
+        /* Borde punteado dibujado en SVG: el CSS "dashed" reparte mal los trazos en las esquinas */
+        .aviso-sin-proximos .borde-punteado {
+            position: absolute;
+            inset: -2px;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .aviso-sin-proximos .material-symbols-outlined {
+            font-size: 20px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
         @media (hover: hover) {
             .tarjeta-evento:hover { 
                 transform: scale(1.015); 
@@ -667,17 +698,77 @@
             return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
         }
 
+        // Cuántas tarjetas se ven con la lista cerrada: 2 normalmente, 1 si el aviso
+        // "No hay eventos próximos" ocupa el primer espacio.
+        let tarjetasCompactas = 2;
+
         function calcularAlturaCompacta() {
-            const tarjetasVisibles = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(0, 2);
+            const tarjetasVisibles = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(0, tarjetasCompactas);
             if (tarjetasVisibles.length === 0) return 12;
-            let h = 12;
-            tarjetasVisibles.forEach((el, idx) => {
-                h += el.offsetHeight;
-                if (idx < tarjetasVisibles.length - 1) {
-                    h += 8;
-                }
-            });
-            return h;
+            // Se mide desde el borde superior del contenedor hasta el borde inferior de la última
+            // tarjeta visible, así también cuenta el separador si queda entre las tarjetas visibles.
+            const topContenedor = contenedorEventos.getBoundingClientRect().top;
+            const ultima = tarjetasVisibles[tarjetasVisibles.length - 1];
+            const bottomUltima = ultima.getBoundingClientRect().bottom;
+            return Math.ceil(bottomUltima - topContenedor) + 6; // 6px = padding inferior del contenedor
+        }
+
+        function crearAvisoSinProximos() {
+            const aviso = document.createElement('div');
+            aviso.className = 'aviso-sin-proximos';
+            aviso.innerHTML = `
+                <svg class="borde-punteado" aria-hidden="true">
+                    <rect fill="none" stroke="#bc9731" stroke-opacity="0.45" stroke-width="2"></rect>
+                </svg>
+                <span class="material-symbols-outlined">event_busy</span>
+                <span>No hay eventos próximos</span>
+            `;
+            ajustarBordePunteado(aviso);
+            return aviso;
+        }
+
+        // Dibuja el rectángulo punteado y calcula el patrón de trazos para que dé un número
+        // exacto de ciclos alrededor del perímetro: así todos los trazos y huecos quedan iguales,
+        // sin cortes raros en las esquinas ni en el punto donde cierra el borde.
+        function ajustarBordePunteado(aviso) {
+            const rect = aviso.querySelector('.borde-punteado rect');
+            const grosor = 2;
+            const radio = 16;
+            const cicloDeseado = 10; // trazo + hueco, en px (aproximado)
+
+            const actualizar = () => {
+                // El SVG cubre exactamente la caja completa del aviso (incluido su borde transparente)
+                const ancho = aviso.offsetWidth;
+                const alto = aviso.offsetHeight;
+                if (!ancho || !alto) return;
+
+                const r = radio - grosor / 2;
+                rect.setAttribute('x', grosor / 2);
+                rect.setAttribute('y', grosor / 2);
+                rect.setAttribute('width', ancho - grosor);
+                rect.setAttribute('height', alto - grosor);
+                rect.setAttribute('rx', r);
+                rect.setAttribute('ry', r);
+
+                const perimetro = rect.getTotalLength();
+                const ciclos = Math.max(1, Math.round(perimetro / cicloDeseado));
+                const ciclo = perimetro / ciclos;
+                const trazo = ciclo * 0.6;
+                rect.setAttribute('stroke-dasharray', `${trazo} ${ciclo - trazo}`);
+            };
+
+            new ResizeObserver(actualizar).observe(aviso);
+        }
+
+        // Caso sin ningún evento: se muestra únicamente el aviso
+        function mostrarSoloAviso() {
+            contenedorEventos.innerHTML = '';
+            contenedorEventos.appendChild(crearAvisoSinProximos());
+            seccionEventos.style.display = 'block';
+            contenedorEventos.style.maxHeight = 'none';
+            contenedorEventos.style.overflow = 'visible';
+            btnToggleEventos.style.display = 'none';
+            activarAnimacionIconos();
         }
 
         function cargarEventosFirebase() {
@@ -685,13 +776,13 @@
             onValue(eventosRef, (snapshot) => {
                 const datos = snapshot.val();
                 if (!datos) {
-                    seccionEventos.style.display = 'none';
+                    mostrarSoloAviso();
                     return;
                 }
 
                 const eventos = Object.values(datos);
                 if (!Array.isArray(eventos) || eventos.length === 0) {
-                    seccionEventos.style.display = 'none';
+                    mostrarSoloAviso();
                     return;
                 }
 
@@ -736,15 +827,29 @@
                 const primerFuturoIdx = ordenados.findIndex(e => !e.esPasado && !e.esHoy && e.tieneFecha);
 
                 contenedorEventos.innerHTML = '';
+
+                // Si no hay ningún evento de hoy ni futuro con fecha, se avisa arriba de la lista
+                const hayProximos = ordenados.some(e => e.esHoy || (e.tieneFecha && !e.esPasado));
+                tarjetasCompactas = hayProximos ? 2 : 1;
+                if (!hayProximos) {
+                    contenedorEventos.appendChild(crearAvisoSinProximos());
+                }
+
                 let desplegado = false;
                 let enAnimacion = false;
                 let separadorEl = null;
                 let separadorInsertado = false;
+                let separadorSePliega = false;
 
                 ordenados.forEach((evento, idx) => {
                     if (evento.esPasado && !separadorInsertado) {
+                        // El separador solo se oculta si la primera tarjeta pasada (la que va justo
+                        // después de él) también está oculta en el estado cerrado.
+                        const tarjetasAntesDelSeparador = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
+                        separadorSePliega = tarjetasAntesDelSeparador >= tarjetasCompactas;
+
                         separadorEl = document.createElement('div');
-                        separadorEl.className = 'separador-eventos-pasados oculto'; 
+                        separadorEl.className = `separador-eventos-pasados${separadorSePliega ? ' oculto' : ''}`;
                         separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
                         contenedorEventos.appendChild(separadorEl);
                         separadorInsertado = true;
@@ -759,7 +864,7 @@
                     else if (evento.esPasado) claseExtra = 'pasado';
 
                     const tarjetasActualesCount = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
-                    const esOculto = tarjetasActualesCount >= 2;
+                    const esOculto = tarjetasActualesCount >= tarjetasCompactas;
 
                     tarjeta.className = `tarjeta-evento ${esOculto ? 'oculto' : ''} ${claseExtra}`;
 
@@ -812,20 +917,20 @@
 
                 const totalTarjetas = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
 
-                if (totalTarjetas > 2) {
+                if (totalTarjetas > tarjetasCompactas) {
                     btnToggleEventos.style.display = 'flex';
                     btnToggleEventos.onclick = () => {
                         if (enAnimacion) return;
                         enAnimacion = true;
                         desplegado = !desplegado;
 
-                        const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(2);
+                        const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(tarjetasCompactas);
                         const duracionTransicion = 300;
 
                         if (desplegado) {
                             contenedorEventos.style.overflow = 'hidden';
                             tarjetasExtra.forEach(el => el.classList.remove('oculto'));
-                            if (separadorEl) separadorEl.classList.remove('oculto');
+                            if (separadorEl && separadorSePliega) separadorEl.classList.remove('oculto');
                             
                             const alturaExpandida = contenedorEventos.scrollHeight + 12;
                             contenedorEventos.style.maxHeight = `${alturaExpandida}px`;
@@ -849,7 +954,7 @@
 
                             setTimeout(() => {
                                 tarjetasExtra.forEach(el => el.classList.add('oculto'));
-                                if (separadorEl) separadorEl.classList.add('oculto');
+                                if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
                                 contenedorEventos.style.overflow = 'visible';
                                 enAnimacion = false;
                             }, duracionTransicion);
