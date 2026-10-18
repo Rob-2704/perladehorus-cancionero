@@ -1,22 +1,6 @@
-// api-cliente.js — Conectado a Firebase con caché local, control offline y timeout
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
-    authDomain: "rondalla-f04a4.firebaseapp.com",
-    databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
-    projectId: "rondalla-f04a4",
-    storageBucket: "rondalla-f04a4.firebasestorage.app",
-    messagingSenderId: "835273996097",
-    appId: "1:835273996097:web:f1258c2f461ef6613513c0"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-let cacheCanciones = null;
+// api-cliente.js — Conectado a Firebase con importación dinámica y caché local offline
 const STORAGE_KEY = 'cache_canciones_perla_v1';
+let cacheCanciones = null;
 
 // Suscriptores del estado de guardado
 let callbacksEstadoGuardado = [];
@@ -39,7 +23,7 @@ async function cargarDatosFirebase() {
 
     notificarEstadoGuardado('guardando');
 
-    // 1. Si el navegador detecta que no hay internet, cargamos del almacenamiento local de inmediato
+    // 1. Si el dispositivo está offline, cargar de inmediato desde localStorage
     if (!navigator.onLine) {
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
@@ -53,19 +37,38 @@ async function cargarDatosFirebase() {
         return {};
     }
 
-    // 2. Timeout para evitar que Firebase se quede colgado si la red falla o es muy lenta
-    const fetchConTimeout = (promise, ms = 3500) => {
-        let timeoutId;
-        const timeoutPromise = new Promise((_, reject) => {
-            timeoutId = setTimeout(() => reject(new Error('Timeout de conexión')), ms);
-        });
-        return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
-    };
-
     try {
+        // Importación dinámica: si no hay red, esto falla de forma controlada sin romper la app
+        const [appModule, dbModule] = await Promise.all([
+            import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+        ]);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+            authDomain: "rondalla-f04a4.firebaseapp.com",
+            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+            projectId: "rondalla-f04a4",
+            storageBucket: "rondalla-f04a4.firebasestorage.app",
+            messagingSenderId: "835273996097",
+            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+        };
+
+        const app = appModule.initializeApp(firebaseConfig);
+        const db = dbModule.getDatabase(app);
+
+        // Timeout de seguridad de 3.5 segundos por si la red móvil es lenta o inestable
+        const fetchConTimeout = (promise, ms = 3500) => {
+            let timeoutId;
+            const timeoutPromise = new Promise((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error('Timeout de conexión')), ms);
+            });
+            return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+        };
+
         const promesaFirebase = Promise.all([
-            get(ref(db, 'canciones')),
-            get(ref(db, 'canciones_custom'))
+            dbModule.get(dbModule.ref(db, 'canciones')),
+            dbModule.get(dbModule.ref(db, 'canciones_custom'))
         ]);
 
         const [snapshotCanciones, snapshotCustom] = await fetchConTimeout(promesaFirebase, 3500);
@@ -76,7 +79,7 @@ async function cargarDatosFirebase() {
         const combinadas = { ...datosCanciones, ...datosCustom };
         cacheCanciones = combinadas;
 
-        // Guardar todas las canciones y letras en localStorage
+        // Guardar respaldo completo en localStorage para la PWA
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
         } catch (e) {
@@ -86,7 +89,7 @@ async function cargarDatosFirebase() {
         notificarEstadoGuardado('completado');
         return combinadas;
     } catch (err) {
-        console.warn("Sin conexión o tiempo de espera agotado. Cargando desde el almacenamiento local...", err);
+        console.warn("Modo offline o error de red en móvil. Cargando desde almacenamiento local...", err);
         
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
@@ -120,13 +123,29 @@ export async function obtenerContenidoCancion(idC) {
     const datos = await cargarDatosFirebase();
     let c = datos[idC];
 
-    if (!c) {
+    if (!c && navigator.onLine) {
         try {
-            const snapCustom = await get(ref(db, `canciones_custom/${idC}`));
+            const [appModule, dbModule] = await Promise.all([
+                import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+                import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+            ]);
+            const firebaseConfig = {
+                apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+                authDomain: "rondalla-f04a4.firebaseapp.com",
+                databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+                projectId: "rondalla-f04a4",
+                storageBucket: "rondalla-f04a4.firebasestorage.app",
+                messagingSenderId: "835273996097",
+                appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+            };
+            const app = appModule.initializeApp(firebaseConfig);
+            const db = dbModule.getDatabase(app);
+
+            const snapCustom = await dbModule.get(dbModule.ref(db, `canciones_custom/\${idC}`));
             if (snapCustom.exists()) {
                 c = snapCustom.val();
             } else {
-                const snapNorm = await get(ref(db, `canciones/${idC}`));
+                const snapNorm = await dbModule.get(dbModule.ref(db, `canciones/\${idC}`));
                 if (snapNorm.exists()) {
                     c = snapNorm.val();
                 }

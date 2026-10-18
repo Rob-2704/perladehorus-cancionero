@@ -172,7 +172,6 @@
             box-sizing: border-box;
         }
 
-        /* Separador elegante para eventos anteriores */
         .separador-eventos-pasados {
             display: flex;
             align-items: center;
@@ -265,7 +264,6 @@
 
         .tarjeta-evento.oculto { display: none !important; }
 
-        /* Aviso cuando no hay eventos próximos */
         .aviso-sin-proximos {
             position: relative;
             display: flex;
@@ -385,9 +383,7 @@
         }
 
         @media (hover: hover) {
-            .btn-toggle-eventos:hover { 
-                transform: scale(1.1); 
-            }
+            .btn-toggle-eventos:hover { transform: scale(1.1); }
         }
         .btn-toggle-eventos:active { transform: scale(0.9); }
 
@@ -430,7 +426,6 @@
         .select-categoria {
             cursor: pointer;
             -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
             padding-right: 36px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -452,10 +447,8 @@
         }
 
         .input-busqueda { width: 100%; box-sizing: border-box; }
-
         .select-categoria:focus,
         .input-busqueda:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
-
         .input-busqueda::placeholder { color: var(--text-sec); opacity: 0.7; }
 
         .lista-sugerencias {
@@ -471,7 +464,6 @@
             max-height: 240px;
             overflow-y: auto;
             display: none;
-            will-change: transform, opacity;
         }
 
         .lista-sugerencias.activa {
@@ -486,25 +478,13 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(188, 151, 49, 0.2);
-            transition: background-color 0.15s, padding-left 0.15s;
             font-family: 'Sono', monospace;
             font-size: 13px;
             color: var(--text-main);
         }
 
-        .item-sugerencia:last-child { border-bottom: none; }
-
-        .item-sugerencia:hover {
-            background-color: rgba(188, 151, 49, 0.18);
-            padding-left: 18px;
-        }
-
-        .item-sugerencia .sugerencia-meta {
-            font-size: 11px;
-            color: var(--text-sec);
-            margin-left: 10px;
-            white-space: nowrap;
-        }
+        .item-sugerencia:hover { background-color: rgba(188, 151, 49, 0.18); }
+        .item-sugerencia .sugerencia-meta { font-size: 11px; color: var(--text-sec); }
 
         .lista-canciones {
             display: grid;
@@ -532,22 +512,15 @@
             transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             position: relative;
             -webkit-tap-highlight-color: transparent;
             opacity: 0;
-            will-change: transform, opacity;
             animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
         @media (hover: hover) {
-            .fila-cancion:hover {
-                transform: scale(1.05);
-                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-                z-index: 2;
-            }
+            .fila-cancion:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); z-index: 2; }
         }
-        
         .fila-cancion:active { transform: scale(1.05); }
 
         .fila-cancion h2 {
@@ -562,51 +535,15 @@
             justify-content: space-between;
         }
 
-        .contenedor-iconos-header {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .contenedor-iconos-header { display: inline-flex; align-items: center; gap: 8px; }
 
-        .icono-grabacion {
-            font-family: 'Material Symbols Outlined' !important;
-            font-size: 20px;
-            color: var(--accent);
-            user-select: none;
-            font-weight: normal !important;
-            font-style: normal !important;
-            font-feature-settings: 'liga';
-            -webkit-font-feature-settings: 'liga';
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
-        }
+        .estado-icono { display: inline-block; width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .estado-icono.terminada { background-color: #2ec4b6; }
+        .estado-icono.revisar { background-color: #f5c518; }
+        .estado-icono.pendiente { background-color: #e71d36; }
 
-        .estado-icono {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .estado-icono.terminada { background-color: #2ec4b6; box-shadow: 0 0 8px rgba(46, 196, 182, 0.5); }
-        .estado-icono.revisar { background-color: #f5c518; box-shadow: 0 0 8px rgba(245, 197, 24, 0.5); }
-        .estado-icono.pendiente { background-color: #e71d36; box-shadow: 0 0 8px rgba(231, 29, 54, 0.5); }
-
-        .fila-cancion .meta {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 13px;
-            color: var(--text-sec);
-        }
-
-        .cargando {
-            text-align: center;
-            color: var(--accent);
-            padding: 20px;
-            font-family: 'Sono', monospace;
-            grid-column: 1 / -1;
-        }
+        .fila-cancion .meta { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-sec); }
+        .cargando { text-align: center; color: var(--accent); padding: 20px; font-family: 'Sono', monospace; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
@@ -621,7 +558,6 @@
     </header>
 
     <main>
-        <!-- Sección de Eventos Programados -->
         <div id="seccion-eventos" style="display: none;">
             <div class="titulo-seccion">
                 <span class="material-symbols-outlined">event_available</span> Eventos
@@ -653,24 +589,8 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
         import { obtenerCanciones, obtenerContenidoCancion, alCambiarEstadoGuardado } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad, leerAlteracionGuardada } from './js/modulo-transponer.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
-            authDomain: "rondalla-f04a4.firebaseapp.com",
-            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
-            projectId: "rondalla-f04a4",
-            storageBucket: "rondalla-f04a4.firebasestorage.app",
-            messagingSenderId: "835273996097",
-            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
 
         const listaDiv = document.getElementById('lista-canciones');
         const selectCategoria = document.getElementById('select-categoria');
@@ -695,7 +615,7 @@
                 indicadorGuardado.title = 'Guardando canciones localmente...';
             } else if (estado === 'completado') {
                 iconoIndicador.textContent = 'cloud_done';
-                indicadorGuardado.title = 'Todas las canciones están guardadas localmente';
+                iconoIndicador.title = 'Todas las canciones están guardadas localmente';
                 activarAnimacionIconos();
             } else if (estado === 'offline') {
                 iconoIndicador.textContent = 'offline_pin';
@@ -735,20 +655,15 @@
 
         function formatearHoraAMPM(horaStr) {
             if (!horaStr) return '';
-            if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) {
-                return horaStr;
-            }
+            if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) return horaStr;
             const partes = horaStr.split(':');
             if (partes.length < 2) return horaStr;
-
             let hrs = parseInt(partes[0], 10);
             const mins = partes[1].trim();
             if (isNaN(hrs)) return horaStr;
-
             const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
             hrs = hrs % 12;
             if (hrs === 0) hrs = 12;
-
             return `${hrs}:${mins}${ampm}`;
         }
 
@@ -756,23 +671,16 @@
             if (!stringFecha || stringFecha.trim() === '') return 'Fecha por confirmar';
             const partes = stringFecha.split('-');
             let textoFecha = stringFecha;
-
             if (partes.length === 3) {
                 const d = new Date(partes[0], partes[1] - 1, partes[2]);
                 textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
                 textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
             }
-
             const inicioFormatted = formatearHoraAMPM(horaInicio);
             const finFormatted = formatearHoraAMPM(horaFin);
-
             let rangoHoras = '';
-            if (inicioFormatted && finFormatted) {
-                rangoHoras = `${inicioFormatted}-${finFormatted}`;
-            } else if (inicioFormatted) {
-                rangoHoras = inicioFormatted;
-            }
-
+            if (inicioFormatted && finFormatted) rangoHoras = `${inicioFormatted}-${finFormatted}`;
+            else if (inicioFormatted) rangoHoras = inicioFormatted;
             return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
         }
 
@@ -783,8 +691,7 @@
             if (tarjetasVisibles.length === 0) return 12;
             const topContenedor = contenedorEventos.getBoundingClientRect().top;
             const ultima = tarjetasVisibles[tarjetasVisibles.length - 1];
-            const bottomUltima = ultima.getBoundingClientRect().bottom;
-            return Math.ceil(bottomUltima - topContenedor) + 6;
+            return Math.ceil(ultima.getBoundingClientRect().bottom - topContenedor) + 6;
         }
 
         function crearAvisoSinProximos() {
@@ -803,15 +710,11 @@
 
         function ajustarBordePunteado(aviso) {
             const rect = aviso.querySelector('.borde-punteado rect');
-            const grosor = 2;
-            const radio = 16;
-            const cicloDeseado = 10;
-
+            const grosor = 2, radio = 16, cicloDeseado = 10;
             const actualizar = () => {
                 const ancho = aviso.offsetWidth;
                 const alto = aviso.offsetHeight;
                 if (!ancho || !alto) return;
-
                 const r = radio - grosor / 2;
                 rect.setAttribute('x', grosor / 2);
                 rect.setAttribute('y', grosor / 2);
@@ -819,14 +722,12 @@
                 rect.setAttribute('height', alto - grosor);
                 rect.setAttribute('rx', r);
                 rect.setAttribute('ry', r);
-
                 const perimetro = rect.getTotalLength();
                 const ciclos = Math.max(1, Math.round(perimetro / cicloDeseado));
                 const ciclo = perimetro / ciclos;
                 const trazo = ciclo * 0.6;
                 rect.setAttribute('stroke-dasharray', `${trazo} ${ciclo - trazo}`);
             };
-
             new ResizeObserver(actualizar).observe(aviso);
         }
 
@@ -840,216 +741,164 @@
             activarAnimacionIconos();
         }
 
-        function cargarEventosFirebase() {
-            const eventosRef = ref(db, 'eventos');
-            onValue(eventosRef, (snapshot) => {
-                const datos = snapshot.val();
-                if (!datos) {
-                    mostrarSoloAviso();
-                    return;
-                }
+        function procesarYRenderizarEventos(datos) {
+            const eventos = Object.values(datos);
+            if (!Array.isArray(eventos) || eventos.length === 0) {
+                mostrarSoloAviso();
+                return;
+            }
 
-                const eventos = Object.values(datos);
-                if (!Array.isArray(eventos) || eventos.length === 0) {
-                    mostrarSoloAviso();
-                    return;
-                }
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const fechaHoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                const anioHoy = hoy.getFullYear();
-                const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
-                const diaHoy = String(hoy.getDate()).padStart(2, '0');
-                const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
-
-                const ordenados = eventos
-                    .map(e => {
-                        const tieneFecha = e.fecha && e.fecha.trim() !== '';
-                        let fechaObj;
-                        if (tieneFecha) {
-                            const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
-                            const f = e.fecha.split('-');
-                            fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
-                        } else {
-                            fechaObj = null;
-                        }
-
-                        const esPasado = tieneFecha && e.fecha < fechaHoyStr;
-                        const esHoy = tieneFecha && e.fecha === fechaHoyStr;
-                        return { ...e, fechaObj, tieneFecha, esHoy, esPasado };
-                    })
-                    .sort((a, b) => {
-                        const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
-                        const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
-
-                        if (grupoA !== grupoB) return grupoA - grupoB;
-
-                        if (a.tieneFecha && b.tieneFecha) {
-                            if (a.esPasado) {
-                                return b.fechaObj - a.fechaObj; 
-                            }
-                            return a.fechaObj - b.fechaObj;     
-                        }
-                        return 0;
-                    });
-
-                const primerFuturoIdx = ordenados.findIndex(e => !e.esPasado && !e.esHoy && e.tieneFecha);
-
-                contenedorEventos.innerHTML = '';
-
-                const hayProximos = ordenados.some(e => e.esHoy || (e.tieneFecha && !e.esPasado));
-                tarjetasCompactas = hayProximos ? 2 : 1;
-                if (!hayProximos) {
-                    contenedorEventos.appendChild(crearAvisoSinProximos());
-                }
-
-                let desplegado = false;
-                let enAnimacion = false;
-                let separadorEl = null;
-                let separadorInsertado = false;
-                let separadorSePliega = false;
-
-                ordenados.forEach((evento, idx) => {
-                    if (evento.esPasado && !separadorInsertado) {
-                        const tarjetasAntesDelSeparador = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
-                        separadorSePliega = tarjetasAntesDelSeparador >= tarjetasCompactas;
-
-                        separadorEl = document.createElement('div');
-                        separadorEl.className = `separador-eventos-pasados${separadorSePliega ? ' oculto' : ''}`;
-                        separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
-                        contenedorEventos.appendChild(separadorEl);
-                        separadorInsertado = true;
-                    }
-
-                    const tarjeta = document.createElement('div');
-                    const esProximo = idx === primerFuturoIdx;
-                    
-                    let claseExtra = '';
-                    if (evento.esHoy) claseExtra = 'hoy';
-                    else if (esProximo) claseExtra = 'proximo';
-                    else if (evento.esPasado) claseExtra = 'pasado';
-
-                    const tarjetasActualesCount = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
-                    const esOculto = tarjetasActualesCount >= tarjetasCompactas;
-
-                    tarjeta.className = `tarjeta-evento ${esOculto ? 'oculto' : ''} ${claseExtra}`;
-
-                    tarjeta.onclick = () => {
-                        window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`;
-                    };
-
-                    const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
-                    const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
-
-                    let badgeHtml = '';
-                    if (evento.esHoy) {
-                        badgeHtml = '<span class="badge-hoy">Hoy</span>';
-                    } else if (esProximo) {
-                        badgeHtml = '<span class="badge-proximo">Próximo</span>';
-                    }
-
-                    tarjeta.innerHTML = `
-                        <div class="tarjeta-evento-header">
-                            <h3>${evento.titulo}</h3>
-                            ${badgeHtml}
-                        </div>
-                        <div class="meta-evento">
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">calendar_month</span> 
-                                ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
-                            </span>
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                ${textoLugar}
-                            </span>
-                            <span class="meta-item">
-                                <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
-                                ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
-                            </span>
-                        </div>
-                    `;
-                    contenedorEventos.appendChild(tarjeta);
-                });
-
-                seccionEventos.style.display = 'block';
-
-                requestAnimationFrame(() => {
-                    const alturaInicial = calcularAlturaCompacta();
-                    contenedorEventos.style.maxHeight = `${alturaInicial}px`;
-                    setTimeout(() => {
-                        contenedorEventos.style.overflow = 'visible';
-                    }, 300);
-                });
-
-                const totalTarjetas = contenedorEventos.querySelectorAll('.tarjeta-evento').length;
-
-                if (totalTarjetas > tarjetasCompactas) {
-                    btnToggleEventos.style.display = 'flex';
-                    btnToggleEventos.onclick = () => {
-                        if (enAnimacion) return;
-                        enAnimacion = true;
-                        desplegado = !desplegado;
-
-                        const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(tarjetasCompactas);
-                        const duracionTransicion = 300;
-
-                        if (desplegado) {
-                            contenedorEventos.style.overflow = 'hidden';
-                            tarjetasExtra.forEach(el => el.classList.remove('oculto'));
-                            if (separadorEl && separadorSePliega) separadorEl.classList.remove('oculto');
-                            
-                            const alturaExpandida = contenedorEventos.scrollHeight + 12;
-                            contenedorEventos.style.maxHeight = `${alturaExpandida}px`;
-
-                            setTimeout(() => { 
-                                contenedorEventos.style.maxHeight = 'none';
-                                contenedorEventos.style.overflow = 'visible';
-                                enAnimacion = false; 
-                            }, duracionTransicion + 30);
-
-                            btnToggleEventos.title = 'Ver menos';
-                            iconoToggleEventos.textContent = 'expand_less';
-                        } else {
-                            contenedorEventos.style.overflow = 'hidden';
-                            contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
-                            
-                            void contenedorEventos.offsetWidth;
-
-                            const alturaFinal = calcularAlturaCompacta();
-                            contenedorEventos.style.maxHeight = `${alturaFinal}px`;
-
-                            setTimeout(() => {
-                                tarjetasExtra.forEach(el => el.classList.add('oculto'));
-                                if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
-                                contenedorEventos.style.overflow = 'visible';
-                                enAnimacion = false;
-                            }, duracionTransicion);
-
-                            btnToggleEventos.title = 'Ver más eventos';
-                            iconoToggleEventos.textContent = 'expand_more';
-                        }
-                    };
-                } else {
-                    btnToggleEventos.style.display = 'none';
-                }
-
-                activarAnimacionIconos();
+            const ordenados = eventos.map(e => {
+                const tieneFecha = e.fecha && e.fecha.trim() !== '';
+                let fechaObj = tieneFecha ? new Date(e.fecha.split('-')[0], (e.fecha.split('-')[1] || 1) - 1, e.fecha.split('-')[2] || 1) : null;
+                return { ...e, fechaObj, tieneFecha, esHoy: tieneFecha && e.fecha === fechaHoyStr, esPasado: tieneFecha && e.fecha < fechaHoyStr };
+            }).sort((a, b) => {
+                const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
+                const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
+                if (grupoA !== grupoB) return grupoA - grupoB;
+                return a.esPasado ? (b.fechaObj - a.fechaObj) : (a.fechaObj - b.fechaObj);
             });
+
+            const primerFuturoIdx = ordenados.findIndex(e => !e.esPasado && !e.esHoy && e.tieneFecha);
+            contenedorEventos.innerHTML = '';
+
+            const hayProximos = ordenados.some(e => e.esHoy || (e.tieneFecha && !e.esPasado));
+            tarjetasCompactas = hayProximos ? 2 : 1;
+            if (!hayProximos) contenedorEventos.appendChild(crearAvisoSinProximos());
+
+            let desplegado = false, enAnimacion = false, separadorEl = null, separadorInsertado = false, separadorSePliega = false;
+
+            ordenados.forEach((evento, idx) => {
+                if (evento.esPasado && !separadorInsertado) {
+                    separadorSePliega = contenedorEventos.querySelectorAll('.tarjeta-evento').length >= tarjetasCompactas;
+                    separadorEl = document.createElement('div');
+                    separadorEl.className = `separador-eventos-pasados${separadorSePliega ? ' oculto' : ''}`;
+                    separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
+                    contenedorEventos.appendChild(separadorEl);
+                    separadorInsertado = true;
+                }
+
+                const tarjeta = document.createElement('div');
+                const esProximo = idx === primerFuturoIdx;
+                let claseExtra = evento.esHoy ? 'hoy' : (esProximo ? 'proximo' : (evento.esPasado ? 'pasado' : ''));
+                const esOculto = contenedorEventos.querySelectorAll('.tarjeta-evento').length >= tarjetasCompactas;
+
+                tarjeta.className = `tarjeta-evento ${esOculto ? 'oculto' : ''} ${claseExtra}`;
+                tarjeta.onclick = () => { window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`; };
+
+                const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
+                tarjeta.innerHTML = `
+                    <div class="tarjeta-evento-header">
+                        <h3>${evento.titulo}</h3>
+                        ${evento.esHoy ? '<span class="badge-hoy">Hoy</span>' : (esProximo ? '<span class="badge-proximo">Próximo</span>' : '')}
+                    </div>
+                    <div class="meta-evento">
+                        <span class="meta-item"><span class="material-symbols-outlined" style="font-size:15px;">calendar_month</span> ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}</span>
+                        <span class="meta-item"><span class="material-symbols-outlined" style="font-size:15px;">location_on</span> ${evento.lugar || 'Lugar por definir'}</span>
+                        <span class="meta-item"><span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}</span>
+                    </div>
+                `;
+                contenedorEventos.appendChild(tarjeta);
+            });
+
+            seccionEventos.style.display = 'block';
+            requestAnimationFrame(() => {
+                contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
+                setTimeout(() => { contenedorEventos.style.overflow = 'visible'; }, 300);
+            });
+
+            if (contenedorEventos.querySelectorAll('.tarjeta-evento').length > tarjetasCompactas) {
+                btnToggleEventos.style.display = 'flex';
+                btnToggleEventos.onclick = () => {
+                    if (enAnimacion) return;
+                    enAnimacion = true;
+                    desplegado = !desplegado;
+                    const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(tarjetasCompactas);
+
+                    if (desplegado) {
+                        contenedorEventos.style.overflow = 'hidden';
+                        tarjetasExtra.forEach(el => el.classList.remove('oculto'));
+                        if (separadorEl && separadorSePliega) separadorEl.classList.remove('oculto');
+                        contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight + 12}px`;
+                        setTimeout(() => { contenedorEventos.style.maxHeight = 'none'; contenedorEventos.style.overflow = 'visible'; enAnimacion = false; }, 330);
+                        iconoToggleEventos.textContent = 'expand_less';
+                    } else {
+                        contenedorEventos.style.overflow = 'hidden';
+                        contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
+                        void contenedorEventos.offsetWidth;
+                        contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
+                        setTimeout(() => {
+                            tarjetasExtra.forEach(el => el.classList.add('oculto'));
+                            if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
+                            contenedorEventos.style.overflow = 'visible';
+                            enAnimacion = false;
+                        }, 300);
+                        iconoToggleEventos.textContent = 'expand_more';
+                    }
+                };
+            }
+            activarAnimacionIconos();
+        }
+
+        async function cargarEventosFirebase() {
+            if (!navigator.onLine) {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                } catch (e) {}
+                mostrarSoloAviso();
+                return;
+            }
+
+            try {
+                const [appModule, dbModule] = await Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+                ]);
+                const firebaseConfig = {
+                    apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+                    authDomain: "rondalla-f04a4.firebaseapp.com",
+                    databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+                    projectId: "rondalla-f04a4",
+                    storageBucket: "rondalla-f04a4.firebasestorage.app",
+                    messagingSenderId: "835273996097",
+                    appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+                };
+                const app = appModule.initializeApp(firebaseConfig);
+                const db = dbModule.getDatabase(app);
+                dbModule.onValue(dbModule.ref(db, 'eventos'), (snapshot) => {
+                    const datos = snapshot.val();
+                    if (datos) {
+                        try { localStorage.setItem('cache_eventos_perla', JSON.stringify(datos)); } catch (e) {}
+                        procesarYRenderizarEventos(datos);
+                    } else { mostrarSoloAviso(); }
+                }, () => {
+                    try {
+                        const guardado = localStorage.getItem('cache_eventos_perla');
+                        if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                    } catch (e) {}
+                    mostrarSoloAviso();
+                });
+            } catch (err) {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                } catch (e) {}
+                mostrarSoloAviso();
+            }
         }
 
         async function tieneGrabacionAudio(nombreCancion, categoria) {
             if (!nombreCancion) return false;
-            const nombreLimpio = nombreCancion
-                .replace(/\(.*?\)/g, '')
-                .replace(/-/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
-            const nombreEncoded = encodeURIComponent(nombreLimpio);
+            const nombreLimpio = nombreCancion.replace(/\(.*?\)/g, '').replace(/-/g, '').replace(/\s+/g, ' ').trim();
             const subcarpetaGrabacion = (categoria === 'general') ? 'Grabaciones/General' : 'Grabaciones';
-
             for (const ext of FORMATOS_AUDIO) {
                 try {
-                    const res = await fetch(`${subcarpetaGrabacion}/${nombreEncoded}.${ext}`, { method: 'HEAD' });
+                    const res = await fetch(`${subcarpetaGrabacion}/${encodeURIComponent(nombreLimpio)}.${ext}`, { method: 'HEAD' });
                     if (res.ok) return true;
                 } catch (_) {}
             }
@@ -1069,9 +918,7 @@
 
             const coincidencias = cancionesGlobal.filter(c => {
                 const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
-                const coincideNombre = normalizarTexto(c.nombreC).includes(textoBusqueda);
-                const coincideArreglos = normalizarTexto(c.arreglos).includes(textoBusqueda);
-                return coincideCategoria && (coincideNombre || coincideArreglos);
+                return coincideCategoria && (normalizarTexto(c.nombreC).includes(textoBusqueda) || normalizarTexto(c.arreglos).includes(textoBusqueda));
             }).slice(0, 6);
 
             if (coincidencias.length === 0) {
@@ -1084,19 +931,10 @@
             coincidencias.forEach(cancion => {
                 const div = document.createElement('div');
                 div.className = 'item-sugerencia';
-                div.innerHTML = `
-                    <span>${cancion.nombreC}</span>
-                    <span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>
-                `;
-                div.onclick = (e) => {
-                    e.stopPropagation();
-                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
-                };
+                div.innerHTML = `<span>${cancion.nombreC}</span><span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>`;
+                div.onclick = (e) => { e.stopPropagation(); window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`; };
                 listaSugerencias.appendChild(div);
             });
-
-            listaSugerencias.classList.remove('activa');
-            void listaSugerencias.offsetWidth;
             listaSugerencias.classList.add('activa');
         }
 
@@ -1104,14 +942,11 @@
             const categoriaSeleccionada = selectCategoria.value;
             const textoBusqueda = normalizarTexto(inputBusqueda.value);
             const etiquetaMeta = categoriaSeleccionada === 'general' ? 'Artista' : 'Arreglos';
-
             listaDiv.innerHTML = "";
 
             const filtradas = cancionesGlobal.filter(c => {
                 const coincideCategoria = (c.categoria || 'rondalla') === categoriaSeleccionada;
-                const coincideNombre = normalizarTexto(c.nombreC).includes(textoBusqueda);
-                const coincideArreglos = normalizarTexto(c.arreglos).includes(textoBusqueda);
-                return coincideCategoria && (coincideNombre || coincideArreglos);
+                return coincideCategoria && (normalizarTexto(c.nombreC).includes(textoBusqueda) || normalizarTexto(c.arreglos).includes(textoBusqueda));
             });
 
             if (filtradas.length === 0) {
@@ -1125,35 +960,15 @@
             filtradas.forEach((cancion, indice) => {
                 const fila = document.createElement('div');
                 fila.className = "fila-cancion";
-
-                const numFila = Math.floor(indice / numColumnas);
-                const numCol = indice % numColumnas;
-                const pasoDiagonal = numFila + numCol;
-                
-                fila.style.animationDelay = `${pasoDiagonal * 0.025}s`;
-
-                fila.addEventListener('animationend', () => {
-                    fila.style.animation = 'none';
-                    fila.style.opacity = '1';
-                });
-
-                fila.onclick = () => {
-                    window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`;
-                };
+                fila.style.animationDelay = `${(Math.floor(indice / numColumnas) + (indice % numColumnas)) * 0.025}s`;
+                fila.addEventListener('animationend', () => { fila.style.animation = 'none'; fila.style.opacity = '1'; });
+                fila.onclick = () => { window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`; };
 
                 const claseEstado = cancion.estado || 'terminada';
-                const tituloEstado = {
-                    terminada: 'Canción terminada',
-                    revisar: 'Hay que revisarla',
-                    pendiente: 'Canción no terminada'
-                }[claseEstado] || '';
-
                 fila.innerHTML = `
                     <h2>
                         <span>${cancion.nombreC}</span>
-                        <span class="contenedor-iconos-header">
-                            <span class="estado-icono ${claseEstado}" title="${tituloEstado}"></span>
-                        </span>
+                        <span class="contenedor-iconos-header"><span class="estado-icono ${claseEstado}"></span></span>
                     </h2>
                     <div class="meta">
                         <span>${etiquetaMeta}: ${cancion.arreglos || '—'}</span>
@@ -1165,20 +980,15 @@
                 const spanTonalidad = fila.querySelector('.tonalidad-valor');
                 const contenedorIconos = fila.querySelector('.contenedor-iconos-header');
 
-                obtenerContenidoCancion(cancion.idC)
-                    .then(datos => {
-                        let sistemaCifrado = 'LATINO';
-                        try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
-                        spanTonalidad.textContent = datos.contenido
-                            ? nombreTonalidad(detectarTonalidad(datos.contenido), sistemaCifrado, leerAlteracionGuardada())
-                            : '—';
-                    })
-                    .catch(() => { spanTonalidad.textContent = '—'; });
+                obtenerContenidoCancion(cancion.idC).then(datos => {
+                    let sistemaCifrado = 'LATINO';
+                    try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
+                    spanTonalidad.textContent = datos.contenido ? nombreTonalidad(detectarTonalidad(datos.contenido), sistemaCifrado, leerAlteracionGuardada()) : '—';
+                }).catch(() => { spanTonalidad.textContent = '—'; });
 
                 tieneGrabacionAudio(cancion.nombreC, cancion.categoria).then(tieneAudio => {
                     if (tieneAudio) {
-                        contenedorIconos.insertAdjacentHTML('afterbegin',
-                            `<span class="material-symbols-outlined icono-grabacion" title="Grabación de audio disponible">play_circle</span>`);
+                        contenedorIconos.insertAdjacentHTML('afterbegin', `<span class="material-symbols-outlined icono-grabacion" title="Grabación disponible">play_circle</span>`);
                         activarAnimacionIconos();
                     }
                 });
@@ -1191,29 +1001,13 @@
         async function init() {
             try {
                 cargarEventosFirebase();
-
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
-                cancionesGlobal = (await obtenerCanciones())
-                    .slice()
-                    .sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
+                cancionesGlobal = (await obtenerCanciones()).slice().sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 
-                selectCategoria.addEventListener('change', () => {
-                    listaSugerencias.classList.remove('activa');
-                    renderizarLista();
-                });
-
-                inputBusqueda.addEventListener('input', () => {
-                    renderizarLista();
-                    mostrarSugerencias();
-                });
-
+                selectCategoria.addEventListener('change', () => { listaSugerencias.classList.remove('activa'); renderizarLista(); });
+                inputBusqueda.addEventListener('input', () => { renderizarLista(); mostrarSugerencias(); });
                 inputBusqueda.addEventListener('focus', mostrarSugerencias);
-
-                document.addEventListener('click', (e) => {
-                    if (!contenedorBusqueda.contains(e.target)) {
-                        listaSugerencias.classList.remove('activa');
-                    }
-                });
+                document.addEventListener('click', (e) => { if (!contenedorBusqueda.contains(e.target)) listaSugerencias.classList.remove('activa'); });
 
                 renderizarLista();
             } catch (err) {
@@ -1226,9 +1020,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-                    .catch(err => console.log('Error al registrar el Service Worker:', err));
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
             });
         }
     </script>
