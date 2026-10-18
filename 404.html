@@ -2,15 +2,15 @@
 <html lang="es-mx">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="dark">
 
     <link rel="icon" type="image/x-icon" href="img/icono.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
 
     <link href="style.css" rel="stylesheet">
     <title>404 - Página no encontrada</title>
@@ -19,82 +19,93 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            height: 100dvh;
+        /* Color de respaldo por si style.css no carga */
+        html {
+            background-color: var(--bg-color, #0d0d0d);
         }
 
-        /* Anulamos las restricciones de style.css para centrar de forma absoluta */
-        body {
-            max-width: 80%;
-            margin: 0 auto;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+        /*
+         * Contenedor fijo que cubre toda la pantalla. Como no depende del <body>
+         * (su ancho máximo, márgenes, padding o display definidos en style.css),
+         * el centrado funciona igual en cualquier navegador y tamaño de pantalla.
+         */
+        .pagina-404 {
+            --acento: var(--accent, #bc9731);
+            --tarjeta: var(--card-bg, #1c1c21);
+            --texto: var(--text-main, #f2f2f2);
+
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            isolation: isolate;
+            display: flex;
+            overflow: auto;
+            padding:
+                max(16px, env(safe-area-inset-top))
+                max(16px, env(safe-area-inset-right))
+                max(16px, env(safe-area-inset-bottom))
+                max(16px, env(safe-area-inset-left));
+            font-family: 'Sono', monospace;
         }
 
-        body::before {
+        /* Marca de agua centrada (70% del área visible) */
+        .pagina-404::before {
             content: "";
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: 70%;
+            inset: 15%;
             background-image: url('img/fondo.png');
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
             opacity: 0.18;
             pointer-events: none;
-            z-index: 0;
+            z-index: -1;
         }
 
-        main {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 90%;
-            max-width: 480px;
-        }
-
+        /* margin: auto centra en ambos ejes y, si la tarjeta no cabe, permite hacer scroll sin recortarla */
         .tarjeta-404 {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            text-align: center;
+            position: relative;
+            margin: auto;
             width: 100%;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            border: 2px solid var(--accent);
+            padding: 40px 30px;
+            background-color: var(--tarjeta);
+            border: 2px solid var(--acento);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: aparecer404 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
 
-            opacity: 0;
-            will-change: transform, opacity;
-            animation: popWiiU 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        @keyframes aparecer404 {
+            0%   { opacity: 0; transform: scale(0.85); }
+            70%  { opacity: 1; transform: scale(1.03); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .codigo-404 {
-            font-size: 72px;
-            font-weight: 700;
-            color: var(--accent);
-            margin: 0;
-            line-height: 1;
-            font-family: 'Sono', monospace;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 12px;
             width: 100%;
+            margin: 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--acento);
+            color: var(--acento);
+            font-family: 'Sono', monospace;
+            font-size: clamp(56px, 18vw, 72px);
+            font-weight: 700;
+            line-height: 1;
         }
 
         .mensaje-404 {
-            font-size: 15px;
-            color: var(--text-main);
             margin: 0;
-            line-height: 1.5;
+            color: var(--texto);
             font-family: 'Sono', monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            text-wrap: balance;
         }
 
         .btn-inicio {
@@ -102,11 +113,12 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
+            margin-top: 10px;
             padding: 10px 22px;
+            background-color: var(--tarjeta);
+            color: var(--texto);
+            border: 2px solid var(--acento);
+            border-radius: 12px;
             font-family: 'Sono', monospace;
             font-size: 14px;
             text-decoration: none;
@@ -114,7 +126,11 @@
             outline: none;
             transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
-            margin-top: 10px;
+        }
+
+        .btn-inicio:focus-visible {
+            outline: 2px solid var(--acento);
+            outline-offset: 3px;
         }
 
         @media (hover: hover) {
@@ -127,12 +143,17 @@
         .btn-inicio:active {
             transform: translateY(1px) scale(0.98);
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tarjeta-404 { animation: none; }
+            .btn-inicio { transition: none; }
+        }
     </style>
 </head>
 <body>
-    <main>
+    <main class="pagina-404">
         <article class="tarjeta-404">
-            <h2 class="codigo-404">404</h2>
+            <h1 class="codigo-404">404</h1>
             <p class="mensaje-404">La página que buscas no existe</p>
             <a href="./" class="btn-inicio">← Volver al cancionero</a>
         </article>
