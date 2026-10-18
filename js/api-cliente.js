@@ -1,4 +1,4 @@
-// api-cliente.js — Conectado a Firebase con caché local y notificación de estado
+// api-cliente.js — Conectado a Firebase con caché local, control offline y timeout
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -39,11 +39,36 @@ async function cargarDatosFirebase() {
 
     notificarEstadoGuardado('guardando');
 
+    // 1. Si el navegador detecta que no hay internet, cargamos del almacenamiento local de inmediato
+    if (!navigator.onLine) {
+        try {
+            const guardado = localStorage.getItem(STORAGE_KEY);
+            if (guardado) {
+                cacheCanciones = JSON.parse(guardado);
+                notificarEstadoGuardado('offline');
+                return cacheCanciones;
+            }
+        } catch (e) {}
+        notificarEstadoGuardado('offline');
+        return {};
+    }
+
+    // 2. Timeout para evitar que Firebase se quede colgado si la red falla o es muy lenta
+    const fetchConTimeout = (promise, ms = 3500) => {
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Timeout de conexión')), ms);
+        });
+        return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+    };
+
     try {
-        const [snapshotCanciones, snapshotCustom] = await Promise.all([
+        const promesaFirebase = Promise.all([
             get(ref(db, 'canciones')),
             get(ref(db, 'canciones_custom'))
         ]);
+
+        const [snapshotCanciones, snapshotCustom] = await fetchConTimeout(promesaFirebase, 3500);
 
         const datosCanciones = snapshotCanciones.val() || {};
         const datosCustom = snapshotCustom.val() || {};
@@ -51,7 +76,7 @@ async function cargarDatosFirebase() {
         const combinadas = { ...datosCanciones, ...datosCustom };
         cacheCanciones = combinadas;
 
-        // Guardar todas las letras en localStorage
+        // Guardar todas las canciones y letras en localStorage
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
         } catch (e) {
@@ -61,7 +86,7 @@ async function cargarDatosFirebase() {
         notificarEstadoGuardado('completado');
         return combinadas;
     } catch (err) {
-        console.warn("Sin conexión a Internet. Cargando canciones desde el almacenamiento local...", err);
+        console.warn("Sin conexión o tiempo de espera agotado. Cargando desde el almacenamiento local...", err);
         
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
@@ -97,11 +122,11 @@ export async function obtenerContenidoCancion(idC) {
 
     if (!c) {
         try {
-            const snapCustom = await get(ref(db, `canciones_custom/\${idC}`));
+            const snapCustom = await get(ref(db, `canciones_custom/${idC}`));
             if (snapCustom.exists()) {
                 c = snapCustom.val();
             } else {
-                const snapNorm = await get(ref(db, `canciones/\${idC}`));
+                const snapNorm = await get(ref(db, `canciones/${idC}`));
                 if (snapNorm.exists()) {
                     c = snapNorm.val();
                 }
