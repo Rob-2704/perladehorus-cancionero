@@ -233,7 +233,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
         raiz += alteraciones.substring(0, 1);
-        alteraciones = alterations.substring(1);
+        alteraciones = alteraciones.substring(1);
     }
 
     if (notaBajoRaw) {
