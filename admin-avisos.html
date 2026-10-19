@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
     <link href="style.css" rel="stylesheet">
-    <title>Gestor de Anuncios</title>
+    <title>Gestor de Avisos</title>
     <style>
         body { 
             max-width: 80%; 
@@ -52,6 +52,29 @@
         .btn-accion:hover { 
             filter: brightness(1.1); 
         }
+        .btn-secundario {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secundario:hover {
+            background-color: var(--card-bg);
+            border-color: #ffffff;
+        }
+        .btn-grupo-acciones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
         .btn-eliminar { 
             background-color: #e71d36; 
             color: #ffffff; 
@@ -67,9 +90,28 @@
             justify-content: center; 
             gap: 6px; 
         }
+        .btn-editar {
+            background-color: var(--card-bg);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-editar:hover {
+            background-color: var(--accent);
+            color: #0d0d0d;
+        }
         
         /* Contenedor principal totalmente sólido */
-        .formulario-anuncio { 
+        .formulario-aviso { 
             background-color: #1E1E24 !important; 
             border-radius: 20px; 
             padding: 24px; 
@@ -80,7 +122,7 @@
             border: 2px solid var(--accent); 
             opacity: 1 !important;
         }
-        .formulario-anuncio h2 { 
+        .formulario-aviso h2 { 
             margin: 0 0 10px 0; 
             font-size: 20px; 
             color: var(--text-main); 
@@ -121,12 +163,12 @@
             border-color: #ffffff; 
         }
 
-        .grid-anuncios { 
+        .grid-avisos { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 16px; 
         }
-        .tarjeta-anuncio-admin { 
+        .tarjeta-aviso-admin { 
             background-color: #1E1E24 !important; 
             border-radius: 16px; 
             padding: 16px; 
@@ -137,20 +179,20 @@
             gap: 12px; 
             opacity: 1 !important;
         }
-        .tarjeta-anuncio-admin:hover { 
+        .tarjeta-aviso-admin:hover { 
             border-color: var(--accent); 
         }
-        .tarjeta-anuncio-admin h3 { 
+        .tarjeta-aviso-admin h3 { 
             margin: 0; 
             font-size: 18px; 
             color: var(--text-main); 
         }
-        .tarjeta-anuncio-admin .meta { 
+        .tarjeta-aviso-admin .meta { 
             font-size: 12px; 
             color: var(--accent); 
             font-weight: bold; 
         }
-        .tarjeta-anuncio-admin p { 
+        .tarjeta-aviso-admin p { 
             margin: 0; 
             font-size: 13px; 
             color: var(--text-sec); 
@@ -173,17 +215,17 @@
     
     <header>
         <div>
-            <h1>Gestión de Anuncios</h1>
+            <h1>Gestión de Avisos</h1>
             <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--text-sec);">Publica y administra los avisos para la aplicación</p>
         </div>
     </header>
 
     <main>
-        <!-- Formulario de Creación -->
-        <div class="formulario-anuncio">
-            <h2>Nuevo Anuncio</h2>
+        <!-- Formulario de Creación / Edición -->
+        <div class="formulario-aviso">
+            <h2 id="titulo-formulario">Nuevo Aviso</h2>
             <div class="grupo-campo">
-                <label for="input-titulo">Título del Anuncio</label>
+                <label for="input-titulo">Título del Aviso</label>
                 <input type="text" id="input-titulo" class="input-texto" placeholder="Ej. Ensayo general obligatorio" autocomplete="off">
             </div>
             <div class="grupo-campo">
@@ -192,18 +234,23 @@
             </div>
             <div class="grupo-campo">
                 <label for="textarea-texto">Contenido del Aviso</label>
-                <textarea id="textarea-texto" class="textarea-texto" placeholder="Escribe los detalles del anuncio aquí..."></textarea>
+                <textarea id="textarea-texto" class="textarea-texto" placeholder="Escribe los detalles del aviso aquí..."></textarea>
             </div>
-            <button id="btn-guardar" class="btn-accion" style="align-self: flex-start;">
-                <span class="material-symbols-outlined">save</span> Publicar Anuncio
-            </button>
+            <div class="btn-grupo-acciones">
+                <button id="btn-guardar" class="btn-accion">
+                    <span class="material-symbols-outlined">save</span> <span id="texto-btn-guardar">Publicar Aviso</span>
+                </button>
+                <button id="btn-cancelar-edicion" class="btn-secundario" style="display: none;">
+                    <span class="material-symbols-outlined">close</span> Cancelar Edición
+                </button>
+            </div>
         </div>
 
         <div class="titulo-seccion" style="font-size: 18px; margin-bottom: 12px; color: var(--text-main);">
-            <span class="material-symbols-outlined">campaign</span> Anuncios Publicados
+            <span class="material-symbols-outlined">campaign</span> Avisos Publicados
         </div>
-        <div id="grid-anuncios" class="grid-anuncios">
-            <div class="cargando">Cargando anuncios...</div>
+        <div id="grid-avisos" class="grid-avisos">
+            <div class="cargando">Cargando avisos...</div>
         </div>
     </main>
 
@@ -228,10 +275,27 @@
         const inputFecha = document.getElementById('input-fecha');
         const textareaTexto = document.getElementById('textarea-texto');
         const btnGuardar = document.getElementById('btn-guardar');
-        const gridAnuncios = document.getElementById('grid-anuncios');
+        const textoBtnGuardar = document.getElementById('texto-btn-guardar');
+        const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
+        const tituloFormulario = document.getElementById('titulo-formulario');
+        const gridAvisos = document.getElementById('grid-avisos');
+
+        let idAvisoEditando = null;
 
         const hoy = new Date();
         inputFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+        function limpiarFormulario() {
+            idAvisoEditando = null;
+            inputTitulo.value = '';
+            textareaTexto.value = '';
+            inputFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+            tituloFormulario.textContent = 'Nuevo Aviso';
+            textoBtnGuardar.textContent = 'Publicar Aviso';
+            btnCancelarEdicion.style.display = 'none';
+        }
+
+        btnCancelarEdicion.addEventListener('click', limpiarFormulario);
 
         btnGuardar.addEventListener('click', async () => {
             const titulo = inputTitulo.value.trim();
@@ -239,37 +303,46 @@
             const texto = textareaTexto.value.trim();
 
             if (!titulo || !texto) {
-                alert("Por favor completa el título y el contenido del anuncio.");
+                alert("Por favor completa el título y el contenido del aviso.");
                 return;
             }
 
             try {
-                const anunciosRef = ref(db, 'anuncios');
-                const nuevoAnuncioRef = push(anunciosRef);
-                await set(nuevoAnuncioRef, {
-                    idA: nuevoAnuncioRef.key,
-                    titulo,
-                    fecha,
-                    texto
-                });
+                if (idAvisoEditando) {
+                    await set(ref(db, `anuncios/${idAvisoEditando}`), {
+                        idA: idAvisoEditando,
+                        titulo,
+                        fecha,
+                        texto
+                    });
+                    alert("¡Aviso actualizado con éxito!");
+                } else {
+                    const avisosRef = ref(db, 'anuncios');
+                    const nuevoAvisoRef = push(avisosRef);
+                    await set(nuevoAvisoRef, {
+                        idA: nuevoAvisoRef.key,
+                        titulo,
+                        fecha,
+                        texto
+                    });
+                    alert("¡Aviso publicado con éxito!");
+                }
 
-                inputTitulo.value = '';
-                textareaTexto.value = '';
-                alert("¡Anuncio publicado con éxito!");
+                limpiarFormulario();
             } catch (err) {
-                console.error("Error al guardar anuncio:", err);
-                alert("No se pudo publicar el anuncio.");
+                console.error("Error al guardar aviso:", err);
+                alert("No se pudo guardar el aviso.");
             }
         });
 
-        function cargarAnunciosAdmin() {
-            const anunciosRef = ref(db, 'anuncios');
-            onValue(anunciosRef, (snapshot) => {
+        function cargarAvisosAdmin() {
+            const avisosRef = ref(db, 'anuncios');
+            onValue(avisosRef, (snapshot) => {
                 const datos = snapshot.val();
-                gridAnuncios.innerHTML = '';
+                gridAvisos.innerHTML = '';
 
                 if (!datos) {
-                    gridAnuncios.innerHTML = '<div class="cargando">No hay anuncios publicados.</div>';
+                    gridAvisos.innerHTML = '<div class="cargando">No hay avisos publicados.</div>';
                     return;
                 }
 
@@ -277,28 +350,53 @@
                 lista.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
                 const fragmento = document.createDocumentFragment();
-                lista.forEach(anuncio => {
+                lista.forEach(aviso => {
                     const tarjeta = document.createElement('div');
-                    tarjeta.className = 'tarjeta-anuncio-admin';
+                    tarjeta.className = 'tarjeta-aviso-admin';
+
+                    let htmlMeta = '';
+                    if (aviso.fecha) {
+                        htmlMeta = `<span class="meta">${aviso.fecha}</span>`;
+                    }
+
                     tarjeta.innerHTML = `
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                <h3>${anuncio.titulo}</h3>
-                                ${anuncio.fecha ? `<span class="meta">\${anuncio.fecha}</span>` : ''}
+                                <h3>${aviso.titulo}</h3>
+                                ${htmlMeta}
                             </div>
-                            <p>${anuncio.texto || anuncio.contenido || ''}</p>
+                            <p>${aviso.texto || aviso.contenido || ''}</p>
                         </div>
-                        <button class="btn-eliminar" data-id="${anuncio.idA}">
-                            <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
-                        </button>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button class="btn-editar" data-id="${aviso.idA}">
+                                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Editar
+                            </button>
+                            <button class="btn-eliminar" data-id="${aviso.idA}">
+                                <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
+                            </button>
+                        </div>
                     `;
 
+                    tarjeta.querySelector('.btn-editar').addEventListener('click', () => {
+                        idAvisoEditando = aviso.idA;
+                        inputTitulo.value = aviso.titulo || '';
+                        inputFecha.value = aviso.fecha || '';
+                        textareaTexto.value = aviso.texto || aviso.contenido || '';
+                        tituloFormulario.textContent = 'Editar Aviso';
+                        textoBtnGuardar.textContent = 'Actualizar Aviso';
+                        btnCancelarEdicion.style.display = 'inline-flex';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+
                     tarjeta.querySelector('.btn-eliminar').addEventListener('click', async () => {
-                        if (confirm(`¿Estás seguro de eliminar el anuncio "${anuncio.titulo}"?`)) {
+                        if (confirm(`¿Estás seguro de eliminar el aviso "${aviso.titulo}"?`)) {
                             try {
-                                await remove(ref(db, `anuncios/${anuncio.idA}`));
+                                await remove(ref(db, `anuncios/${aviso.idA}`));
+                                if (idAvisoEditando === aviso.idA) {
+                                    limpiarFormulario();
+                                }
                             } catch (e) {
-                                alert("No se pudo eliminar el anuncio.");
+                                alert("No se pudo eliminar el aviso.");
                             }
                         }
                     });
@@ -306,13 +404,13 @@
                     fragmento.appendChild(tarjeta);
                 });
 
-                gridAnuncios.appendChild(fragmento);
+                gridAvisos.appendChild(fragmento);
             }, () => {
-                gridAnuncios.innerHTML = '<div class="cargando">Error al cargar anuncios.</div>';
+                gridAvisos.innerHTML = '<div class="cargando">Error al cargar avisos.</div>';
             });
         }
 
-        cargarAnunciosAdmin();
+        cargarAvisosAdmin();
     </script>
 </body>
 </html>

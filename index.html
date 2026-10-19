@@ -19,6 +19,7 @@
         body {
             max-width: 80%;
             margin: 0 auto;
+            background-color: #0d0d0d;
         }
 
         header {
@@ -47,7 +48,7 @@
             h1 { font-size: 32px; }
         }
 
-        /* Indicador de estado de guardado junto al título */
+        /* Indicador de estado de guardado sólido */
         .contenedor-titulo-indicador {
             display: flex;
             align-items: center;
@@ -83,13 +84,13 @@
         .indicador-guardado.completado {
             border-color: #2ec4b6;
             color: #2ec4b6;
-            background-color: rgba(46, 196, 182, 0.12);
+            background-color: var(--card-bg);
         }
 
         .indicador-guardado.offline {
             border-color: var(--text-sec);
             color: var(--text-sec);
-            background-color: rgba(153, 153, 153, 0.12);
+            background-color: var(--card-bg);
         }
 
         @keyframes girarSync {
@@ -163,49 +164,51 @@
             animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
 
-        /* Estilos de Anuncios */
-        .contenedor-anuncios {
+        /* Estilos de Avisos Informativos (No interactivos) */
+        .contenedor-avisos {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
-        .tarjeta-anuncio {
+        .tarjeta-aviso {
             background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 14px 18px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: none;
+            border-left: 4px solid var(--accent);
             display: flex;
             flex-direction: column;
             gap: 6px;
             font-family: 'Sono', monospace;
+            cursor: default;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        .tarjeta-anuncio-header {
+        .tarjeta-aviso-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
         }
 
-        .tarjeta-anuncio h3 {
+        .tarjeta-aviso h3 {
             margin: 0;
             font-size: 16px;
             font-weight: 600;
             color: var(--text-main);
         }
 
-        .anuncio-fecha {
+        .aviso-fecha {
             font-size: 11px;
             color: var(--accent);
             font-weight: 600;
             white-space: nowrap;
         }
 
-        .tarjeta-anuncio p {
+        .tarjeta-aviso p {
             margin: 0;
             font-size: 13px;
             color: var(--text-sec);
@@ -213,6 +216,8 @@
             padding: 0;
             line-height: 1.4;
             white-space: pre-line;
+            opacity: 1 !important;
+            animation: none !important;
         }
 
         .contenedor-eventos {
@@ -251,7 +256,7 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: rgba(188, 151, 49, 0.25);
+            background: var(--accent);
         }
 
         .tarjeta-evento {
@@ -259,8 +264,7 @@
             border-radius: 16px;
             padding: 12px 16px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             flex-direction: column;
             gap: 4px;
@@ -298,25 +302,11 @@
             position: relative;
         }
 
-        .tarjeta-evento.pasado::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.38);
-            pointer-events: none;
-            border-radius: 16px;
-            transition: background-color 0.2s ease;
-            z-index: 1;
-        }
-
         .tarjeta-evento.pasado h3,
         .tarjeta-evento.pasado .meta-evento,
         .tarjeta-evento.pasado .meta-item,
         .tarjeta-evento.pasado .material-symbols-outlined {
             color: var(--text-sec) !important;
-            position: relative;
-            z-index: 2;
-            transition: color 0.2s ease;
         }
 
         .tarjeta-evento.oculto { display: none !important; }
@@ -353,14 +343,7 @@
         @media (hover: hover) {
             .tarjeta-evento:hover { 
                 transform: scale(1.015); 
-                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
                 z-index: 2;
-            }
-            .tarjeta-evento.pasado:hover::after {
-                background-color: rgba(0, 0, 0, 0);
-            }
-            .tarjeta-evento.pasado:hover h3 {
-                color: var(--text-main) !important;
             }
         }
         .tarjeta-evento:active { transform: scale(1.015); }
@@ -476,7 +459,7 @@
             font-family: 'Sono', monospace;
             font-size: 14px;
             outline: none;
-            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -505,7 +488,7 @@
 
         .input-busqueda { width: 100%; box-sizing: border-box; }
         .select-categoria:focus,
-        .input-busqueda:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
+        .input-busqueda:focus { border-color: var(--text-main); }
         .input-busqueda::placeholder { color: var(--text-sec); opacity: 0.7; }
 
         .lista-sugerencias {
@@ -516,7 +499,6 @@
             background-color: var(--card-bg);
             border: 2px solid var(--accent);
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
             z-index: 9999;
             max-height: 240px;
             overflow-y: auto;
@@ -534,13 +516,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(188, 151, 49, 0.2);
+            border-bottom: 1px solid var(--accent);
             font-family: 'Sono', monospace;
             font-size: 13px;
             color: var(--text-main);
         }
 
-        .item-sugerencia:hover { background-color: rgba(188, 151, 49, 0.18); }
+        .item-sugerencia:hover { background-color: var(--card-bg); border-left: 4px solid var(--accent); }
         .item-sugerencia .sugerencia-meta { font-size: 11px; color: var(--text-sec); }
 
         .lista-canciones {
@@ -565,8 +547,7 @@
             border-radius: 20px;
             padding: 16px 20px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             flex-direction: column;
             position: relative;
@@ -576,7 +557,7 @@
         }
         
         @media (hover: hover) {
-            .fila-cancion:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); z-index: 2; }
+            .fila-cancion:hover { transform: scale(1.05); z-index: 2; }
         }
         .fila-cancion:active { transform: scale(1.05); }
 
@@ -615,12 +596,12 @@
     </header>
 
     <main>
-        <!-- Sección de Anuncios -->
-        <div id="seccion-anuncios" style="display: none;">
+        <!-- Sección de Avisos -->
+        <div id="seccion-avisos" style="display: none;">
             <div class="titulo-seccion">
-                <span class="material-symbols-outlined">campaign</span> Anuncios
+                <span class="material-symbols-outlined">campaign</span> Avisos
             </div>
-            <div id="contenedor-anuncios" class="contenedor-anuncios"></div>
+            <div id="contenedor-avisos" class="contenedor-avisos"></div>
         </div>
 
         <!-- Sección de Eventos -->
@@ -664,8 +645,8 @@
         const contenedorBusqueda = document.querySelector('.contenedor-busqueda');
         const listaSugerencias = document.getElementById('lista-sugerencias');
         
-        const seccionAnuncios = document.getElementById('seccion-anuncios');
-        const contenedorAnuncios = document.getElementById('contenedor-anuncios');
+        const seccionAvisos = document.getElementById('seccion-avisos');
+        const contenedorAvisos = document.getElementById('contenedor-avisos');
 
         const seccionEventos = document.getElementById('seccion-eventos');
         const contenedorEventos = document.getElementById('contenedor-eventos');
@@ -754,42 +735,43 @@
             return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
         }
 
-        // --- GESTIÓN Y RENDERIZADO DE ANUNCIOS OFFLINE ---
-        function procesarYRenderizarAnuncios(datos) {
-            const anuncios = Object.values(datos);
-            if (!Array.isArray(anuncios) || anuncios.length === 0) {
-                seccionAnuncios.style.display = 'none';
+        // --- GESTIÓN Y RENDERIZADO DE AVISOS OFFLINE ---
+        function procesarYRenderizarAvisos(datos) {
+            const avisos = Object.values(datos);
+            if (!Array.isArray(avisos) || avisos.length === 0) {
+                seccionAvisos.style.display = 'none';
                 return;
             }
 
-            // Ordenar por fecha descendente (más recientes primero) si la tienen
-            anuncios.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+            avisos.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
-            contenedorAnuncios.innerHTML = '';
-            anuncios.forEach(anuncio => {
+            contenedorAvisos.innerHTML = '';
+            avisos.forEach(aviso => {
                 const tarjeta = document.createElement('div');
-                tarjeta.className = 'tarjeta-anuncio';
-                tarjeta.innerHTML = `
-                    <div class="tarjeta-anuncio-header">
-                        <h3>${anuncio.titulo || 'Aviso'}</h3>
-                        ${anuncio.fecha ? `<span class="anuncio-fecha">\${anuncio.fecha}</span>` : ''}
-                    </div>
-                    <p>${anuncio.texto || anuncio.contenido || ''}</p>
-                `;
-                contenedorAnuncios.appendChild(tarjeta);
+                tarjeta.className = 'tarjeta-aviso';
+
+                let htmlHeader = '<div class="tarjeta-aviso-header">';
+                htmlHeader += '<h3>' + (aviso.titulo || 'Aviso') + '</h3>';
+                if (aviso.fecha) {
+                    htmlHeader += '<span class="aviso-fecha">' + aviso.fecha + '</span>';
+                }
+                htmlHeader += '</div>';
+
+                tarjeta.innerHTML = htmlHeader + '<p>' + (aviso.texto || aviso.contenido || '') + '</p>';
+                contenedorAvisos.appendChild(tarjeta);
             });
 
-            seccionAnuncios.style.display = 'block';
+            seccionAvisos.style.display = 'block';
             activarAnimacionIconos();
         }
 
-        async function cargarAnunciosFirebase() {
+        async function cargarAvisosFirebase() {
             if (!navigator.onLine) {
                 try {
-                    const guardado = localStorage.getItem('cache_anuncios_perla');
-                    if (guardado) { procesarYRenderizarAnuncios(JSON.parse(guardado)); return; }
+                    const guardado = localStorage.getItem('cache_avisos_perla');
+                    if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
                 } catch (e) {}
-                seccionAnuncios.style.display = 'none';
+                seccionAvisos.style.display = 'none';
                 return;
             }
 
@@ -813,24 +795,24 @@
                 dbModule.onValue(dbModule.ref(db, 'anuncios'), (snapshot) => {
                     const datos = snapshot.val();
                     if (datos) {
-                        try { localStorage.setItem('cache_anuncios_perla', JSON.stringify(datos)); } catch (e) {}
-                        procesarYRenderizarAnuncios(datos);
+                        try { localStorage.setItem('cache_avisos_perla', JSON.stringify(datos)); } catch (e) {}
+                        procesarYRenderizarAvisos(datos);
                     } else {
-                        seccionAnuncios.style.display = 'none';
+                        seccionAvisos.style.display = 'none';
                     }
                 }, () => {
                     try {
-                        const guardado = localStorage.getItem('cache_anuncios_perla');
-                        if (guardado) { procesarYRenderizarAnuncios(JSON.parse(guardado)); return; }
+                        const guardado = localStorage.getItem('cache_avisos_perla');
+                        if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
                     } catch (e) {}
-                    seccionAnuncios.style.display = 'none';
+                    seccionAvisos.style.display = 'none';
                 });
             } catch (err) {
                 try {
-                    const guardado = localStorage.getItem('cache_anuncios_perla');
-                    if (guardado) { procesarYRenderizarAnuncios(JSON.parse(guardado)); return; }
+                    const guardado = localStorage.getItem('cache_avisos_perla');
+                    if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
                 } catch (e) {}
-                seccionAnuncios.style.display = 'none';
+                seccionAvisos.style.display = 'none';
             }
         }
 
@@ -849,7 +831,7 @@
             aviso.className = 'aviso-sin-proximos';
             aviso.innerHTML = `
                 <svg class="borde-punteado" aria-hidden="true">
-                    <rect fill="none" stroke="#bc9731" stroke-opacity="0.45" stroke-width="2"></rect>
+                    <rect fill="none" stroke="#bc9731" stroke-width="2"></rect>
                 </svg>
                 <span class="material-symbols-outlined">event_busy</span>
                 <span>No hay eventos próximos</span>
@@ -1150,7 +1132,7 @@
 
         async function init() {
             try {
-                cargarAnunciosFirebase();
+                cargarAvisosFirebase();
                 cargarEventosFirebase();
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
                 cancionesGlobal = (await obtenerCanciones()).slice().sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
