@@ -164,7 +164,7 @@
             animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
 
-        /* Estilos de Avisos Informativos (No interactivos) */
+        /* Estilos de Avisos Informativos Interactivos */
         .contenedor-avisos {
             display: flex;
             flex-direction: column;
@@ -182,9 +182,18 @@
             flex-direction: column;
             gap: 6px;
             font-family: 'Sono', monospace;
-            cursor: default;
+            cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            opacity: 0;
             animation: popWiiU 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transition: transform 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (hover: hover) {
+            .tarjeta-aviso:hover {
+                transform: scale(1.01);
+            }
         }
 
         .tarjeta-aviso-header {
@@ -208,6 +217,7 @@
             white-space: nowrap;
         }
 
+        /* Transición fluida de altura manejada por JS */
         .tarjeta-aviso p {
             margin: 0;
             font-size: 13px;
@@ -218,6 +228,9 @@
             white-space: pre-line;
             opacity: 1 !important;
             animation: none !important;
+            overflow: hidden;
+            max-height: 1.4em; 
+            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .contenedor-eventos {
@@ -746,9 +759,16 @@
             avisos.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
             contenedorAvisos.innerHTML = '';
-            avisos.forEach(aviso => {
+            avisos.forEach((aviso, indice) => {
                 const tarjeta = document.createElement('div');
                 tarjeta.className = 'tarjeta-aviso';
+                
+                // Aplicar animación de entrada escalonada idéntica a las canciones
+                tarjeta.style.animationDelay = `${indice * 0.03}s`;
+                tarjeta.addEventListener('animationend', () => {
+                    tarjeta.style.animation = 'none';
+                    tarjeta.style.opacity = '1';
+                });
 
                 let htmlHeader = '<div class="tarjeta-aviso-header">';
                 htmlHeader += '<h3>' + (aviso.titulo || 'Aviso') + '</h3>';
@@ -757,7 +777,28 @@
                 }
                 htmlHeader += '</div>';
 
-                tarjeta.innerHTML = htmlHeader + '<p>' + (aviso.texto || aviso.contenido || '') + '</p>';
+                const textoCompleto = aviso.texto || aviso.contenido || '';
+                tarjeta.innerHTML = htmlHeader + '<p>' + textoCompleto + '</p>';
+                
+                const p = tarjeta.querySelector('p');
+
+                // Evento para expandir y contraer con cálculo dinámico de altura para animación fluida
+                tarjeta.addEventListener('click', () => {
+                    const expandido = tarjeta.classList.toggle('expandido');
+                    if (expandido) {
+                        p.style.maxHeight = p.scrollHeight + 'px';
+                        setTimeout(() => {
+                            if (tarjeta.classList.contains('expandido')) {
+                                p.style.maxHeight = 'none'; // Permite flexibilidad si cambia el tamaño
+                            }
+                        }, 300);
+                    } else {
+                        p.style.maxHeight = p.scrollHeight + 'px';
+                        void p.offsetWidth; // Forzar reflow para reiniciar la transición
+                        p.style.maxHeight = '1.4em';
+                    }
+                });
+
                 contenedorAvisos.appendChild(tarjeta);
             });
 
