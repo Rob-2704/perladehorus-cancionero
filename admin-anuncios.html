@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="img/icono.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
+    <link href="style.css" rel="stylesheet">
+    <title>Gestor de Anuncios</title>
+    <style>
+        body { 
+            max-width: 80%; 
+            margin: 0 auto; 
+            font-family: 'Sono', monospace; 
+            padding-bottom: 40px; 
+            background-color: #0d0d0d;
+        }
+        header { 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid var(--accent); 
+            padding-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+        }
+        h1 { 
+            margin: 0; 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+        }
+        .btn-accion { 
+            background-color: var(--accent); 
+            color: #0d0d0d; 
+            border: none; 
+            padding: 10px 18px; 
+            border-radius: 12px; 
+            font-family: 'Sono', monospace; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            text-decoration: none; 
+        }
+        .btn-accion:hover { 
+            filter: brightness(1.1); 
+        }
+        .btn-eliminar { 
+            background-color: #e71d36; 
+            color: #ffffff; 
+            border: none; 
+            border-radius: 10px; 
+            padding: 8px 14px; 
+            font-family: 'Sono', monospace; 
+            font-size: 13px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+        }
+        
+        /* Contenedor principal totalmente sólido */
+        .formulario-anuncio { 
+            background-color: #1E1E24 !important; 
+            border-radius: 20px; 
+            padding: 24px; 
+            margin-bottom: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            border: 2px solid var(--accent); 
+            opacity: 1 !important;
+        }
+        .formulario-anuncio h2 { 
+            margin: 0 0 10px 0; 
+            font-size: 20px; 
+            color: var(--text-main); 
+            border-bottom: 2px solid var(--accent); 
+            padding-bottom: 8px; 
+        }
+        .grupo-campo { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+        }
+        .grupo-campo label { 
+            font-size: 12px; 
+            color: var(--text-sec); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+
+        /* Inputs y textarea totalmente sólidos para bloquear el fondo */
+        .input-texto, .textarea-texto { 
+            width: 100%; 
+            background-color: #16161b !important; 
+            color: var(--text-main) !important; 
+            border: 2px solid var(--accent); 
+            border-radius: 12px; 
+            padding: 10px 16px; 
+            font-family: 'Sono', monospace; 
+            font-size: 14px; 
+            outline: none; 
+            box-sizing: border-box; 
+            opacity: 1 !important;
+        }
+        .textarea-texto { 
+            resize: vertical; 
+            min-height: 100px; 
+        }
+        .input-texto:focus, .textarea-texto:focus { 
+            border-color: #ffffff; 
+        }
+
+        .grid-anuncios { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 16px; 
+        }
+        .tarjeta-anuncio-admin { 
+            background-color: #1E1E24 !important; 
+            border-radius: 16px; 
+            padding: 16px; 
+            border: 2px solid #1E1E24; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            gap: 12px; 
+            opacity: 1 !important;
+        }
+        .tarjeta-anuncio-admin:hover { 
+            border-color: var(--accent); 
+        }
+        .tarjeta-anuncio-admin h3 { 
+            margin: 0; 
+            font-size: 18px; 
+            color: var(--text-main); 
+        }
+        .tarjeta-anuncio-admin .meta { 
+            font-size: 12px; 
+            color: var(--accent); 
+            font-weight: bold; 
+        }
+        .tarjeta-anuncio-admin p { 
+            margin: 0; 
+            font-size: 13px; 
+            color: var(--text-sec); 
+            white-space: pre-line; 
+        }
+        .cargando { 
+            text-align: center; 
+            color: var(--accent); 
+            padding: 40px; 
+            grid-column: 1 / -1; 
+        }
+        @media (max-width: 600px) { 
+            body { max-width: 92%; } 
+            h1 { font-size: 24px; } 
+        }
+    </style>
+</head>
+<body>
+    <a href="./" style="color: var(--text-sec); text-decoration: none; font-size: 13px; display: inline-block; margin-top: 20px;">← Volver al inicio</a>
+    
+    <header>
+        <div>
+            <h1>Gestión de Anuncios</h1>
+            <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--text-sec);">Publica y administra los avisos para la aplicación</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Formulario de Creación -->
+        <div class="formulario-anuncio">
+            <h2>Nuevo Anuncio</h2>
+            <div class="grupo-campo">
+                <label for="input-titulo">Título del Anuncio</label>
+                <input type="text" id="input-titulo" class="input-texto" placeholder="Ej. Ensayo general obligatorio" autocomplete="off">
+            </div>
+            <div class="grupo-campo">
+                <label for="input-fecha">Fecha (Opcional)</label>
+                <input type="date" id="input-fecha" class="input-texto">
+            </div>
+            <div class="grupo-campo">
+                <label for="textarea-texto">Contenido del Aviso</label>
+                <textarea id="textarea-texto" class="textarea-texto" placeholder="Escribe los detalles del anuncio aquí..."></textarea>
+            </div>
+            <button id="btn-guardar" class="btn-accion" style="align-self: flex-start;">
+                <span class="material-symbols-outlined">save</span> Publicar Anuncio
+            </button>
+        </div>
+
+        <div class="titulo-seccion" style="font-size: 18px; margin-bottom: 12px; color: var(--text-main);">
+            <span class="material-symbols-outlined">campaign</span> Anuncios Publicados
+        </div>
+        <div id="grid-anuncios" class="grid-anuncios">
+            <div class="cargando">Cargando anuncios...</div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+            authDomain: "rondalla-f04a4.firebaseapp.com",
+            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+            projectId: "rondalla-f04a4",
+            storageBucket: "rondalla-f04a4.firebasestorage.app",
+            messagingSenderId: "835273996097",
+            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const inputTitulo = document.getElementById('input-titulo');
+        const inputFecha = document.getElementById('input-fecha');
+        const textareaTexto = document.getElementById('textarea-texto');
+        const btnGuardar = document.getElementById('btn-guardar');
+        const gridAnuncios = document.getElementById('grid-anuncios');
+
+        const hoy = new Date();
+        inputFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+        btnGuardar.addEventListener('click', async () => {
+            const titulo = inputTitulo.value.trim();
+            const fecha = inputFecha.value;
+            const texto = textareaTexto.value.trim();
+
+            if (!titulo || !texto) {
+                alert("Por favor completa el título y el contenido del anuncio.");
+                return;
+            }
+
+            try {
+                const anunciosRef = ref(db, 'anuncios');
+                const nuevoAnuncioRef = push(anunciosRef);
+                await set(nuevoAnuncioRef, {
+                    idA: nuevoAnuncioRef.key,
+                    titulo,
+                    fecha,
+                    texto
+                });
+
+                inputTitulo.value = '';
+                textareaTexto.value = '';
+                alert("¡Anuncio publicado con éxito!");
+            } catch (err) {
+                console.error("Error al guardar anuncio:", err);
+                alert("No se pudo publicar el anuncio.");
+            }
+        });
+
+        function cargarAnunciosAdmin() {
+            const anunciosRef = ref(db, 'anuncios');
+            onValue(anunciosRef, (snapshot) => {
+                const datos = snapshot.val();
+                gridAnuncios.innerHTML = '';
+
+                if (!datos) {
+                    gridAnuncios.innerHTML = '<div class="cargando">No hay anuncios publicados.</div>';
+                    return;
+                }
+
+                const lista = Object.entries(datos).map(([key, val]) => ({ idA: key, ...val }));
+                lista.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+                const fragmento = document.createDocumentFragment();
+                lista.forEach(anuncio => {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'tarjeta-anuncio-admin';
+                    tarjeta.innerHTML = `
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                <h3>${anuncio.titulo}</h3>
+                                ${anuncio.fecha ? `<span class="meta">\${anuncio.fecha}</span>` : ''}
+                            </div>
+                            <p>${anuncio.texto || anuncio.contenido || ''}</p>
+                        </div>
+                        <button class="btn-eliminar" data-id="${anuncio.idA}">
+                            <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
+                        </button>
+                    `;
+
+                    tarjeta.querySelector('.btn-eliminar').addEventListener('click', async () => {
+                        if (confirm(`¿Estás seguro de eliminar el anuncio "${anuncio.titulo}"?`)) {
+                            try {
+                                await remove(ref(db, `anuncios/${anuncio.idA}`));
+                            } catch (e) {
+                                alert("No se pudo eliminar el anuncio.");
+                            }
+                        }
+                    });
+
+                    fragmento.appendChild(tarjeta);
+                });
+
+                gridAnuncios.appendChild(fragmento);
+            }, () => {
+                gridAnuncios.innerHTML = '<div class="cargando">Error al cargar anuncios.</div>';
+            });
+        }
+
+        cargarAnunciosAdmin();
+    </script>
+</body>
+</html>
