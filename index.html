@@ -217,6 +217,11 @@
             white-space: nowrap;
         }
 
+        .aviso-mas {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
         /* Transición fluida de altura manejada por JS */
         .tarjeta-aviso p {
             margin: 0;
@@ -778,26 +783,42 @@
                 htmlHeader += '</div>';
 
                 const textoCompleto = aviso.texto || aviso.contenido || '';
-                tarjeta.innerHTML = htmlHeader + '<p>' + textoCompleto + '</p>';
+                const lineas = textoCompleto.split('\n');
+                const primeraLinea = lineas[0] || '';
+                const esMultilinea = lineas.length > 1 || textoCompleto.length > primeraLinea.length;
+
+                const htmlResumido = primeraLinea + (esMultilinea ? ' <span class="aviso-mas">...</span>' : '');
+
+                tarjeta.innerHTML = htmlHeader + '<p>' + htmlResumido + '</p>';
                 
                 const p = tarjeta.querySelector('p');
 
-                // Evento para expandir y contraer con cálculo dinámico de altura para animación fluida
-                tarjeta.addEventListener('click', () => {
-                    const expandido = tarjeta.classList.toggle('expandido');
-                    if (expandido) {
-                        p.style.maxHeight = p.scrollHeight + 'px';
-                        setTimeout(() => {
-                            if (tarjeta.classList.contains('expandido')) {
-                                p.style.maxHeight = 'none'; // Permite flexibilidad si cambia el tamaño
-                            }
-                        }, 300);
-                    } else {
-                        p.style.maxHeight = p.scrollHeight + 'px';
-                        void p.offsetWidth; // Forzar reflow para reiniciar la transición
-                        p.style.maxHeight = '1.4em';
-                    }
-                });
+                if (esMultilinea) {
+                    tarjeta.style.cursor = 'pointer';
+                    tarjeta.addEventListener('click', () => {
+                        const expandido = tarjeta.classList.toggle('expandido');
+                        if (expandido) {
+                            p.innerHTML = textoCompleto;
+                            p.style.maxHeight = p.scrollHeight + 'px';
+                            setTimeout(() => {
+                                if (tarjeta.classList.contains('expandido')) {
+                                    p.style.maxHeight = 'none';
+                                }
+                            }, 300);
+                        } else {
+                            p.style.maxHeight = p.scrollHeight + 'px';
+                            void p.offsetWidth;
+                            p.style.maxHeight = '1.4em';
+                            setTimeout(() => {
+                                if (!tarjeta.classList.contains('expandido')) {
+                                    p.innerHTML = htmlResumido;
+                                }
+                            }, 300);
+                        }
+                    });
+                } else {
+                    tarjeta.style.cursor = 'default';
+                }
 
                 contenedorAvisos.appendChild(tarjeta);
             });
