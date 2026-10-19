@@ -812,9 +812,7 @@
                 return;
             }
 
-            const eventoRef = ref(db, `eventos/${idE}`);
-            onValue(eventoRef, async (snapshot) => {
-                const evento = snapshot.val();
+            const renderizarYContinuar = (evento) => {
                 if (!evento) {
                     tituloEventoEl.textContent = "Evento no encontrado";
                     contenedorDetalleEl.innerHTML = "<div class='cargando'>El evento solicitado no existe.</div>";
@@ -886,8 +884,7 @@
                 activarAnimacionIconos();
 
                 if (Array.isArray(evento.canciones) && evento.canciones.length > 0) {
-                    try {
-                        const todasLasCanciones = await obtenerCanciones();
+                    obtenerCanciones().then(todasLasCanciones => {
                         const cancionesEvento = todasLasCanciones.filter(c => 
                             evento.canciones.some(id => String(id) === String(c.idC))
                         );
@@ -965,13 +962,66 @@
                         } else {
                             listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
                         }
-                    } catch (e) {
-                        console.error("Error al cargar repertorio:", e);
+                    }).catch(() => {
                         listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
-                    }
+                    });
                 } else {
                     listaRepertorioEl.innerHTML = '<div style="font-size:13px; color:var(--text-sec); padding: 10px 0; font-family:\'Sono\', monospace;">No hay canciones programadas</div>';
                 }
+            };
+
+            // 1. Si está offline, cargar de inmediato desde el localStorage guardado en index
+            if (!navigator.onLine) {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) {
+                        const eventosObj = JSON.parse(guardado);
+                        const evento = eventosObj[idE] || Object.values(eventosObj).find(e => String(e.idE) === String(idE));
+                        renderizarYContinuar(evento);
+                        return;
+                    }
+                } catch (e) {}
+                renderizarYContinuar(null);
+                return;
+            }
+
+            // 2. Si hay red, intentar obtener de Firebase y actualizar caché
+            const eventoRef = ref(db, `eventos/${idE}`);
+            get(eventoRef).then((snapshot) => {
+                const evento = snapshot.val();
+                if (evento) {
+                    try {
+                        const guardado = localStorage.getItem('cache_eventos_perla');
+                        const eventosObj = guardado ? JSON.parse(guardado) : {};
+                        eventosObj[idE] = evento;
+                        localStorage.setItem('cache_eventos_perla', JSON.stringify(eventosObj));
+                    } catch (e) {}
+                    renderizarYContinuar(evento);
+                } else {
+                    try {
+                        const guardado = localStorage.getItem('cache_eventos_perla');
+                        if (guardado) {
+                            const eventosObj = JSON.parse(guardado);
+                            const eventoLocal = eventosObj[idE] || Object.values(eventosObj).find(e => String(e.idE) === String(idE));
+                            if (eventoLocal) {
+                                renderizarYContinuar(eventoLocal);
+                                return;
+                            }
+                        }
+                    } catch (e) {}
+                    renderizarYContinuar(null);
+                }
+            }).catch(() => {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) {
+                        const eventosObj = JSON.parse(guardado);
+                        const evento = eventosObj[idE] || Object.values(eventosObj).find(e => String(e.idE) === String(idE));
+                        renderizarYContinuar(evento);
+                        return;
+                    }
+                } catch (e) {}
+                renderizarYContinuar(null);
             });
         }
 
