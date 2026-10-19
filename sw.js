@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cancionero-perla-0.6';
+const CACHE_NAME = 'cancionero-perla-0.7';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -46,22 +46,36 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Estrategia de respuesta: Buscar primero en caché, si no, ir a la red
+// Estrategia de respuesta optimizada para el manejo offline de vistas con parámetros
 self.addEventListener('fetch', (event) => {
-  // Omitir peticiones a Firebase Realtime Database para que siempre obtengan datos frescos de la BD
+  // Omitir peticiones a Firebase Realtime Database para que siempre intenten conectar a la BD si hay red
   if (event.request.url.includes('firebaseio.com')) {
     return;
   }
+
+  const url = new URL(event.request.url);
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
+
+      // Manejar rutas con parámetros (ej. visor?idC=... o evento?idE=...) entregando la plantilla base cacheada
+      if (url.pathname.includes('visor')) {
+        return caches.match('./visor.html').then(res => res || fetch(event.request));
+      }
+      if (url.pathname.includes('evento')) {
+        return caches.match('./evento.html').then(res => res || fetch(event.request));
+      }
+
       return fetch(event.request).then((networkResponse) => {
         return networkResponse;
       }).catch(() => {
-        // Si no hay red y el recurso no está en caché
+        // Fallback de navegación general para otras páginas si no hay red
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
       });
     })
   );
