@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cancionero-perla-0.8';
+const CACHE_NAME = 'cancionero-perla-0.9';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -46,7 +46,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Estrategia de respuesta optimizada para el manejo offline de vistas con parámetros
+// Estrategia Network First: Prioriza la red para obtener siempre los cambios frescos
 self.addEventListener('fetch', (event) => {
   // Omitir peticiones a Firebase Realtime Database para que siempre intenten conectar a la BD si hay red
   if (event.request.url.includes('firebaseio.com')) {
@@ -55,28 +55,41 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
+  // Manejo específico para rutas con parámetros o vistas dinámicas (visor / evento) con respaldo offline
+  if (url.pathname.includes('visor')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => networkResponse)
+        .catch(() => caches.match('./visor.html').then(res => res || caches.match('./index.html')))
+    );
+    return;
+  }
+  
+  if (url.pathname.includes('evento')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => networkResponse)
+        .catch(() => caches.match('./evento.html').then(res => res || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Estrategia general Network First para archivos estáticos y páginas
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      // Manejar rutas con parámetros (ej. visor?idC=... o evento?idE=...) entregando la plantilla base cacheada
-      if (url.pathname.includes('visor')) {
-        return caches.match('./visor.html').then(res => res || fetch(event.request));
-      }
-      if (url.pathname.includes('evento')) {
-        return caches.match('./evento.html').then(res => res || fetch(event.request));
-      }
-
-      return fetch(event.request).then((networkResponse) => {
+    fetch(event.request)
+      .then((networkResponse) => {
         return networkResponse;
-      }).catch(() => {
-        // Fallback de navegación general para otras páginas si no hay red
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // Fallback de navegación general si no hay red ni caché específica
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });
