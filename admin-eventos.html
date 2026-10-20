@@ -258,7 +258,6 @@
             gap: 12px;
         }
 
-        /* Separador elegante para eventos anteriores en el admin */
         .separador-eventos-pasados {
             display: flex;
             align-items: center;
@@ -398,7 +397,6 @@
     </header>
 
     <main>
-        <!-- Formulario Crear/Editar -->
         <div class="tarjeta-formulario">
             <h2 id="titulo-form">
                 <span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Evento
@@ -474,7 +472,6 @@
             </form>
         </div>
 
-        <!-- Lista de Eventos Existentes -->
         <div class="titulo-lista">
             <span class="material-symbols-outlined">event</span> Eventos Registrados
         </div>
@@ -485,391 +482,382 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { obtenerCanciones } from './js/api-cliente.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
-            authDomain: "rondalla-f04a4.firebaseapp.com",
-            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
-            projectId: "rondalla-f04a4",
-            storageBucket: "rondalla-f04a4.firebasestorage.app",
-            messagingSenderId: "835273996097",
-            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
-        };
+        protegerPaginaAdmin((user) => {
+            const db = getDatabase();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const formIdE = document.getElementById('form-id-e');
-        const formTitulo = document.getElementById('form-titulo');
-        const formFecha = document.getElementById('form-fecha');
-        const formVestimenta = document.getElementById('form-vestimenta');
-        const formHoraInicio = document.getElementById('form-hora-inicio');
-        const formHoraFin = document.getElementById('form-hora-fin');
-        const formLugar = document.getElementById('form-lugar');
-        const formLinkLugar = document.getElementById('form-link-lugar');
-        const formNotas = document.getElementById('form-notas');
-        
-        const contenedorCancionesSelector = document.getElementById('contenedor-canciones-selector');
-        const btnSeleccionarTodas = document.getElementById('btn-seleccionar-todas');
-        const btnGuardarEvento = document.getElementById('btn-guardar-evento');
-        const btnCancelarForm = document.getElementById('btn-cancelar-form');
-        const tituloForm = document.getElementById('titulo-form');
-        const listaEventosAdmin = document.getElementById('lista-eventos-admin');
-
-        let listaCancionesGlobal = [];
-        let cancionesSeleccionadas = [];
-        let eventosGlobalMap = {};
-
-        function activarAnimacionIconos() {
-            document.fonts.ready.then(() => {
-                document.querySelectorAll('.material-symbols-outlined').forEach(icono => {
-                    icono.classList.add('fuente-cargada');
-                });
-            });
-        }
-
-        function formatearHoraAMPM(horaStr) {
-            if (!horaStr) return '';
-            if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) return horaStr;
-            const partes = horaStr.split(':');
-            if (partes.length < 2) return horaStr;
-            let hrs = parseInt(partes[0], 10);
-            const mins = partes[1].trim();
-            if (isNaN(hrs)) return horaStr;
-            const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
-            hrs = hrs % 12;
-            if (hrs === 0) hrs = 12;
-            return `${hrs}:${mins}${ampm}`;
-        }
-
-        function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
-            if (!stringFecha || stringFecha.trim() === '') return 'Fecha por confirmar';
-            const partes = stringFecha.split('-');
-            let textoFecha = stringFecha;
-
-            if (partes.length === 3) {
-                const d = new Date(partes[0], partes[1] - 1, partes[2]);
-                textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
-                textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
-            }
-
-            const inicioFormatted = formatearHoraAMPM(horaInicio);
-            const finFormatted = formatearHoraAMPM(horaFin);
-
-            let rangoHoras = '';
-            if (inicioFormatted && finFormatted) {
-                rangoHoras = `${inicioFormatted}-${finFormatted}`;
-            } else if (inicioFormatted) {
-                rangoHoras = inicioFormatted;
-            }
-
-            return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
-        }
-
-        async function cargarCanciones() {
-            try {
-                const todasLasCanciones = await obtenerCanciones();
-                listaCancionesGlobal = todasLasCanciones.filter(c => (c.categoria || 'rondalla') === 'rondalla');
-                renderizarSelectorCanciones();
-            } catch (err) {
-                contenedorCancionesSelector.innerHTML = '<span style="color:var(--text-sec); font-size:12px;">Error al cargar canciones.</span>';
-            }
-        }
-
-        function actualizarBotonSeleccionarTodas() {
-            if (!listaCancionesGlobal.length) return;
-            const todosIds = listaCancionesGlobal.map(c => String(c.idC));
-            const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
+            const formIdE = document.getElementById('form-id-e');
+            const formTitulo = document.getElementById('form-titulo');
+            const formFecha = document.getElementById('form-fecha');
+            const formVestimenta = document.getElementById('form-vestimenta');
+            const formHoraInicio = document.getElementById('form-hora-inicio');
+            const formHoraFin = document.getElementById('form-hora-fin');
+            const formLugar = document.getElementById('form-lugar');
+            const formLinkLugar = document.getElementById('form-link-lugar');
+            const formNotas = document.getElementById('form-notas');
             
-            if (todasSeleccionadas) {
-                btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">remove_done</span> Quitar todas`;
-            } else {
-                btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">done_all</span> Seleccionar todas`;
+            const contenedorCancionesSelector = document.getElementById('contenedor-canciones-selector');
+            const btnSeleccionarTodas = document.getElementById('btn-seleccionar-todas');
+            const btnGuardarEvento = document.getElementById('btn-guardar-evento');
+            const btnCancelarForm = document.getElementById('btn-cancelar-form');
+            const tituloForm = document.getElementById('titulo-form');
+            const listaEventosAdmin = document.getElementById('lista-eventos-admin');
+
+            let listaCancionesGlobal = [];
+            let cancionesSeleccionadas = [];
+            let eventosGlobalMap = {};
+
+            function activarAnimacionIconos() {
+                document.fonts.ready.then(() => {
+                    document.querySelectorAll('.material-symbols-outlined').forEach(icono => {
+                        icono.classList.add('fuente-cargada');
+                    });
+                });
             }
-            activarAnimacionIconos();
-        }
 
-        function renderizarSelectorCanciones() {
-            contenedorCancionesSelector.innerHTML = '';
-
-            if (!listaCancionesGlobal || listaCancionesGlobal.length === 0) {
-                contenedorCancionesSelector.innerHTML = '<span style="color:var(--text-sec); font-size:12px;">No hay canciones de Rondalla registradas.</span>';
-                return;
+            function formatearHoraAMPM(horaStr) {
+                if (!horaStr) return '';
+                if (horaStr.toLowerCase().includes('a.m') || horaStr.toLowerCase().includes('p.m')) return horaStr;
+                const partes = horaStr.split(':');
+                if (partes.length < 2) return horaStr;
+                let hrs = parseInt(partes[0], 10);
+                const mins = partes[1].trim();
+                if (isNaN(hrs)) return horaStr;
+                const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
+                hrs = hrs % 12;
+                if (hrs === 0) hrs = 12;
+                return `${hrs}:${mins}${ampm}`;
             }
 
-            const seleccionadas = [];
-            cancionesSeleccionadas.forEach(id => {
-                const enc = listaCancionesGlobal.find(c => String(c.idC) === String(id));
-                if (enc) seleccionadas.push(enc);
-            });
+            function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
+                if (!stringFecha || stringFecha.trim() === '') return 'Fecha por confirmar';
+                const partes = stringFecha.split('-');
+                let textoFecha = stringFecha;
 
-            const noSeleccionadas = listaCancionesGlobal.filter(c => 
-                !cancionesSeleccionadas.some(id => String(id) === String(c.idC))
-            );
+                if (partes.length === 3) {
+                    const d = new Date(partes[0], partes[1] - 1, partes[2]);
+                    textoFecha = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+                    textoFecha = textoFecha.charAt(0).toUpperCase() + textoFecha.slice(1);
+                }
 
-            seleccionadas.forEach(cancion => {
-                const tarjeta = document.createElement('div');
-                tarjeta.className = 'tarjeta-cancion-selector seleccionada';
-                tarjeta.innerHTML = `
-                    <span>${cancion.nombreC}</span>
-                    <span class="material-symbols-outlined icono-chk">check_circle</span>
-                `;
-                tarjeta.onclick = () => {
-                    cancionesSeleccionadas = cancionesSeleccionadas.filter(id => String(id) !== String(cancion.idC));
+                const inicioFormatted = formatearHoraAMPM(horaInicio);
+                const finFormatted = formatearHoraAMPM(horaFin);
+
+                let rangoHoras = '';
+                if (inicioFormatted && finFormatted) {
+                    rangoHoras = `${inicioFormatted}-${finFormatted}`;
+                } else if (inicioFormatted) {
+                    rangoHoras = inicioFormatted;
+                }
+
+                return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
+            }
+
+            async function cargarCanciones() {
+                try {
+                    const todasLasCanciones = await obtenerCanciones();
+                    listaCancionesGlobal = todasLasCanciones.filter(c => (c.categoria || 'rondalla') === 'rondalla');
                     renderizarSelectorCanciones();
-                };
-                contenedorCancionesSelector.appendChild(tarjeta);
-            });
-
-            noSeleccionadas.forEach(cancion => {
-                const tarjeta = document.createElement('div');
-                tarjeta.className = 'tarjeta-cancion-selector';
-                tarjeta.innerHTML = `
-                    <span>${cancion.nombreC}</span>
-                    <span class="material-symbols-outlined icono-chk">check_circle</span>
-                `;
-                tarjeta.onclick = () => {
-                    cancionesSeleccionadas.push(String(cancion.idC));
-                    renderizarSelectorCanciones();
-                };
-                contenedorCancionesSelector.appendChild(tarjeta);
-            });
-
-            actualizarBotonSeleccionarTodas();
-            activarAnimacionIconos();
-        }
-
-        btnSeleccionarTodas.addEventListener('click', () => {
-            if (!listaCancionesGlobal || listaCancionesGlobal.length === 0) return;
-            const todosIds = listaCancionesGlobal.map(c => String(c.idC));
-            const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
-
-            if (todasSeleccionadas) {
-                cancionesSeleccionadas = [];
-            } else {
-                cancionesSeleccionadas = [...todosIds];
+                } catch (err) {
+                    contenedorCancionesSelector.innerHTML = '<span style="color:var(--text-sec); font-size:12px;">Error al cargar canciones.</span>';
+                }
             }
-            renderizarSelectorCanciones();
-        });
 
-        function resetearFormulario() {
-            formIdE.value = '';
-            formTitulo.value = '';
-            formFecha.value = '';
-            formVestimenta.value = '';
-            formHoraInicio.value = '';
-            formHoraFin.value = '';
-            formLugar.value = '';
-            formLinkLugar.value = '';
-            formNotas.value = '';
+            function actualizarBotonSeleccionarTodas() {
+                if (!listaCancionesGlobal.length) return;
+                const todosIds = listaCancionesGlobal.map(c => String(c.idC));
+                const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
+                
+                if (todasSeleccionadas) {
+                    btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">remove_done</span> Quitar todas`;
+                } else {
+                    btnSeleccionarTodas.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">done_all</span> Seleccionar todas`;
+                }
+                activarAnimacionIconos();
+            }
 
-            cancionesSeleccionadas = [];
-            renderizarSelectorCanciones();
+            function renderizarSelectorCanciones() {
+                contenedorCancionesSelector.innerHTML = '';
 
-            tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Evento';
-            btnCancelarForm.style.display = 'none';
-            activarAnimacionIconos();
-        }
-
-        function escucharEventosFirebase() {
-            const eventosRef = ref(db, 'eventos');
-            onValue(eventosRef, (snapshot) => {
-                const datos = snapshot.val();
-                eventosGlobalMap = datos || {};
-                listaEventosAdmin.innerHTML = '';
-
-                if (!datos) {
-                    listaEventosAdmin.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:13px; padding:20px;">No hay eventos guardados. ¡Crea el primero arriba!</div>';
+                if (!listaCancionesGlobal || listaCancionesGlobal.length === 0) {
+                    contenedorCancionesSelector.innerHTML = '<span style="color:var(--text-sec); font-size:12px;">No hay canciones de Rondalla registradas.</span>';
                     return;
                 }
 
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                const anioHoy = hoy.getFullYear();
-                const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
-                const diaHoy = String(hoy.getDate()).padStart(2, '0');
-                const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
+                const seleccionadas = [];
+                cancionesSeleccionadas.forEach(id => {
+                    const enc = listaCancionesGlobal.find(c => String(c.idC) === String(id));
+                    if (enc) seleccionadas.push(enc);
+                });
 
-                const eventosArray = Object.keys(datos).map(idE => ({ ...datos[idE], idE }));
-                const ordenados = eventosArray
-                    .map(e => {
-                        const tieneFecha = e.fecha && e.fecha.trim() !== '';
-                        let fechaObj;
-                        if (tieneFecha) {
-                            const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
-                            const f = e.fecha.split('-');
-                            fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
-                        } else {
-                            fechaObj = null;
-                        }
+                const noSeleccionadas = listaCancionesGlobal.filter(c => 
+                    !cancionesSeleccionadas.some(id => String(id) === String(c.idC))
+                );
 
-                        const esPasado = tieneFecha && e.fecha < fechaHoyStr;
-                        const esHoy = tieneFecha && e.fecha === fechaHoyStr;
-                        return { ...e, fechaObj, tieneFecha, esHoy, esPasado };
-                    })
-                    .sort((a, b) => {
-                        const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
-                        const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
+                seleccionadas.forEach(cancion => {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'tarjeta-cancion-selector seleccionada';
+                    tarjeta.innerHTML = `
+                        <span>${cancion.nombreC}</span>
+                        <span class="material-symbols-outlined icono-chk">check_circle</span>
+                    `;
+                    tarjeta.onclick = () => {
+                        cancionesSeleccionadas = cancionesSeleccionadas.filter(id => String(id) !== String(cancion.idC));
+                        renderizarSelectorCanciones();
+                    };
+                    contenedorCancionesSelector.appendChild(tarjeta);
+                });
 
-                        if (grupoA !== grupoB) return grupoA - grupoB;
+                noSeleccionadas.forEach(cancion => {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'tarjeta-cancion-selector';
+                    tarjeta.innerHTML = `
+                        <span>${cancion.nombreC}</span>
+                        <span class="material-symbols-outlined icono-chk">check_circle</span>
+                    `;
+                    tarjeta.onclick = () => {
+                        cancionesSeleccionadas.push(String(cancion.idC));
+                        renderizarSelectorCanciones();
+                    };
+                    contenedorCancionesSelector.appendChild(tarjeta);
+                });
 
-                        if (a.tieneFecha && b.tieneFecha) {
-                            if (a.esPasado) {
-                                return b.fechaObj - a.fechaObj;
-                            }
-                            return a.fechaObj - b.fechaObj;
-                        }
-                        return 0;
-                    });
+                actualizarBotonSeleccionarTodas();
+                activarAnimacionIconos();
+            }
 
-                let separadorInsertado = false;
+            btnSeleccionarTodas.addEventListener('click', () => {
+                if (!listaCancionesGlobal || listaCancionesGlobal.length === 0) return;
+                const todosIds = listaCancionesGlobal.map(c => String(c.idC));
+                const todasSeleccionadas = todosIds.length > 0 && todosIds.every(id => cancionesSeleccionadas.includes(id));
 
-                ordenados.forEach(evento => {
-                    if (evento.esPasado && !separadorInsertado) {
-                        const separador = document.createElement('div');
-                        separador.className = 'separador-eventos-pasados';
-                        separador.innerHTML = `<span>Eventos anteriores</span>`;
-                        listaEventosAdmin.appendChild(separador);
-                        separadorInsertado = true;
+                if (todasSeleccionadas) {
+                    cancionesSeleccionadas = [];
+                } else {
+                    cancionesSeleccionadas = [...todosIds];
+                }
+                renderizarSelectorCanciones();
+            });
+
+            function resetearFormulario() {
+                formIdE.value = '';
+                formTitulo.value = '';
+                formFecha.value = '';
+                formVestimenta.value = '';
+                formHoraInicio.value = '';
+                formHoraFin.value = '';
+                formLugar.value = '';
+                formLinkLugar.value = '';
+                formNotas.value = '';
+
+                cancionesSeleccionadas = [];
+                renderizarSelectorCanciones();
+
+                tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Evento';
+                btnCancelarForm.style.display = 'none';
+                activarAnimacionIconos();
+            }
+
+            function escucharEventosFirebase() {
+                const eventosRef = ref(db, 'eventos');
+                onValue(eventosRef, (snapshot) => {
+                    const datos = snapshot.val();
+                    eventosGlobalMap = datos || {};
+                    listaEventosAdmin.innerHTML = '';
+
+                    if (!datos) {
+                        listaEventosAdmin.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:13px; padding:20px;">No hay eventos guardados. ¡Crea el primero arriba!</div>';
+                        return;
                     }
 
-                    const idE = evento.idE;
-                    const div = document.createElement('div');
-                    div.className = 'tarjeta-evento-admin';
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const anioHoy = hoy.getFullYear();
+                    const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
+                    const diaHoy = String(hoy.getDate()).padStart(2, '0');
+                    const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
 
-                    const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
-                    const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
+                    const eventosArray = Object.keys(datos).map(idE => ({ ...datos[idE], idE }));
+                    const ordenados = eventosArray
+                        .map(e => {
+                            const tieneFecha = e.fecha && e.fecha.trim() !== '';
+                            let fechaObj;
+                            if (tieneFecha) {
+                                const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
+                                const f = e.fecha.split('-');
+                                fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, h[0] || 0, h[1] || 0);
+                            } else {
+                                fechaObj = null;
+                            }
 
-                    div.innerHTML = `
-                        <div class="info-evento-admin">
-                            <h3>${evento.titulo}</h3>
-                            <div class="meta-evento-admin">
-                                <span class="meta-item-admin">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
-                                    ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
-                                </span>
-                                <span class="meta-item-admin">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                    ${textoLugar}
-                                </span>
-                                <span class="meta-item-admin">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
-                                    ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
-                                </span>
+                            const esPasado = tieneFecha && e.fecha < fechaHoyStr;
+                            const esHoy = tieneFecha && e.fecha === fechaHoyStr;
+                            return { ...e, fechaObj, tieneFecha, esHoy, esPasado };
+                        })
+                        .sort((a, b) => {
+                            const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
+                            const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
+
+                            if (grupoA !== grupoB) return grupoA - grupoB;
+
+                            if (a.tieneFecha && b.tieneFecha) {
+                                if (a.esPasado) {
+                                    return b.fechaObj - a.fechaObj;
+                                }
+                                return a.fechaObj - b.fechaObj;
+                            }
+                            return 0;
+                        });
+
+                    let separadorInsertado = false;
+
+                    ordenados.forEach(evento => {
+                        if (evento.esPasado && !separadorInsertado) {
+                            const separador = document.createElement('div');
+                            separador.className = 'separador-eventos-pasados';
+                            separador.innerHTML = `<span>Eventos anteriores</span>`;
+                            listaEventosAdmin.appendChild(separador);
+                            separadorInsertado = true;
+                        }
+
+                        const idE = evento.idE;
+                        const div = document.createElement('div');
+                        div.className = 'tarjeta-evento-admin';
+
+                        const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
+                        const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
+
+                        div.innerHTML = `
+                            <div class="info-evento-admin">
+                                <h3>${evento.titulo}</h3>
+                                <div class="meta-evento-admin">
+                                    <span class="meta-item-admin">
+                                        <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
+                                        ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
+                                    </span>
+                                    <span class="meta-item-admin">
+                                        <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
+                                        ${textoLugar}
+                                    </span>
+                                    <span class="meta-item-admin">
+                                        <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
+                                        ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="botones-item-admin">
-                            <button class="btn-mini btn-editar" data-id="${idE}">
-                                <span class="material-symbols-outlined" style="font-size:15px;">edit</span> Editar
-                            </button>
-                            <button class="btn-mini btn-eliminar" data-id="${idE}">
-                                <span class="material-symbols-outlined" style="font-size:15px;">delete</span> Borrar
-                            </button>
-                        </div>
-                    `;
-                    listaEventosAdmin.appendChild(div);
-                });
+                            <div class="botones-item-admin">
+                                <button class="btn-mini btn-editar" data-id="${idE}">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">edit</span> Editar
+                                </button>
+                                <button class="btn-mini btn-eliminar" data-id="${idE}">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">delete</span> Borrar
+                                </button>
+                            </div>
+                        `;
+                        listaEventosAdmin.appendChild(div);
+                    });
 
-                document.querySelectorAll('.btn-editar').forEach(btn => {
-                    btn.onclick = () => editarEvento(btn.getAttribute('data-id'));
-                });
+                    document.querySelectorAll('.btn-editar').forEach(btn => {
+                        btn.onclick = () => editarEvento(btn.getAttribute('data-id'));
+                    });
 
-                document.querySelectorAll('.btn-eliminar').forEach(btn => {
-                    btn.onclick = () => borrarEvento(btn.getAttribute('data-id'));
-                });
+                    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                        btn.onclick = () => borrarEvento(btn.getAttribute('data-id'));
+                    });
 
+                    activarAnimacionIconos();
+                });
+            }
+
+            function editarEvento(idE) {
+                const evento = eventosGlobalMap[idE];
+                if (!evento) return;
+
+                formIdE.value = idE;
+                formTitulo.value = evento.titulo || '';
+                formFecha.value = evento.fecha || '';
+                formVestimenta.value = evento.vestimenta || '';
+                formHoraInicio.value = evento.horaInicio || '';
+                formHoraFin.value = evento.horaFin || '';
+                formLugar.value = evento.lugar || '';
+                formLinkLugar.value = evento.linkLugar || '';
+                formNotas.value = evento.notas || evento.nota || '';
+
+                cancionesSeleccionadas = Array.isArray(evento.canciones) ? evento.canciones.map(String) : [];
+                renderizarSelectorCanciones();
+
+                tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">edit_note</span> Editar Evento';
+                btnCancelarForm.style.display = 'inline-flex';
                 activarAnimacionIconos();
-            });
-        }
-
-        function editarEvento(idE) {
-            const evento = eventosGlobalMap[idE];
-            if (!evento) return;
-
-            formIdE.value = idE;
-            formTitulo.value = evento.titulo || '';
-            formFecha.value = evento.fecha || '';
-            formVestimenta.value = evento.vestimenta || '';
-            formHoraInicio.value = evento.horaInicio || '';
-            formHoraFin.value = evento.horaFin || '';
-            formLugar.value = evento.lugar || '';
-            formLinkLugar.value = evento.linkLugar || '';
-            formNotas.value = evento.notas || evento.nota || '';
-
-            cancionesSeleccionadas = Array.isArray(evento.canciones) ? evento.canciones.map(String) : [];
-            renderizarSelectorCanciones();
-
-            tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">edit_note</span> Editar Evento';
-            btnCancelarForm.style.display = 'inline-flex';
-            activarAnimacionIconos();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        async function borrarEvento(idE) {
-            const evento = eventosGlobalMap[idE];
-            const titulo = evento ? evento.titulo : 'este evento';
-
-            if (!confirm(`¿Estás seguro de eliminar "${titulo}"?\n\nEsta acción también eliminará permanentemente la base de datos de asistencias de este evento.`)) {
-                return;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            try {
-                await remove(ref(db, `eventos/${idE}`));
-                await remove(ref(db, `asistencias/${idE}`));
-                if (formIdE.value === idE) resetearFormulario();
-            } catch (err) {
-                console.error(err);
-                alert('Ocurrió un error al intentar eliminar el evento.');
-            }
-        }
+            async function borrarEvento(idE) {
+                const evento = eventosGlobalMap[idE];
+                const titulo = evento ? evento.titulo : 'este evento';
 
-        btnGuardarEvento.onclick = async () => {
-            if (!formTitulo.value.trim()) {
-                alert('Por favor completa el campo obligatorio: Título del Evento.');
-                return;
-            }
+                if (!confirm(`¿Estás seguro de eliminar "${titulo}"?\n\nEsta acción también eliminará permanentemente la base de datos de asistencias de este evento.`)) {
+                    return;
+                }
 
-            let idE = formIdE.value;
-
-            if (!idE) {
-                const nuevoRef = push(ref(db, 'eventos'));
-                idE = `evt_${nuevoRef.key}`;
+                try {
+                    await remove(ref(db, `eventos/${idE}`));
+                    await remove(ref(db, `asistencias/${idE}`));
+                    if (formIdE.value === idE) resetearFormulario();
+                } catch (err) {
+                    console.error(err);
+                    alert('Ocurrió un error al intentar eliminar el evento.');
+                }
             }
 
-            const objetoEvento = {
-                idE: idE,
-                titulo: formTitulo.value.trim(),
-                fecha: formFecha.value,
-                vestimenta: formVestimenta.value.trim(),
-                horaInicio: formHoraInicio.value,
-                horaFin: formHoraFin.value,
-                lugar: formLugar.value.trim(),
-                linkLugar: formLinkLugar.value.trim(),
-                notas: formNotas.value.trim(),
-                canciones: cancionesSeleccionadas
+            btnGuardarEvento.onclick = async () => {
+                if (!formTitulo.value.trim()) {
+                    alert('Por favor completa el campo obligatorio: Título del Evento.');
+                    return;
+                }
+
+                let idE = formIdE.value;
+
+                if (!idE) {
+                    const nuevoRef = push(ref(db, 'eventos'));
+                    idE = `evt_${nuevoRef.key}`;
+                }
+
+                const objetoEvento = {
+                    idE: idE,
+                    titulo: formTitulo.value.trim(),
+                    fecha: formFecha.value,
+                    vestimenta: formVestimenta.value.trim(),
+                    horaInicio: formHoraInicio.value,
+                    horaFin: formHoraFin.value,
+                    lugar: formLugar.value.trim(),
+                    linkLugar: formLinkLugar.value.trim(),
+                    notas: formNotas.value.trim(),
+                    canciones: cancionesSeleccionadas
+                };
+
+                try {
+                    await set(ref(db, `eventos/${idE}`), objetoEvento);
+                    resetearFormulario();
+                } catch (err) {
+                    console.error(err);
+                    alert('No se pudieron guardar los cambios en Firebase.');
+                }
             };
 
-            try {
-                await set(ref(db, `eventos/${idE}`), objetoEvento);
-                resetearFormulario();
-            } catch (err) {
-                console.error(err);
-                alert('No se pudieron guardar los cambios en Firebase.');
+            btnCancelarForm.onclick = resetearFormulario;
+
+            async function init() {
+                await cargarCanciones();
+                escucharEventosFirebase();
+                activarAnimacionIconos();
             }
-        };
 
-        btnCancelarForm.onclick = resetearFormulario;
-
-        async function init() {
-            await cargarCanciones();
-            escucharEventosFirebase();
-            activarAnimacionIconos();
-        }
-
-        init();
+            init();
+        });
     </script>
 </body>
 </html>

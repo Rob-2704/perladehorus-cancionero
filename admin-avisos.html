@@ -110,7 +110,6 @@
             color: #0d0d0d;
         }
         
-        /* Contenedor principal totalmente sólido */
         .formulario-aviso { 
             background-color: #1E1E24 !important; 
             border-radius: 20px; 
@@ -141,7 +140,6 @@
             letter-spacing: 0.5px; 
         }
 
-        /* Inputs y textarea totalmente sólidos para bloquear el fondo */
         .input-texto, .textarea-texto { 
             width: 100%; 
             background-color: #16161b !important; 
@@ -211,8 +209,6 @@
     </style>
 </head>
 <body>
-    <a href="./" style="color: var(--text-sec); text-decoration: none; font-size: 13px; display: inline-block; margin-top: 20px;">← Volver al inicio</a>
-    
     <header>
         <div>
             <h1>Gestión de Avisos</h1>
@@ -221,7 +217,6 @@
     </header>
 
     <main>
-        <!-- Formulario de Creación / Edición -->
         <div class="formulario-aviso">
             <h2 id="titulo-formulario">Nuevo Aviso</h2>
             <div class="grupo-campo">
@@ -255,162 +250,152 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
-            authDomain: "rondalla-f04a4.firebaseapp.com",
-            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
-            projectId: "rondalla-f04a4",
-            storageBucket: "rondalla-f04a4.firebasestorage.app",
-            messagingSenderId: "835273996097",
-            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
-        };
+        protegerPaginaAdmin((user) => {
+            const db = getDatabase();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+            const inputTitulo = document.getElementById('input-titulo');
+            const inputFecha = document.getElementById('input-fecha');
+            const textareaTexto = document.getElementById('textarea-texto');
+            const btnGuardar = document.getElementById('btn-guardar');
+            const textoBtnGuardar = document.getElementById('texto-btn-guardar');
+            const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
+            const tituloFormulario = document.getElementById('titulo-formulario');
+            const gridAvisos = document.getElementById('grid-avisos');
 
-        const inputTitulo = document.getElementById('input-titulo');
-        const inputFecha = document.getElementById('input-fecha');
-        const textareaTexto = document.getElementById('textarea-texto');
-        const btnGuardar = document.getElementById('btn-guardar');
-        const textoBtnGuardar = document.getElementById('texto-btn-guardar');
-        const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
-        const tituloFormulario = document.getElementById('titulo-formulario');
-        const gridAvisos = document.getElementById('grid-avisos');
+            let idAvisoEditando = null;
 
-        let idAvisoEditando = null;
+            const hoy = new Date();
+            inputFecha.value = `\${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 
-        const hoy = new Date();
-        inputFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-
-        function limpiarFormulario() {
-            idAvisoEditando = null;
-            inputTitulo.value = '';
-            textareaTexto.value = '';
-            inputFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-            tituloFormulario.textContent = 'Nuevo Aviso';
-            textoBtnGuardar.textContent = 'Publicar Aviso';
-            btnCancelarEdicion.style.display = 'none';
-        }
-
-        btnCancelarEdicion.addEventListener('click', limpiarFormulario);
-
-        btnGuardar.addEventListener('click', async () => {
-            const titulo = inputTitulo.value.trim();
-            const fecha = inputFecha.value;
-            const texto = textareaTexto.value.trim();
-
-            if (!titulo || !texto) {
-                alert("Por favor completa el título y el contenido del aviso.");
-                return;
+            function limpiarFormulario() {
+                idAvisoEditando = null;
+                inputTitulo.value = '';
+                textareaTexto.value = '';
+                inputFecha.value = `\${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+                tituloFormulario.textContent = 'Nuevo Aviso';
+                textoBtnGuardar.textContent = 'Publicar Aviso';
+                btnCancelarEdicion.style.display = 'none';
             }
 
-            try {
-                if (idAvisoEditando) {
-                    await set(ref(db, `anuncios/${idAvisoEditando}`), {
-                        idA: idAvisoEditando,
-                        titulo,
-                        fecha,
-                        texto
-                    });
-                    alert("¡Aviso actualizado con éxito!");
-                } else {
-                    const avisosRef = ref(db, 'anuncios');
-                    const nuevoAvisoRef = push(avisosRef);
-                    await set(nuevoAvisoRef, {
-                        idA: nuevoAvisoRef.key,
-                        titulo,
-                        fecha,
-                        texto
-                    });
-                    alert("¡Aviso publicado con éxito!");
-                }
+            btnCancelarEdicion.addEventListener('click', limpiarFormulario);
 
-                limpiarFormulario();
-            } catch (err) {
-                console.error("Error al guardar aviso:", err);
-                alert("No se pudo guardar el aviso.");
-            }
-        });
+            btnGuardar.addEventListener('click', async () => {
+                const titulo = inputTitulo.value.trim();
+                const fecha = inputFecha.value;
+                const texto = textareaTexto.value.trim();
 
-        function cargarAvisosAdmin() {
-            const avisosRef = ref(db, 'anuncios');
-            onValue(avisosRef, (snapshot) => {
-                const datos = snapshot.val();
-                gridAvisos.innerHTML = '';
-
-                if (!datos) {
-                    gridAvisos.innerHTML = '<div class="cargando">No hay avisos publicados.</div>';
+                if (!titulo || !texto) {
+                    alert("Por favor completa el título y el contenido del aviso.");
                     return;
                 }
 
-                const lista = Object.entries(datos).map(([key, val]) => ({ idA: key, ...val }));
-                lista.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
-
-                const fragmento = document.createDocumentFragment();
-                lista.forEach(aviso => {
-                    const tarjeta = document.createElement('div');
-                    tarjeta.className = 'tarjeta-aviso-admin';
-
-                    let htmlMeta = '';
-                    if (aviso.fecha) {
-                        htmlMeta = `<span class="meta">${aviso.fecha}</span>`;
+                try {
+                    if (idAvisoEditando) {
+                        await set(ref(db, `anuncios/\${idAvisoEditando}`), {
+                            idA: idAvisoEditando,
+                            titulo,
+                            fecha,
+                            texto
+                        });
+                        alert("¡Aviso actualizado con éxito!");
+                    } else {
+                        const avisosRef = ref(db, 'anuncios');
+                        const nuevoAvisoRef = push(avisosRef);
+                        await set(nuevoAvisoRef, {
+                            idA: nuevoAvisoRef.key,
+                            titulo,
+                            fecha,
+                            texto
+                        });
+                        alert("¡Aviso publicado con éxito!");
                     }
 
-                    tarjeta.innerHTML = `
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                <h3>${aviso.titulo}</h3>
-                                ${htmlMeta}
-                            </div>
-                            <p>${aviso.texto || aviso.contenido || ''}</p>
-                        </div>
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <button class="btn-editar" data-id="${aviso.idA}">
-                                <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Editar
-                            </button>
-                            <button class="btn-eliminar" data-id="${aviso.idA}">
-                                <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
-                            </button>
-                        </div>
-                    `;
-
-                    tarjeta.querySelector('.btn-editar').addEventListener('click', () => {
-                        idAvisoEditando = aviso.idA;
-                        inputTitulo.value = aviso.titulo || '';
-                        inputFecha.value = aviso.fecha || '';
-                        textareaTexto.value = aviso.texto || aviso.contenido || '';
-                        tituloFormulario.textContent = 'Editar Aviso';
-                        textoBtnGuardar.textContent = 'Actualizar Aviso';
-                        btnCancelarEdicion.style.display = 'inline-flex';
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
-
-                    tarjeta.querySelector('.btn-eliminar').addEventListener('click', async () => {
-                        if (confirm(`¿Estás seguro de eliminar el aviso "${aviso.titulo}"?`)) {
-                            try {
-                                await remove(ref(db, `anuncios/${aviso.idA}`));
-                                if (idAvisoEditando === aviso.idA) {
-                                    limpiarFormulario();
-                                }
-                            } catch (e) {
-                                alert("No se pudo eliminar el aviso.");
-                            }
-                        }
-                    });
-
-                    fragmento.appendChild(tarjeta);
-                });
-
-                gridAvisos.appendChild(fragmento);
-            }, () => {
-                gridAvisos.innerHTML = '<div class="cargando">Error al cargar avisos.</div>';
+                    limpiarFormulario();
+                } catch (err) {
+                    console.error("Error al guardar aviso:", err);
+                    alert("No se pudo guardar el aviso.");
+                }
             });
-        }
 
-        cargarAvisosAdmin();
+            function cargarAvisosAdmin() {
+                const avisosRef = ref(db, 'anuncios');
+                onValue(avisosRef, (snapshot) => {
+                    const datos = snapshot.val();
+                    gridAvisos.innerHTML = '';
+
+                    if (!datos) {
+                        gridAvisos.innerHTML = '<div class="cargando">No hay avisos publicados.</div>';
+                        return;
+                    }
+
+                    const lista = Object.entries(datos).map(([key, val]) => ({ idA: key, ...val }));
+                    lista.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+                    const fragmento = document.createDocumentFragment();
+                    lista.forEach(aviso => {
+                        const tarjeta = document.createElement('div');
+                        tarjeta.className = 'tarjeta-aviso-admin';
+
+                        let htmlMeta = '';
+                        if (aviso.fecha) {
+                            htmlMeta = `<span class="meta">\${aviso.fecha}</span>`;
+                        }
+
+                        tarjeta.innerHTML = `
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <h3>${aviso.titulo}</h3>${htmlMeta}
+                                </div>
+                                <p>\${aviso.texto || aviso.contenido || ''}</p>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <button class="btn-editar" data-id="\${aviso.idA}">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Editar
+                                </button>
+                                <button class="btn-eliminar" data-id="\${aviso.idA}">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
+                                </button>
+                            </div>
+                        `;
+
+                        tarjeta.querySelector('.btn-editar').addEventListener('click', () => {
+                            idAvisoEditando = aviso.idA;
+                            inputTitulo.value = aviso.titulo || '';
+                            inputFecha.value = aviso.fecha || '';
+                            textareaTexto.value = aviso.texto || aviso.contenido || '';
+                            tituloFormulario.textContent = 'Editar Aviso';
+                            textoBtnGuardar.textContent = 'Actualizar Aviso';
+                            btnCancelarEdicion.style.display = 'inline-flex';
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        });
+
+                        tarjeta.querySelector('.btn-eliminar').addEventListener('click', async () => {
+                            if (confirm(`¿Estás seguro de eliminar el aviso "\${aviso.titulo}"?`)) {
+                                try {
+                                    await remove(ref(db, `anuncios/\${aviso.idA}`));
+                                    if (idAvisoEditando === aviso.idA) {
+                                        limpiarFormulario();
+                                    }
+                                } catch (e) {
+                                    alert("No se pudo eliminar el aviso.");
+                                }
+                            }
+                        });
+
+                        fragmento.appendChild(tarjeta);
+                    });
+
+                    gridAvisos.appendChild(fragmento);
+                }, () => {
+                    gridAvisos.innerHTML = '<div class="cargando">Error al cargar avisos.</div>';
+                });
+            }
+
+            cargarAvisosAdmin();
+        });
     </script>
 </body>
 </html>

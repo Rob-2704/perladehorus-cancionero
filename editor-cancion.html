@@ -42,7 +42,6 @@
             min-width: 0;
         }
 
-        /* ---------- Animaciones ---------- */
         @keyframes fadeInImagen {
             0% { opacity: 0; }
             100% { opacity: 0.18; }
@@ -122,7 +121,6 @@
             .btn-volver:hover { color: var(--text-main); }
         }
 
-        /* ---------- Cabecera ---------- */
         .info-cabecera {
             margin-bottom: 10px;
         }
@@ -220,7 +218,6 @@
         .campo-titulo:focus,
         .campo-artista:focus { border-bottom-color: var(--accent); }
 
-        /* ---------- Píldora de ajustes ---------- */
         .contenedor-ajustes {
             background: var(--card-bg);
             padding: 12px 25px;
@@ -312,7 +309,6 @@
             color: var(--text-main);
         }
 
-        /* ---------- Hoja de letra ---------- */
         .workspace {
             display: grid;
             gap: 30px;
@@ -452,7 +448,6 @@
 
         .modo-vista .ayuda-formato { display: none; }
 
-        /* ---------- Ventana emergente de acorde ---------- */
         .caja-acorde-emergente {
             position: fixed;
             display: none;
@@ -490,7 +485,6 @@
             margin: 5px 0 0 0;
         }
 
-        /* ---------- Barra flotante inferior ---------- */
         #panel-flotante-wrapper {
             position: fixed;
             bottom: 25px;
@@ -750,8 +744,6 @@
 </head>
 <body class="modo-edicion">
     <div class="container">
-        <a href="admin-canciones.html" class="btn-volver" id="btn-volver">← Volver al gestor</a>
-
         <div class="info-cabecera">
             <div class="titulo-row">
                 <input type="text" id="input-titulo" class="campo-titulo" placeholder="Título de la canción" autocomplete="off" spellcheck="false">
@@ -844,392 +836,365 @@
     <script src="js/acordes.js"></script>
 
     <script type="module">
-        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { obtenerContenidoCancion } from './js/api-cliente.js';
         import { procesarLetraYAcordes, inicializarModalAcordes } from './js/modulo-acordes.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
-            authDomain: "rondalla-f04a4.firebaseapp.com",
-            databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
-            projectId: "rondalla-f04a4",
-            storageBucket: "rondalla-f04a4.firebasestorage.app",
-            messagingSenderId: "835273996097",
-            appId: "1:835273996097:web:f1258c2f461ef6613513c0"
-        };
+        protegerPaginaAdmin((user) => {
+            const db = getDatabase();
+            const params = new URLSearchParams(window.location.search);
+            const idC = params.get('idC');
 
-        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-        const db = getDatabase(app);
+            const body = document.body;
+            const inputTitulo = document.getElementById('input-titulo');
+            const inputArreglos = document.getElementById('input-arreglos');
+            const etiquetaArtista = document.getElementById('etiqueta-artista');
+            const selectCategoria = document.getElementById('select-categoria');
+            const selectEstado = document.getElementById('select-estado');
+            const puntoEstado = document.getElementById('punto-estado');
+            const selectCapoEditor = document.getElementById('select-capo-editor');
+            const inputContenido = document.getElementById('input-contenido');
+            const letraCancionDiv = document.getElementById('letra-cancion');
+            const letraContenedorEl = document.getElementById('letra-contenedor');
+            const badgeCapo = document.getElementById('badge-capo');
+            const textoCapo = document.getElementById('texto-capo');
+            const btnGuardar = document.getElementById('btn-guardar');
+            const iconoGuardar = document.getElementById('icono-guardar');
+            const textoGuardar = document.getElementById('texto-guardar');
+            const btnModoEditar = document.getElementById('btn-modo-editar');
+            const btnModoVista = document.getElementById('btn-modo-vista');
+            const toast = document.getElementById('toast');
 
-        const params = new URLSearchParams(window.location.search);
-        const idC = params.get('idC');
+            let sistemaCifrado = 'LATINO';
+            try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
 
-        const body = document.body;
-        const inputTitulo = document.getElementById('input-titulo');
-        const inputArreglos = document.getElementById('input-arreglos');
-        const etiquetaArtista = document.getElementById('etiqueta-artista');
-        const selectCategoria = document.getElementById('select-categoria');
-        const selectEstado = document.getElementById('select-estado');
-        const puntoEstado = document.getElementById('punto-estado');
-        const selectCapoEditor = document.getElementById('select-capo-editor');
-        const inputContenido = document.getElementById('input-contenido');
-        const letraCancionDiv = document.getElementById('letra-cancion');
-        const letraContenedorEl = document.getElementById('letra-contenedor');
-        const badgeCapo = document.getElementById('badge-capo');
-        const textoCapo = document.getElementById('texto-capo');
-        const btnGuardar = document.getElementById('btn-guardar');
-        const iconoGuardar = document.getElementById('icono-guardar');
-        const textoGuardar = document.getElementById('texto-guardar');
-        const btnModoEditar = document.getElementById('btn-modo-editar');
-        const btnModoVista = document.getElementById('btn-modo-vista');
-        const toast = document.getElementById('toast');
+            let modoActual = 'edicion';
+            let guardando = false;
+            let hayCambios = false;
+            let cargaTerminada = false;
+            let modalInicializado = false;
 
-        let sistemaCifrado = 'LATINO';
-        try { sistemaCifrado = localStorage.getItem('sistemaCifrado') || 'LATINO'; } catch (_) {}
-
-        let modoActual = 'edicion';
-        let guardando = false;
-        let hayCambios = false;
-        let cargaTerminada = false;
-        let modalInicializado = false;
-
-        /* ---------- Utilidades ---------- */
-
-        function mostrarToast(mensaje, esError = false) {
-            toast.textContent = mensaje;
-            toast.classList.toggle('error', esError);
-            toast.classList.remove('visible');
-            void toast.offsetWidth;
-            toast.classList.add('visible');
-            clearTimeout(mostrarToast._t);
-            mostrarToast._t = setTimeout(() => toast.classList.remove('visible'), esError ? 4500 : 2200);
-        }
-
-        function marcarCambios(valor) {
-            hayCambios = valor;
-            btnGuardar.classList.toggle('pendiente-guardar', valor);
-            if (!guardando) textoGuardar.textContent = valor ? 'Guardar' : 'Guardado';
-        }
-
-        function actualizarEtiquetaArtista() {
-            etiquetaArtista.textContent = selectCategoria.value === 'general' ? 'Artista:' : 'Arreglos:';
-        }
-
-        function actualizarPuntoEstado() {
-            puntoEstado.className = 'punto-estado ' + selectEstado.value;
-        }
-
-        function ajustarAlturaTextarea() {
-            inputContenido.style.height = 'auto';
-            inputContenido.style.height = Math.max(inputContenido.scrollHeight, 320) + 'px';
-        }
-
-        function separarCapo(contenido) {
-            let texto = contenido || '';
-            const matchCapo = texto.match(/Capo:\s*#?\s*(\d+)/i);
-            if (!matchCapo) return { numero: null, texto };
-
-            const lineas = texto.split(/\r?\n/);
-            if (lineas.length > 0 && /Capo:/i.test(lineas[0])) {
-                lineas.splice(0, Math.min(2, lineas.length));
-                texto = lineas.join('\n');
-            } else {
-                texto = texto.replace(/^.*Capo:\s*#?\s*\d+.*(?:\r?\n)?/im, '');
+            function mostrarToast(mensaje, esError = false) {
+                toast.textContent = mensaje;
+                toast.classList.toggle('error', esError);
+                toast.classList.remove('visible');
+                void toast.offsetWidth;
+                toast.classList.add('visible');
+                clearTimeout(mostrarToast._t);
+                mostrarToast._t = setTimeout(() => toast.classList.remove('visible'), esError ? 4500 : 2200);
             }
-            return { numero: matchCapo[1], texto: texto.trimStart() };
-        }
 
-        function actualizarBadgeCapo() {
-            const valorCapo = selectCapoEditor.value;
-            if (valorCapo && valorCapo !== "0") {
-                textoCapo.textContent = `Capo: ${valorCapo}º traste`;
-                badgeCapo.style.display = 'inline-flex';
-            } else {
-                badgeCapo.style.display = 'none';
+            function marcarCambios(valor) {
+                hayCambios = valor;
+                btnGuardar.classList.toggle('pendiente-guardar', valor);
+                if (!guardando) textoGuardar.textContent = valor ? 'Guardar' : 'Guardado';
             }
-        }
 
-        selectCapoEditor.addEventListener('change', () => {
-            actualizarBadgeCapo();
-            if (cargaTerminada) marcarCambios(true);
-        });
+            function actualizarEtiquetaArtista() {
+                etiquetaArtista.textContent = selectCategoria.value === 'general' ? 'Artista:' : 'Arreglos:';
+            }
 
-        /* ---------- Modo Editar / Vista ---------- */
+            function actualizarPuntoEstado() {
+                puntoEstado.className = 'punto-estado ' + selectEstado.value;
+            }
 
-        function renderizarVista() {
-            let texto = inputContenido.value || '';
-            letraCancionDiv.innerHTML = texto.trim()
-                ? procesarLetraYAcordes(texto, sistemaCifrado)
-                : '<span style="opacity:.55">Todavía no hay letra. Cambia a "Editar" para escribirla.</span>';
-        }
+            function ajustarAlturaTextarea() {
+                inputContenido.style.height = 'auto';
+                inputContenido.style.height = Math.max(inputContenido.scrollHeight, 320) + 'px';
+            }
 
-        function activarFondo() {
-            letraContenedorEl.classList.add('fondo-activo');
-        }
+            function separarCapo(contenido) {
+                let texto = contenido || '';
+                const matchCapo = texto.match(/Capo:\s*#?\s*(\d+)/i);
+                if (!matchCapo) return { numero: null, texto };
 
-        function cambiarModo(modo) {
-            if (modo === modoActual) return;
-            modoActual = modo;
-
-            const esVista = modo === 'vista';
-            body.classList.toggle('modo-vista', esVista);
-            body.classList.toggle('modo-edicion', !esVista);
-            btnModoVista.classList.toggle('activa', esVista);
-            btnModoEditar.classList.toggle('activa', !esVista);
-
-            if (esVista) {
-                renderizarVista();
-                if (!modalInicializado) {
-                    inicializarModalAcordes('caja-acorde', () => sistemaCifrado);
-                    modalInicializado = true;
-                    prepararAnimacionModal();
+                const lineas = texto.split(/\r?\n/);
+                if (lineas.length > 0 && /Capo:/i.test(lineas[0])) {
+                    lineas.splice(0, Math.min(2, lineas.length));
+                    texto = lineas.join('\n');
+                } else {
+                    texto = texto.replace(/^.*Capo:\s*#?\s*\d+.*(?:\r?\n)?/im, '');
                 }
-                letraCancionDiv.classList.remove('animar-entrada-texto');
-                void letraCancionDiv.offsetWidth;
-                letraCancionDiv.classList.add('animar-entrada-texto');
-            } else {
-                const caja = document.getElementById('caja-acorde');
-                if (caja) caja.style.display = 'none';
-                ajustarAlturaTextarea();
-                inputContenido.focus({ preventScroll: true });
-
-                inputContenido.classList.remove('animar-entrada-texto');
-                void inputContenido.offsetWidth;
-                inputContenido.classList.add('animar-entrada-texto');
+                return { numero: matchCapo[1], texto: texto.trimStart() };
             }
-        }
 
-        function prepararAnimacionModal() {
-            const cajaAcordeEl = document.getElementById('caja-acorde');
-            if (!cajaAcordeEl) return;
-
-            let enProcesoDeCierre = false;
-            let ultimoDisplayVal = 'none';
-
-            document.addEventListener('click', (e) => {
-                const linkAcorde = e.target.closest('.acorde-link');
-                if (linkAcorde) {
-                    enProcesoDeCierre = false;
-                    cajaAcordeEl.classList.remove('animar-salida');
-                    cajaAcordeEl.classList.remove('animar-entrada');
-                    void cajaAcordeEl.offsetWidth;
-                    cajaAcordeEl.classList.add('animar-entrada');
+            function actualizarBadgeCapo() {
+                const valorCapo = selectCapoEditor.value;
+                if (valorCapo && valorCapo !== "0") {
+                    textoCapo.textContent = `Capo: ${valorCapo}º traste`;
+                    badgeCapo.style.display = 'inline-flex';
+                } else {
+                    badgeCapo.style.display = 'none';
                 }
-            }, true);
+            }
 
-            const observadorCaja = new MutationObserver(() => {
-                const displayActual = cajaAcordeEl.style.display;
+            selectCapoEditor.addEventListener('change', () => {
+                actualizarBadgeCapo();
+                if (cargaTerminada) marcarCambios(true);
+            });
 
-                if (displayActual === 'none' && !enProcesoDeCierre && ultimoDisplayVal !== 'none') {
-                    enProcesoDeCierre = true;
-                    cajaAcordeEl.style.display = ultimoDisplayVal;
-                    cajaAcordeEl.classList.remove('animar-entrada');
-                    cajaAcordeEl.classList.add('animar-salida');
+            function renderizarVista() {
+                let texto = inputContenido.value || '';
+                letraCancionDiv.innerHTML = texto.trim()
+                    ? procesarLetraYAcordes(texto, sistemaCifrado)
+                    : '<span style="opacity:.55">Todavía no hay letra. Cambia a "Editar" para escribirla.</span>';
+            }
 
-                    setTimeout(() => {
-                        cajaAcordeEl.classList.remove('animar-salida');
-                        cajaAcordeEl.style.display = 'none';
-                        ultimoDisplayVal = 'none';
+            function activarFondo() {
+                letraContenedorEl.classList.add('fondo-activo');
+            }
+
+            function cambiarModo(modo) {
+                if (modo === modoActual) return;
+                modoActual = modo;
+
+                const esVista = modo === 'vista';
+                body.classList.toggle('modo-vista', esVista);
+                body.classList.toggle('modo-edicion', !esVista);
+                btnModoVista.classList.toggle('activa', esVista);
+                btnModoEditar.classList.toggle('activa', !esVista);
+
+                if (esVista) {
+                    renderizarVista();
+                    if (!modalInicializado) {
+                        inicializarModalAcordes('caja-acorde', () => sistemaCifrado);
+                        modalInicializado = true;
+                        prepararAnimacionModal();
+                    }
+                    letraCancionDiv.classList.remove('animar-entrada-texto');
+                    void letraCancionDiv.offsetWidth;
+                    letraCancionDiv.classList.add('animar-entrada-texto');
+                } else {
+                    const caja = document.getElementById('caja-acorde');
+                    if (caja) caja.style.display = 'none';
+                    ajustarAlturaTextarea();
+                    inputContenido.focus({ preventScroll: true });
+
+                    inputContenido.classList.remove('animar-entrada-texto');
+                    void inputContenido.offsetWidth;
+                    inputContenido.classList.add('animar-entrada-texto');
+                }
+            }
+
+            function prepararAnimacionModal() {
+                const cajaAcordeEl = document.getElementById('caja-acorde');
+                if (!cajaAcordeEl) return;
+
+                let enProcesoDeCierre = false;
+                let ultimoDisplayVal = 'none';
+
+                document.addEventListener('click', (e) => {
+                    const linkAcorde = e.target.closest('.acorde-link');
+                    if (linkAcorde) {
                         enProcesoDeCierre = false;
-                    }, 180);
-                } else if (displayActual !== 'none' && !enProcesoDeCierre) {
-                    ultimoDisplayVal = displayActual;
+                        cajaAcordeEl.classList.remove('animar-salida');
+                        cajaAcordeEl.classList.remove('animar-entrada');
+                        void cajaAcordeEl.offsetWidth;
+                        cajaAcordeEl.classList.add('animar-entrada');
+                    }
+                }, true);
+
+                const observadorCaja = new MutationObserver(() => {
+                    const displayActual = cajaAcordeEl.style.display;
+
+                    if (displayActual === 'none' && !enProcesoDeCierre && ultimoDisplayVal !== 'none') {
+                        enProcesoDeCierre = true;
+                        cajaAcordeEl.style.display = ultimoDisplayVal;
+                        cajaAcordeEl.classList.remove('animar-entrada');
+                        cajaAcordeEl.classList.add('animar-salida');
+
+                        setTimeout(() => {
+                            cajaAcordeEl.classList.remove('animar-salida');
+                            cajaAcordeEl.style.display = 'none';
+                            ultimoDisplayVal = 'none';
+                            enProcesoDeCierre = false;
+                        }, 180);
+                    } else if (displayActual !== 'none' && !enProcesoDeCierre) {
+                        ultimoDisplayVal = displayActual;
+                    }
+                });
+
+                observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
+            }
+
+            btnModoEditar.addEventListener('click', () => cambiarModo('edicion'));
+            btnModoVista.addEventListener('click', () => cambiarModo('vista'));
+
+            inputContenido.addEventListener('input', () => {
+                ajustarAlturaTextarea();
+                if (cargaTerminada) marcarCambios(true);
+            });
+
+            inputContenido.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    e.preventDefault();
+                    const { selectionStart: ini, selectionEnd: fin, value } = inputContenido;
+                    inputContenido.value = value.slice(0, ini) + '    ' + value.slice(fin);
+                    inputContenido.selectionStart = inputContenido.selectionEnd = ini + 4;
+                    inputContenido.dispatchEvent(new Event('input'));
                 }
             });
 
-            observadorCaja.observe(cajaAcordeEl, { attributes: true, attributeFilter: ['style'] });
-        }
+            [inputTitulo, inputArreglos].forEach(el => {
+                el.addEventListener('input', () => { if (cargaTerminada) marcarCambios(true); });
+            });
 
-        btnModoEditar.addEventListener('click', () => cambiarModo('edicion'));
-        btnModoVista.addEventListener('click', () => cambiarModo('vista'));
+            selectCategoria.addEventListener('change', () => {
+                actualizarEtiquetaArtista();
+                if (cargaTerminada) marcarCambios(true);
+            });
 
-        /* ---------- Eventos de edición ---------- */
+            selectEstado.addEventListener('change', () => {
+                actualizarPuntoEstado();
+                if (cargaTerminada) marcarCambios(true);
+            });
 
-        inputContenido.addEventListener('input', () => {
-            ajustarAlturaTextarea();
-            if (cargaTerminada) marcarCambios(true);
-        });
+            window.addEventListener('resize', () => { if (modoActual === 'edicion') ajustarAlturaTextarea(); });
+            document.fonts.ready.then(() => { if (modoActual === 'edicion') ajustarAlturaTextarea(); });
 
-        inputContenido.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
-                e.preventDefault();
-                const { selectionStart: ini, selectionEnd: fin, value } = inputContenido;
-                inputContenido.value = value.slice(0, ini) + '    ' + value.slice(fin);
-                inputContenido.selectionStart = inputContenido.selectionEnd = ini + 4;
-                inputContenido.dispatchEvent(new Event('input'));
-            }
-        });
-
-        [inputTitulo, inputArreglos].forEach(el => {
-            el.addEventListener('input', () => { if (cargaTerminada) marcarCambios(true); });
-        });
-
-        selectCategoria.addEventListener('change', () => {
-            actualizarEtiquetaArtista();
-            if (cargaTerminada) marcarCambios(true);
-        });
-
-        selectEstado.addEventListener('change', () => {
-            actualizarPuntoEstado();
-            if (cargaTerminada) marcarCambios(true);
-        });
-
-        window.addEventListener('resize', () => { if (modoActual === 'edicion') ajustarAlturaTextarea(); });
-        document.fonts.ready.then(() => { if (modoActual === 'edicion') ajustarAlturaTextarea(); });
-
-        /* ---------- Carga de la canción ---------- */
-
-        async function cargarCancionExistente() {
-            actualizarEtiquetaArtista();
-            actualizarPuntoEstado();
-
-            if (!idC) {
-                inputTitulo.focus();
-                finalizarCarga();
-                return;
-            }
-
-            inputTitulo.placeholder = 'Cargando...';
-
-            try {
-                const snapshot = await get(ref(db, `canciones_custom/${idC}`));
-                let data = null;
-
-                if (snapshot.exists()) {
-                    data = snapshot.val();
-                } else {
-                    const original = await obtenerContenidoCancion(idC);
-                    if (original && !original.error) data = original;
-                    else mostrarToast('No se pudo cargar la canción: ' + ((original && original.error) || 'no encontrada'), true);
-                }
-
-                if (data) {
-                    inputTitulo.value = data.nombreC || '';
-                    inputArreglos.value = data.arreglos || '';
-                    selectCategoria.value = data.categoria || 'rondalla';
-                    selectEstado.value = data.estado || 'terminada';
-                    
-                    const { numero, texto: textoLimpio } = separarCapo(data.contenido || '');
-                    inputContenido.value = textoLimpio;
-                    selectCapoEditor.value = numero || "0";
-
-                    actualizarEtiquetaArtista();
-                    actualizarPuntoEstado();
-                }
-            } catch (err) {
-                console.error("Error al cargar la canción:", err);
-                mostrarToast('Error al cargar la canción.', true);
-            }
-
-            inputTitulo.placeholder = 'Título de la canción';
-            finalizarCarga();
-        }
-
-        function finalizarCarga() {
-            actualizarBadgeCapo();
-            ajustarAlturaTextarea();
-            cargaTerminada = true;
-            marcarCambios(false);
-            if (!idC) textoGuardar.textContent = 'Guardar';
-
-            const mostrarFondo = () => activarFondo();
-            letraContenedorEl.addEventListener('animationend', (e) => {
-                if (e.animationName === 'extenderContenedor') mostrarFondo();
-            }, { once: true });
-            setTimeout(mostrarFondo, 450);
-        }
-
-        /* ---------- Guardado ---------- */
-
-        async function guardarCancion() {
-            if (guardando) return;
-
-            const titulo = inputTitulo.value.trim();
-            if (!titulo) {
-                mostrarToast('Escribe el título de la canción antes de guardar.', true);
-                inputTitulo.focus();
-                return;
-            }
-
-            guardando = true;
-            btnGuardar.disabled = true;
-            btnGuardar.classList.add('guardando');
-            iconoGuardar.textContent = 'progress_activity';
-            textoGuardar.textContent = 'Guardando';
-
-            const targetId = idC || `c_${Date.now()}`;
-            
-            let contenidoFinal = inputContenido.value;
-            const valorCapo = selectCapoEditor.value;
-            if (valorCapo && valorCapo !== "0") {
-                contenidoFinal = `Capo: ${valorCapo}\n\n` + contenidoFinal.trimStart();
-            }
-
-            const objetoCancion = {
-                idC: targetId,
-                nombreC: titulo,
-                arreglos: inputArreglos.value.trim(),
-                categoria: selectCategoria.value,
-                estado: selectEstado.value,
-                contenido: contenidoFinal
-            };
-
-            try {
-                await set(ref(db, `canciones_custom/${targetId}`), objetoCancion);
-                marcarCambios(false);
-                mostrarToast('Canción guardada correctamente.');
+            async function cargarCancionExistente() {
+                actualizarEtiquetaArtista();
+                actualizarPuntoEstado();
 
                 if (!idC) {
-                    history.replaceState(null, '', `?idC=${encodeURIComponent(targetId)}`);
-                    window.__idActual = targetId;
+                    inputTitulo.focus();
+                    finalizarCarga();
+                    return;
                 }
-            } catch (err) {
-                console.error("Error guardando en Firebase:", err);
-                mostrarToast('Ocurrió un error al guardar. Revisa tu conexión e inténtalo de nuevo.', true);
-            } finally {
-                guardando = false;
-                btnGuardar.disabled = false;
-                btnGuardar.classList.remove('guardando');
-                iconoGuardar.textContent = 'save';
-                textoGuardar.textContent = hayCambios ? 'Guardar' : 'Guardado';
+
+                inputTitulo.placeholder = 'Cargando...';
+
+                try {
+                    const snapshot = await get(ref(db, `canciones_custom/${idC}`));
+                    let data = null;
+
+                    if (snapshot.exists()) {
+                        data = snapshot.val();
+                    } else {
+                        const original = await obtenerContenidoCancion(idC);
+                        if (original && !original.error) data = original;
+                        else mostrarToast('No se pudo cargar la canción: ' + ((original && original.error) || 'no encontrada'), true);
+                    }
+
+                    if (data) {
+                        inputTitulo.value = data.nombreC || '';
+                        inputArreglos.value = data.arreglos || '';
+                        selectCategoria.value = data.categoria || 'rondalla';
+                        selectEstado.value = data.estado || 'terminada';
+                        
+                        const { numero, texto: textoLimpio } = separarCapo(data.contenido || '');
+                        inputContenido.value = textoLimpio;
+                        selectCapoEditor.value = numero || "0";
+
+                        actualizarEtiquetaArtista();
+                        actualizarPuntoEstado();
+                    }
+                } catch (err) {
+                    console.error("Error al cargar la canción:", err);
+                    mostrarToast('Error al cargar la canción.', true);
+                }
+
+                inputTitulo.placeholder = 'Título de la canción';
+                finalizarCarga();
             }
-        }
 
-        btnGuardar.addEventListener('animationend', (e) => {
-            if (e.animationName === 'deslizarElementoInferior') btnGuardar.classList.add('animacion-completada');
-        });
+            function finalizarCarga() {
+                actualizarBadgeCapo();
+                ajustarAlturaTextarea();
+                cargaTerminada = true;
+                marcarCambios(false);
+                if (!idC) textoGuardar.textContent = 'Guardar';
 
-        btnGuardar.addEventListener('click', guardarCancion);
-
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-                e.preventDefault();
-                guardarCancion();
+                const mostrarFondo = () => activarFondo();
+                letraContenedorEl.addEventListener('animationend', (e) => {
+                    if (e.animationName === 'extenderContenedor') mostrarFondo();
+                }, { once: true });
+                setTimeout(mostrarFondo, 450);
             }
-        });
 
-        window.addEventListener('beforeunload', (e) => {
-            if (hayCambios) {
-                e.preventDefault();
-                e.returnValue = '';
+            async function guardarCancion() {
+                if (guardando) return;
+
+                const titulo = inputTitulo.value.trim();
+                if (!titulo) {
+                    mostrarToast('Escribe el título de la canción antes de guardar.', true);
+                    inputTitulo.focus();
+                    return;
+                }
+
+                guardando = true;
+                btnGuardar.disabled = true;
+                btnGuardar.classList.add('guardando');
+                iconoGuardar.textContent = 'progress_activity';
+                textoGuardar.textContent = 'Guardando';
+
+                const targetId = idC || `c_${Date.now()}`;
+                
+                let contenidoFinal = inputContenido.value;
+                const valorCapo = selectCapoEditor.value;
+                if (valorCapo && valorCapo !== "0") {
+                    contenidoFinal = `Capo: ${valorCapo}\n\n` + contenidoFinal.trimStart();
+                }
+
+                const objetoCancion = {
+                    idC: targetId,
+                    nombreC: titulo,
+                    arreglos: inputArreglos.value.trim(),
+                    categoria: selectCategoria.value,
+                    estado: selectEstado.value,
+                    contenido: contenidoFinal
+                };
+
+                try {
+                    await set(ref(db, `canciones_custom/${targetId}`), objetoCancion);
+                    marcarCambios(false);
+                    mostrarToast('Canción guardada correctamente.');
+
+                    if (!idC) {
+                        history.replaceState(null, '', `?idC=${encodeURIComponent(targetId)}`);
+                        window.__idActual = targetId;
+                    }
+                } catch (err) {
+                    console.error("Error guardando en Firebase:", err);
+                    mostrarToast('Ocurrió un error al guardar. Revisa tu conexión e inténtalo de nuevo.', true);
+                } finally {
+                    guardando = false;
+                    btnGuardar.disabled = false;
+                    btnGuardar.classList.remove('guardando');
+                    iconoGuardar.textContent = 'save';
+                    textoGuardar.textContent = hayCambios ? 'Guardar' : 'Guardado';
+                }
             }
-        });
 
-        document.getElementById('btn-volver').addEventListener('click', (e) => {
-            if (hayCambios && !confirm('Tienes cambios sin guardar. ¿Salir de todas formas?')) {
-                e.preventDefault();
-            }
-        });
-
-        cargarCancionExistente();
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            btnGuardar.addEventListener('animationend', (e) => {
+                if (e.animationName === 'deslizarElementoInferior') btnGuardar.classList.add('animacion-completada');
             });
-        }
+
+            btnGuardar.addEventListener('click', guardarCancion);
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    guardarCancion();
+                }
+            });
+
+            window.addEventListener('beforeunload', (e) => {
+                if (hayCambios) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            document.getElementById('btn-volver').addEventListener('click', (e) => {
+                if (hayCambios && !confirm('Tienes cambios sin guardar. ¿Salir de todas formas?')) {
+                    e.preventDefault();
+                }
+            });
+
+            cargarCancionExistente();
+        });
     </script>
 </body>
 </html>
