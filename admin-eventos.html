@@ -203,51 +203,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .contenedor-vestimenta-grupo {
-            background-color: var(--card-bg);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-sizing: border-box;
-            transition: box-shadow 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .contenedor-vestimenta-grupo:hover { transform: translateY(-1px); }
-        .contenedor-vestimenta-grupo:focus-within { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
-
-        .select-interno, .input-interno {
-            background-color: #16161b;
-            color: var(--text-main);
-            border: 1px solid rgba(188, 151, 49, 0.3);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: 'Sono', monospace;
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .select-interno {
-            cursor: pointer;
-            -webkit-appearance: none;
-            appearance: none;
-            padding-right: 36px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 14px;
-        }
-
-        .input-interno::placeholder {
-            color: var(--text-sec);
-            opacity: 0.6;
-        }
-
         .input-admin::placeholder, .textarea-admin::placeholder {
             color: var(--text-sec);
             opacity: 0.6;
@@ -540,17 +495,8 @@
                     </div>
 
                     <div class="campo-grupo">
-                        <label for="form-vestimenta-select">Vestimenta</label>
-                        <div class="contenedor-vestimenta-grupo">
-                            <select id="form-vestimenta-select" class="select-interno">
-                                <option value="Traje negro con corbata roja y camisa blanca / Vestido rojo con moño rojo y saco negro">Formal Rojo (H: Traje/Corbata | M: Vestido)</option>
-                                <option value="Traje negro con corbata roja y camisa blanca / Pantalón negro con camisa negra y saco">Formal Saco (H: Traje/Corbata | M: Pantalón/Saco)</option>
-                                <option value="Pantalón negro con camisa negra">Total Black (Ambos: Pantalón/Camisa)</option>
-                                <option value="Traje negro con camisa negra / Pantalón negro con camisa negra y saco">Oscuro Formal (H: Traje | M: Pantalón/Saco)</option>
-                                <option value="otro">Otro (Especificar)</option>
-                            </select>
-                            <input type="text" id="form-vestimenta-otro" class="input-interno" placeholder="Especifique la vestimenta..." autocomplete="off" style="display: none;">
-                        </div>
+                        <label for="form-vestimenta">Vestimenta</label>
+                        <input type="text" id="form-vestimenta" class="input-admin" placeholder="Ej. Traje negro / Vestido rojo" autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
@@ -637,8 +583,7 @@
             const formIdE = document.getElementById('form-id-e');
             const formTitulo = document.getElementById('form-titulo');
             const formFecha = document.getElementById('form-fecha');
-            const formVestimentaSelect = document.getElementById('form-vestimenta-select');
-            const formVestimentaOtro = document.getElementById('form-vestimenta-otro');
+            const formVestimenta = document.getElementById('form-vestimenta');
             const formHoraInicio = document.getElementById('form-hora-inicio');
             const formHoraFin = document.getElementById('form-hora-fin');
             const formLugar = document.getElementById('form-lugar');
@@ -655,16 +600,6 @@
             let listaCancionesGlobal = [];
             let cancionesSeleccionadas = [];
             let eventosGlobalMap = {};
-
-            formVestimentaSelect.addEventListener('change', () => {
-                if (formVestimentaSelect.value === 'otro') {
-                    formVestimentaOtro.style.display = 'block';
-                    formVestimentaOtro.focus();
-                } else {
-                    formVestimentaOtro.style.display = 'none';
-                    formVestimentaOtro.value = '';
-                }
-            });
 
             function activarAnimacionIconos() {
                 document.fonts.ready.then(() => {
@@ -685,7 +620,7 @@
                 const ampm = hrs >= 12 ? 'p.m.' : 'a.m.';
                 hrs = hrs % 12;
                 if (hrs === 0) hrs = 12;
-                return `\${hrs}:${mins}${ampm}`;
+                return `${hrs}:${mins}${ampm}`;
             }
 
             function formatearFechaHorario(stringFecha, horaInicio, horaFin) {
@@ -709,7 +644,7 @@
                     rangoHoras = inicioFormatted;
                 }
 
-                return rangoHoras ? `${textoFecha} ·${rangoHoras}` : textoFecha;
+                return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
             }
 
             async function cargarCanciones() {
@@ -757,7 +692,7 @@
                     const tarjeta = document.createElement('div');
                     tarjeta.className = 'tarjeta-cancion-selector seleccionada';
                     tarjeta.innerHTML = `
-                        <span>\${cancion.nombreC}</span>
+                        <span>${cancion.nombreC}</span>
                         <span class="material-symbols-outlined icono-chk">check_circle</span>
                     `;
                     tarjeta.onclick = () => {
@@ -771,7 +706,7 @@
                     const tarjeta = document.createElement('div');
                     tarjeta.className = 'tarjeta-cancion-selector';
                     tarjeta.innerHTML = `
-                        <span>\${cancion.nombreC}</span>
+                        <span>${cancion.nombreC}</span>
                         <span class="material-symbols-outlined icono-chk">check_circle</span>
                     `;
                     tarjeta.onclick = () => {
@@ -802,9 +737,7 @@
                 formIdE.value = '';
                 formTitulo.value = '';
                 formFecha.value = '';
-                formVestimentaSelect.selectedIndex = 0;
-                formVestimentaOtro.style.display = 'none';
-                formVestimentaOtro.value = '';
+                formVestimenta.value = '';
                 formHoraInicio.value = '';
                 formHoraFin.value = '';
                 formLugar.value = '';
@@ -836,7 +769,7 @@
                     const anioHoy = hoy.getFullYear();
                     const mesHoy = String(hoy.getMonth() + 1).padStart(2, '0');
                     const diaHoy = String(hoy.getDate()).padStart(2, '0');
-                    const fechaHoyStr = `\${anioHoy}-${mesHoy}-${diaHoy}`;
+                    const fechaHoyStr = `${anioHoy}-${mesHoy}-${diaHoy}`;
 
                     const eventosArray = Object.keys(datos).map(idE => ({ ...datos[idE], idE }));
                     const ordenados = eventosArray
@@ -890,27 +823,27 @@
 
                         div.innerHTML = `
                             <div class="info-evento-admin">
-                                <h3>\${evento.titulo}</h3>
+                                <h3>${evento.titulo}</h3>
                                 <div class="meta-evento-admin">
                                     <span class="meta-item-admin">
                                         <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
-                                        \${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
+                                        ${formatearFechaHorario(evento.fecha, evento.horaInicio, evento.horaFin)}
                                     </span>
                                     <span class="meta-item-admin">
                                         <span class="material-symbols-outlined" style="font-size:15px;">location_on</span> 
-                                        \${textoLugar}
+                                        ${textoLugar}
                                     </span>
                                     <span class="meta-item-admin">
                                         <span class="material-symbols-outlined" style="font-size:15px;">queue_music</span> 
-                                        ${numCanciones}${numCanciones === 1 ? 'canción' : 'canciones'}
+                                        ${numCanciones} ${numCanciones === 1 ? 'canción' : 'canciones'}
                                     </span>
                                 </div>
                             </div>
                             <div class="botones-item-admin">
-                                <button class="btn-mini btn-editar" data-id="\${idE}">
+                                <button class="btn-mini btn-editar" data-id="${idE}">
                                     <span class="material-symbols-outlined" style="font-size:15px;">edit</span> Editar
                                 </button>
-                                <button class="btn-mini btn-eliminar" data-id="\${idE}">
+                                <button class="btn-mini btn-eliminar" data-id="${idE}">
                                     <span class="material-symbols-outlined" style="font-size:15px;">delete</span> Borrar
                                 </button>
                             </div>
@@ -937,31 +870,7 @@
                 formIdE.value = idE;
                 formTitulo.value = evento.titulo || '';
                 formFecha.value = evento.fecha || '';
-                
-                const vestimentaGuardada = evento.vestimenta || '';
-                let coincidenciaEncontrada = false;
-
-                for (let i = 0; i < formVestimentaSelect.options.length; i++) {
-                    if (formVestimentaSelect.options[i].value === vestimentaGuardada) {
-                        formVestimentaSelect.selectedIndex = i;
-                        coincidenciaEncontrada = true;
-                        break;
-                    }
-                }
-
-                if (coincidenciaEncontrada) {
-                    formVestimentaOtro.style.display = 'none';
-                    formVestimentaOtro.value = '';
-                } else if (vestimentaGuardada.trim() !== '') {
-                    formVestimentaSelect.value = 'otro';
-                    formVestimentaOtro.style.display = 'block';
-                    formVestimentaOtro.value = vestimentaGuardada;
-                } else {
-                    formVestimentaSelect.selectedIndex = 0;
-                    formVestimentaOtro.style.display = 'none';
-                    formVestimentaOtro.value = '';
-                }
-
+                formVestimenta.value = evento.vestimenta || '';
                 formHoraInicio.value = evento.horaInicio || '';
                 formHoraFin.value = evento.horaFin || '';
                 formLugar.value = evento.lugar || '';
@@ -981,13 +890,13 @@
                 const evento = eventosGlobalMap[idE];
                 const titulo = evento ? evento.titulo : 'este evento';
 
-                if (!confirm(`¿Estás seguro de eliminar "\${titulo}"?\n\nEsta acción también eliminará permanentemente la base de datos de asistencias de este evento.`)) {
+                if (!confirm(`¿Estás seguro de eliminar "${titulo}"?\n\nEsta acción también eliminará permanentemente la base de datos de asistencias de este evento.`)) {
                     return;
                 }
 
                 try {
-                    await remove(ref(db, `eventos/\${idE}`));
-                    await remove(ref(db, `asistencias/\${idE}`));
+                    await remove(ref(db, `eventos/${idE}`));
+                    await remove(ref(db, `asistencias/${idE}`));
                     if (formIdE.value === idE) resetearFormulario();
                 } catch (err) {
                     console.error(err);
@@ -1001,28 +910,18 @@
                     return;
                 }
 
-                let vestimentaFinal = formVestimentaSelect.value;
-                if (vestimentaFinal === 'otro') {
-                    vestimentaFinal = formVestimentaOtro.value.trim();
-                    if (!vestimentaFinal) {
-                        alert('Por favor especifica el detalle de la vestimenta en el campo de texto.');
-                        formVestimentaOtro.focus();
-                        return;
-                    }
-                }
-
                 let idE = formIdE.value;
 
                 if (!idE) {
                     const nuevoRef = push(ref(db, 'eventos'));
-                    idE = `evt_\${nuevoRef.key}`;
+                    idE = `evt_${nuevoRef.key}`;
                 }
 
                 const objetoEvento = {
                     idE: idE,
                     titulo: formTitulo.value.trim(),
                     fecha: formFecha.value,
-                    vestimenta: vestimentaFinal,
+                    vestimenta: formVestimenta.value.trim(),
                     horaInicio: formHoraInicio.value,
                     horaFin: formHoraFin.value,
                     lugar: formLugar.value.trim(),
@@ -1032,7 +931,7 @@
                 };
 
                 try {
-                    await set(ref(db, `eventos/\${idE}`), objetoEvento);
+                    await set(ref(db, `eventos/${idE}`), objetoEvento);
                     resetearFormulario();
                 } catch (err) {
                     console.error(err);
