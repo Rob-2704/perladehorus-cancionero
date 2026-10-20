@@ -229,8 +229,31 @@
             opacity: 1 !important;
             animation: none !important;
             overflow: hidden;
-            max-height: 1.4em; 
+            position: relative;
+            max-height: 2.8em; /* 2 líneas visibles; la segunda se desvanece si hay más texto */
             transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Degradado que indica que el texto continúa (solo si el aviso es largo) */
+        .tarjeta-aviso p::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1.6em;
+            background: linear-gradient(to bottom, transparent, var(--card-bg));
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .tarjeta-aviso.colapsable:not(.expandido) p::after { opacity: 1; }
+
+        /* Solo se siente clicable si realmente hay más texto que mostrar */
+        .tarjeta-aviso:not(.colapsable) { cursor: default; }
+        @media (hover: hover) {
+            .tarjeta-aviso:not(.colapsable):hover { transform: none; }
         }
 
         .contenedor-eventos {
@@ -243,9 +266,24 @@
             margin-right: -6px;
             overflow: hidden;
             max-height: 0;
-            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1), --fade 0.3s ease;
             box-sizing: border-box;
         }
+
+        /* Degradado inferior: deja asomar la siguiente tarjeta desvanecida para indicar que hay más eventos.
+           --fade es animable (@property); en navegadores sin soporte simplemente cambia sin transición. */
+        @property --fade {
+            syntax: '<length>';
+            inherits: false;
+            initial-value: 0px;
+        }
+
+        .contenedor-eventos.con-mascara {
+            -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+            mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+        }
+
+        .contenedor-eventos.colapsado { --fade: 48px; }
 
         .separador-eventos-pasados {
             display: flex;
@@ -784,6 +822,7 @@
 
                 // Evento para expandir y contraer con cálculo dinámico de altura para animación fluida
                 tarjeta.addEventListener('click', () => {
+                    if (!tarjeta.classList.contains('colapsable')) return; // Texto corto: nada que expandir
                     const expandido = tarjeta.classList.toggle('expandido');
                     if (expandido) {
                         p.style.maxHeight = p.scrollHeight + 'px';
@@ -795,7 +834,7 @@
                     } else {
                         p.style.maxHeight = p.scrollHeight + 'px';
                         void p.offsetWidth; // Forzar reflow para reiniciar la transición
-                        p.style.maxHeight = '1.4em';
+                        p.style.maxHeight = '2.8em';
                     }
                 });
 
@@ -803,8 +842,22 @@
             });
 
             seccionAvisos.style.display = 'block';
+            actualizarAvisosColapsables();
             activarAnimacionIconos();
         }
+
+        // Marca como "colapsable" solo los avisos cuyo texto no cabe en 2 líneas
+        function actualizarAvisosColapsables() {
+            contenedorAvisos.querySelectorAll('.tarjeta-aviso').forEach(tarjeta => {
+                if (tarjeta.classList.contains('expandido')) return;
+                const p = tarjeta.querySelector('p');
+                tarjeta.classList.toggle('colapsable', p.scrollHeight > p.clientHeight + 1);
+            });
+        }
+
+        // Re-medir cuando cargue la fuente (cambia el ancho del texto) o cambie el tamaño de ventana
+        document.fonts.ready.then(actualizarAvisosColapsables);
+        window.addEventListener('resize', actualizarAvisosColapsables);
 
         async function cargarAvisosFirebase() {
             if (!navigator.onLine) {
@@ -859,12 +912,17 @@
 
         let tarjetasCompactas = 2;
 
+        // Píxeles de la siguiente tarjeta que se dejan asomar (desvanecidos) cuando está colapsado
+        const ASOMO_PX = 52;
+
         function calcularAlturaCompacta() {
-            const tarjetasVisibles = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(0, tarjetasCompactas);
+            const todas = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento'));
+            const tarjetasVisibles = todas.slice(0, tarjetasCompactas);
             if (tarjetasVisibles.length === 0) return 12;
             const topContenedor = contenedorEventos.getBoundingClientRect().top;
             const ultima = tarjetasVisibles[tarjetasVisibles.length - 1];
-            return Math.ceil(ultima.getBoundingClientRect().bottom - topContenedor) + 6;
+            const base = Math.ceil(ultima.getBoundingClientRect().bottom - topContenedor) + 6;
+            return todas.length > tarjetasCompactas ? base + ASOMO_PX : base;
         }
 
         function crearAvisoSinProximos() {
@@ -958,9 +1016,9 @@
                 const tarjeta = document.createElement('div');
                 const esProximo = idx === primerFuturoIdx;
                 let claseExtra = evento.esHoy ? 'hoy' : (esProximo ? 'proximo' : (evento.esPasado ? 'pasado' : ''));
-                const esOculto = contenedorEventos.querySelectorAll('.tarjeta-evento').length >= tarjetasCompactas;
+                // Las tarjetas extra ya no se ocultan: el contenedor las recorta y el degradado las desvanece
 
-                tarjeta.className = `tarjeta-evento ${esOculto ? 'oculto' : ''} ${claseExtra}`;
+                tarjeta.className = `tarjeta-evento ${claseExtra}`;
                 tarjeta.onclick = () => { window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`; };
 
                 const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
@@ -979,37 +1037,51 @@
             });
 
             seccionEventos.style.display = 'block';
+            const hayMasEventos = contenedorEventos.querySelectorAll('.tarjeta-evento').length > tarjetasCompactas;
+
+            // Estado inicial: colapsado (con degradado si hay más eventos que mostrar)
+            contenedorEventos.classList.toggle('con-mascara', hayMasEventos);
+            contenedorEventos.classList.toggle('colapsado', hayMasEventos);
+            iconoToggleEventos.textContent = 'expand_more';
+
             requestAnimationFrame(() => {
                 contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
-                setTimeout(() => { contenedorEventos.style.overflow = 'visible'; }, 300);
+                if (hayMasEventos) {
+                    contenedorEventos.style.overflow = 'hidden'; // debe seguir recortando para que asome la tarjeta
+                } else {
+                    setTimeout(() => { contenedorEventos.style.overflow = 'visible'; }, 300);
+                }
             });
 
-            if (contenedorEventos.querySelectorAll('.tarjeta-evento').length > tarjetasCompactas) {
+            if (hayMasEventos) {
                 btnToggleEventos.style.display = 'flex';
                 btnToggleEventos.onclick = () => {
                     if (enAnimacion) return;
                     enAnimacion = true;
                     desplegado = !desplegado;
-                    const tarjetasExtra = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento')).slice(tarjetasCompactas);
 
                     if (desplegado) {
                         contenedorEventos.style.overflow = 'hidden';
-                        tarjetasExtra.forEach(el => el.classList.remove('oculto'));
                         if (separadorEl && separadorSePliega) separadorEl.classList.remove('oculto');
+                        contenedorEventos.classList.remove('colapsado'); // el degradado se desvanece animado
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight + 12}px`;
-                        setTimeout(() => { contenedorEventos.style.maxHeight = 'none'; contenedorEventos.style.overflow = 'visible'; enAnimacion = false; }, 330);
+                        setTimeout(() => {
+                            contenedorEventos.style.maxHeight = 'none';
+                            contenedorEventos.style.overflow = 'visible';
+                            contenedorEventos.classList.remove('con-mascara'); // sin máscara para no recortar el hover
+                            enAnimacion = false;
+                        }, 330);
                         iconoToggleEventos.textContent = 'expand_less';
                     } else {
                         contenedorEventos.style.overflow = 'hidden';
+                        contenedorEventos.classList.add('con-mascara');
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
                         void contenedorEventos.offsetWidth;
+                        // El separador se oculta de inmediato para que la tarjeta que asoma quede en su sitio final
+                        if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
+                        contenedorEventos.classList.add('colapsado'); // el degradado reaparece animado
                         contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
-                        setTimeout(() => {
-                            tarjetasExtra.forEach(el => el.classList.add('oculto'));
-                            if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
-                            contenedorEventos.style.overflow = 'visible';
-                            enAnimacion = false;
-                        }, 300);
+                        setTimeout(() => { enAnimacion = false; }, 300);
                         iconoToggleEventos.textContent = 'expand_more';
                     }
                 };
