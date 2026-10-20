@@ -1256,6 +1256,27 @@
             activarAnimacionIconos();
         }
 
+        let clicsIndicador = 0;
+        let timerClicsIndicador = null;
+        
+        if (indicadorGuardado) {
+            indicadorGuardado.addEventListener('click', () => {
+                clicsIndicador++;
+                
+                clearTimeout(timerClicsIndicador);
+                
+                if (clicsIndicador >= 3) {
+                    clicsIndicador = 0;
+                    window.location.href = './admin.html';
+                    return;
+                }
+                
+                timerClicsIndicador = setTimeout(() => {
+                    clicsIndicador = 0;
+                }, 1500);
+            });
+        }
+
         async function init() {
             try {
                 cargarAvisosFirebase();
