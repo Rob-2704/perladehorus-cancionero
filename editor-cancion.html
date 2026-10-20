@@ -625,6 +625,10 @@
             animation: none;
         }
 
+        #texto-guardar {
+            display: none;
+        }
+
         .btn-toggle-transponer.pendiente-guardar {
             color: var(--accent);
             border-color: var(--accent);
@@ -819,11 +823,6 @@
                         placeholder="Escribe aquí la letra con los acordes...&#10;&#10;   Do          Sol&#10;Se fue mi amor..."></textarea>
                     <pre id="letra-cancion" class="letra-texto"></pre>
                 </article>
-                <p class="ayuda-formato">
-                    Escribe los acordes en la línea de arriba, justo encima de la sílaba donde cambian.
-                    Usa el selector superior para indicar el traste del capotraste.
-                    <code>Ctrl + S</code> guarda.
-                </p>
             </div>
         </div>
     </div>
@@ -850,6 +849,7 @@
             </div>
             <button id="btn-guardar" class="btn-toggle-transponer" type="button" title="Guardar canción (Ctrl + S)">
                 <span id="icono-guardar" class="material-symbols-outlined">save</span>
+                <span id="texto-guardar">Guardar</span>
             </button>
         </div>
     </div>
@@ -909,6 +909,7 @@
             function marcarCambios(valor) {
                 hayCambios = valor;
                 btnGuardar.classList.toggle('pendiente-guardar', valor);
+                if (!guardando) textoGuardar.textContent = valor ? 'Guardar' : 'Guardado';
             }
 
             function actualizarEtiquetaArtista() {
@@ -1124,6 +1125,7 @@
                 ajustarAlturaTextarea();
                 cargaTerminada = true;
                 marcarCambios(false);
+                if (!idC) textoGuardar.textContent = 'Guardar';
 
                 const mostrarFondo = () => activarFondo();
                 letraContenedorEl.addEventListener('animationend', (e) => {
@@ -1146,6 +1148,7 @@
                 btnGuardar.disabled = true;
                 btnGuardar.classList.add('guardando');
                 iconoGuardar.textContent = 'progress_activity';
+                textoGuardar.textContent = 'Guardando';
 
                 const targetId = idC || `c_${Date.now()}`;
                 
@@ -1181,6 +1184,7 @@
                     btnGuardar.disabled = false;
                     btnGuardar.classList.remove('guardando');
                     iconoGuardar.textContent = 'save';
+                    textoGuardar.textContent = hayCambios ? 'Guardar' : 'Guardado';
                 }
             }
 
