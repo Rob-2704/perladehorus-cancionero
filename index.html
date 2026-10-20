@@ -241,8 +241,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            height: 1.6em;
-            background: linear-gradient(to bottom, transparent, var(--card-bg));
+            height: 2.6em; /* cubre casi las 2 líneas visibles */
+            /* Llega a color sólido antes del borde para que la 2da línea se note claramente desvanecida */
+            background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--card-bg) 55%, transparent) 40%, var(--card-bg) 85%);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s ease;
@@ -261,9 +262,9 @@
             flex-direction: column;
             gap: 8px;
             margin-bottom: 6px;
-            padding: 6px;
-            margin-left: -6px;
-            margin-right: -6px;
+            padding: 6px 24px; /* margen lateral extra para que el hover (scale) no se recorte, ni en pantallas anchas */
+            margin-left: -24px;
+            margin-right: -24px;
             overflow: hidden;
             max-height: 0;
             transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1), --fade 0.3s ease;
@@ -278,12 +279,14 @@
             initial-value: 0px;
         }
 
+        /* El degradado empieza a la mitad de la 2da tarjeta (la que asoma) y llega a transparente en el corte.
+           --fade-colapsado lo calcula el JS (distancia desde ese punto hasta el fondo del contenedor). */
         .contenedor-eventos.con-mascara {
-            -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
-            mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+            -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), rgba(0,0,0,.5) calc(100% - var(--fade) * .35), transparent);
+            mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), rgba(0,0,0,.5) calc(100% - var(--fade) * .35), transparent);
         }
 
-        .contenedor-eventos.colapsado { --fade: 48px; }
+        .contenedor-eventos.colapsado { --fade: var(--fade-colapsado, 150px); }
 
         .separador-eventos-pasados {
             display: flex;
@@ -910,10 +913,12 @@
             }
         }
 
-        let tarjetasCompactas = 2;
+        let tarjetasCompactas = 1;
 
-        // Píxeles de la siguiente tarjeta que se dejan asomar (desvanecidos) cuando está colapsado
-        const ASOMO_PX = 52;
+        // Cuánto de la tarjeta que asoma (la 2da) queda visible al colapsar, y desde qué punto de ella
+        // empieza el degradado. Ambos son fracciones de su altura (0 = arriba, 1 = abajo).
+        const ASOMO_FRACCION = 0.85;
+        const DEGRADADO_DESDE = 0.5;
 
         function calcularAlturaCompacta() {
             const todas = Array.from(contenedorEventos.querySelectorAll('.tarjeta-evento'));
@@ -922,7 +927,17 @@
             const topContenedor = contenedorEventos.getBoundingClientRect().top;
             const ultima = tarjetasVisibles[tarjetasVisibles.length - 1];
             const base = Math.ceil(ultima.getBoundingClientRect().bottom - topContenedor) + 6;
-            return todas.length > tarjetasCompactas ? base + ASOMO_PX : base;
+            if (todas.length <= tarjetasCompactas) return base;
+
+            // La tarjeta que asoma es la siguiente a las visibles (la 2da)
+            const asomada = todas[tarjetasCompactas];
+            const altoAsomada = asomada.offsetHeight;
+            const topAsomada = asomada.getBoundingClientRect().top - topContenedor;
+            const alturaColapsada = Math.round(topAsomada + altoAsomada * ASOMO_FRACCION);
+            // El degradado arranca a la mitad de la 2da tarjeta y llega a transparente en el corte
+            const inicioDegradado = topAsomada + altoAsomada * DEGRADADO_DESDE;
+            contenedorEventos.style.setProperty('--fade-colapsado', `${Math.round(alturaColapsada - inicioDegradado)}px`);
+            return Math.max(alturaColapsada, base);
         }
 
         function crearAvisoSinProximos() {
@@ -998,16 +1013,16 @@
             contenedorEventos.innerHTML = '';
 
             const hayProximos = ordenados.some(e => e.esHoy || (e.tieneFecha && !e.esPasado));
-            tarjetasCompactas = hayProximos ? 2 : 1;
+            tarjetasCompactas = 1; // 1 tarjeta completa; la 2ª asoma desvanecida
             if (!hayProximos) contenedorEventos.appendChild(crearAvisoSinProximos());
 
-            let desplegado = false, enAnimacion = false, separadorEl = null, separadorInsertado = false, separadorSePliega = false;
+            let desplegado = false, enAnimacion = false, separadorEl = null, separadorInsertado = false;
 
             ordenados.forEach((evento, idx) => {
                 if (evento.esPasado && !separadorInsertado) {
-                    separadorSePliega = contenedorEventos.querySelectorAll('.tarjeta-evento').length >= tarjetasCompactas;
+                    // Siempre visible: si cae dentro de la zona recortada, el contenedor ya la esconde solo
                     separadorEl = document.createElement('div');
-                    separadorEl.className = `separador-eventos-pasados${separadorSePliega ? ' oculto' : ''}`;
+                    separadorEl.className = 'separador-eventos-pasados';
                     separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
                     contenedorEventos.appendChild(separadorEl);
                     separadorInsertado = true;
@@ -1062,7 +1077,6 @@
 
                     if (desplegado) {
                         contenedorEventos.style.overflow = 'hidden';
-                        if (separadorEl && separadorSePliega) separadorEl.classList.remove('oculto');
                         contenedorEventos.classList.remove('colapsado'); // el degradado se desvanece animado
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight + 12}px`;
                         setTimeout(() => {
@@ -1077,8 +1091,6 @@
                         contenedorEventos.classList.add('con-mascara');
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
                         void contenedorEventos.offsetWidth;
-                        // El separador se oculta de inmediato para que la tarjeta que asoma quede en su sitio final
-                        if (separadorEl && separadorSePliega) separadorEl.classList.add('oculto');
                         contenedorEventos.classList.add('colapsado'); // el degradado reaparece animado
                         contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
                         setTimeout(() => { enAnimacion = false; }, 300);
