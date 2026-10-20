@@ -1035,7 +1035,7 @@
                 // Las tarjetas extra ya no se ocultan: el contenedor las recorta y el degradado las desvanece
 
                 tarjeta.className = `tarjeta-evento ${claseExtra}`;
-                tarjeta.onclick = () => { window.location.href = `evento?idE=${encodeURIComponent(evento.idE)}`; };
+                tarjeta.onclick = () => { window.location.href = `evento.html?idE=${encodeURIComponent(evento.idE)}`; };
 
                 const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
                 tarjeta.innerHTML = `
@@ -1190,7 +1190,7 @@
                 const div = document.createElement('div');
                 div.className = 'item-sugerencia';
                 div.innerHTML = `<span>${cancion.nombreC}</span><span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>`;
-                div.onclick = (e) => { e.stopPropagation(); window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`; };
+                div.onclick = (e) => { e.stopPropagation(); window.location.href = `visor.html?idC=${encodeURIComponent(cancion.idC)}`; };
                 listaSugerencias.appendChild(div);
             });
             listaSugerencias.classList.add('activa');

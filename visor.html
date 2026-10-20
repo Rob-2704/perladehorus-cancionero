@@ -178,6 +178,41 @@
             100% { transform: rotate(360deg); }
         }
 
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .btn-volver-admin {
+            background-color: transparent;
+            color: var(--text-sec);
+            border: 2px solid var(--text-sec);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-volver-admin:hover {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--accent);
+        }
+
+        .btn-volver-admin:active { transform: scale(0.95); }
+
         .btn-audio-ctrl span {
             display: inline-flex;
             align-items: center;
@@ -188,14 +223,6 @@
 
         .btn-audio-ctrl.cargando span {
             animation: girarSpinner 0.8s linear infinite;
-        }
-        
-        .btn-volver { 
-            display: inline-block;
-            color: var(--text-sec);
-            text-decoration: none;
-            font-size: 13px;
-            margin-bottom: 15px;
         }
         
         .contenedor-audio {
@@ -533,7 +560,6 @@
             gap: 8px;
         }
 
-        /* Cápsula con los cuatro pasos (−1, −½, +½, +1) - Oculta por defecto para evitar parpadeos */
         .grupo-pasos {
             display: flex;
             align-items: center;
@@ -545,7 +571,6 @@
             will-change: transform, opacity;
         }
 
-        /* Separador fino entre "transponer" y "notación" */
         .divisor-panel {
             width: 1px;
             height: 28px;
@@ -569,12 +594,10 @@
             animation: deslizarPanelTransponerSalida 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
         }
 
-        /* Animación de expansión desde el centro para la píldora de números */
         #panel-transponer.panel-transponer-entrada .grupo-pasos {
             animation: expandirPildoraCentro 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s forwards;
         }
 
-        /* Aparición progresiva de izquierda a derecha con la animación del reproductor de audio */
         #panel-transponer.panel-transponer-entrada #btn-reset-tono,
         #panel-transponer.panel-transponer-entrada #btn-alteracion,
         #panel-transponer.panel-transponer-entrada #btn-toggle-cifrado {
@@ -585,7 +608,6 @@
         #panel-transponer.panel-transponer-entrada #btn-alteracion      { animation-delay: 0.18s; }
         #panel-transponer.panel-transponer-entrada #btn-toggle-cifrado  { animation-delay: 0.24s; }
 
-        /* Clases para mantener visibles los elementos tras finalizar su animación de entrada */
         .grupo-pasos.animacion-completada {
             opacity: 1;
             transform: scaleX(1);
@@ -642,21 +664,10 @@
             will-change: transform, opacity;
         }
 
-        /* ============================================================
-           Botones duales (♭/♯ y DO/C)
-           Círculo blanco con dos símbolos en diagonal:
-             · ACTIVO   → arriba a la izquierda, grande y oscuro
-             · INACTIVO → abajo a la derecha, pequeño y gris
-           data-a / data-b  = los dos símbolos
-           data-activo      = "a" o "b": cuál de los dos está activo
-           Todo se escala a partir de --dual-size.
-           ============================================================ */
         .btn-dual {
             --dual-size: 44px;
             --dual-color-activo: var(--bg-color);
             --dual-color-inactivo: #9d9d9d;
-
-            /* Centro de cada símbolo, en % del círculo (el activo sube a la izquierda, el inactivo baja a la derecha) */
             --dual-cx-activo: 38%;
             --dual-cy-activo: 40%;
             --dual-cx-inactivo: 68%;
@@ -668,7 +679,7 @@
             padding: 0;
             border: none;
             overflow: hidden;
-            font-size: 0;            /* el texto interno se oculta; los símbolos se dibujan con ::before / ::after */
+            font-size: 0;
             color: transparent;
             box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.35);
             opacity: 0;
@@ -705,14 +716,12 @@
             color: var(--dual-color-inactivo);
         }
 
-        /* Los dos símbolos se escriben como texto y se intercambian según data-activo */
         .btn-dual::before { content: attr(data-a); font-size: var(--dual-fs-activo); }
         .btn-dual::after  { content: attr(data-b); font-size: var(--dual-fs-inactivo); }
 
         .btn-dual[data-activo="b"]::before { content: attr(data-b); }
         .btn-dual[data-activo="b"]::after  { content: attr(data-a); }
 
-        /* ♭ / ♯ */
         .btn-dual--musical {
             --dual-fs-activo: calc(var(--dual-size) * 0.52);
             --dual-fs-inactivo: calc(var(--dual-size) * 0.30);
@@ -727,17 +736,14 @@
             font-family: system-ui, 'Segoe UI Symbol', 'Sono', sans-serif;
         }
 
-        /* DO / C */
         .btn-dual--texto {
             --dual-fs-activo: calc(var(--dual-size) * 0.32);
             --dual-fs-inactivo: calc(var(--dual-size) * 0.22);
-            --dual-borde: 18%;      /* margen lateral: el activo se ancla a la izquierda y el inactivo a la derecha */
+            --dual-borde: 18%;
             --dual-cy-activo: 40%;
             --dual-cy-inactivo: 68%;
         }
 
-        /* Cifrado: "DO" y "C" miden distinto, así que se anclan por sus bordes (no por su centro).
-           Con el mismo margen a cada lado, el par queda centrado en ambos estados. */
         .btn-dual--texto::before {
             left: var(--dual-borde);
             top: var(--dual-cy-activo);
@@ -770,14 +776,12 @@
             line-height: 1;
         }
 
-        /* Clase para mantener visible el botón y permitir el hover tras terminar la animación */
         .btn-toggle-transponer.animacion-completada {
             opacity: 1;
             transform: translateY(0);
             animation: none;
         }
 
-        /* Ícono de flecha triangular que apunta hacia arriba por defecto (cerrado) */
         #btn-toggle-transponer::before {
             content: 'arrow_drop_down_circle';
             transform: rotate(180deg);
@@ -790,13 +794,12 @@
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
         }
 
-        /* Ícono de flecha triangular que apunta hacia abajo cuando el panel está abierto */
         #btn-toggle-transponer.abierto::before {
             content: 'arrow_drop_down_circle';
             transform: rotate(0deg);
         }
 
-        .btn-toggle-transponer.abierto {
+        #btn-toggle-transponer.abierto {
             color: var(--accent);
             border-color: var(--accent);
         }
@@ -890,7 +893,6 @@
             }
         }
 
-        /* Botones de paso dentro de la cápsula: sin círculo blanco, solo texto */
         .btn-paso {
             position: relative;
             background: transparent;
@@ -930,6 +932,10 @@
 </head>
 <body>
     <div class="container">
+        <div class="header-superior">
+            <a href="index.html" class="btn-volver-admin">← Volver al inicio</a>
+        </div>
+
         <div class="info-cabecera">
             <div class="titulo-row">
                 <h1 id="titulo-cancion">Cargando...</h1>
@@ -970,9 +976,7 @@
     </div>
     
     <div id="panel-flotante-wrapper">
-        <!-- Panel superior de transposición -->
         <div id="panel-transponer" class="panel-scroll-flotante" style="display:none;">
-            <!-- Pasos de transposición: una sola cápsula -->
             <div class="grupo-pasos">
                 <button id="btn-bajar-tono" class="btn-transponer btn-paso" title="Bajar 1 tono">−1</button>
                 <button id="btn-bajar-medio" class="btn-transponer btn-paso" title="Bajar medio tono">−½</button>
@@ -984,14 +988,12 @@
 
             <span class="divisor-panel" aria-hidden="true"></span>
 
-            <!-- Notación: bemol/sostenido y cifrado -->
             <div class="grupo-extra-transponer">
                 <button id="btn-alteracion" class="btn-transponer btn-dual btn-dual--musical" data-a="♭" data-b="♯" data-activo="b" title="Cambiar entre sostenidos y bemoles">♭</button>
                 <button id="btn-toggle-cifrado" class="btn-transponer btn-dual btn-dual--texto" data-a="DO" data-b="C" data-activo="a" title="Cambiar cifrado (Español / Inglés)"></button>
             </div>
         </div>
 
-        <!-- Barra inferior optimizada -->
         <div class="fila-inferior">
             <div id="panel-scroll" class="panel-scroll-flotante">
                 <button id="btn-play-scroll" class="btn-scroll material-symbols-outlined" title="Iniciar/Detener autoscroll">keyboard_double_arrow_down</button>
@@ -1378,7 +1380,6 @@
                             panelTranspon.classList.add('panel-transponer-salida');
                             if (btnToggleTransponer) btnToggleTransponer.classList.remove('abierto');
 
-                            // Limpiar clases de completado al cerrar para permitir re-animar al abrir
                             if (grupoPasos) grupoPasos.classList.remove('animacion-completada');
                             if (btnResetTono) btnResetTono.classList.remove('animacion-completada');
                             if (btnAlteracion) btnAlteracion.classList.remove('animacion-completada');
@@ -1395,7 +1396,6 @@
                             panelTranspon.classList.remove('panel-transponer-salida');
                             if (btnToggleTransponer) btnToggleTransponer.classList.add('abierto');
 
-                            // Reiniciar la animación de entrada de forma limpia cada vez que abre
                             if (grupoPasos) grupoPasos.classList.remove('animacion-completada');
                             if (btnResetTono) btnResetTono.classList.remove('animacion-completada');
                             if (btnAlteracion) btnAlteracion.classList.remove('animacion-completada');

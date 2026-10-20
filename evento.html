@@ -21,6 +21,41 @@
             margin: 0 auto;
         }
 
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .btn-volver-admin {
+            background-color: transparent;
+            color: var(--text-sec);
+            border: 2px solid var(--text-sec);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-volver-admin:hover {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--accent);
+        }
+
+        .btn-volver-admin:active { transform: scale(0.95); }
+
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
             user-select: none;
@@ -488,6 +523,9 @@
 </head>
 <body>
     <header>
+        <div class="header-superior">
+            <a href="index.html" class="btn-volver-admin">← Volver al inicio</a>
+        </div>
         <h1 id="titulo-evento">Cargando evento...</h1>
         <p class="subtitulo">Rondalla Perla De Horus</p>
     </header>
@@ -970,7 +1008,6 @@
                 }
             };
 
-            // 1. Si está offline, cargar de inmediato desde el localStorage guardado en index
             if (!navigator.onLine) {
                 try {
                     const guardado = localStorage.getItem('cache_eventos_perla');
@@ -985,7 +1022,6 @@
                 return;
             }
 
-            // 2. Si hay red, intentar obtener de Firebase y actualizar caché
             const eventoRef = ref(db, `eventos/${idE}`);
             get(eventoRef).then((snapshot) => {
                 const evento = snapshot.val();
