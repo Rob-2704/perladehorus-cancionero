@@ -241,9 +241,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            height: 2.6em; /* cubre casi las 2 líneas visibles */
-            /* Llega a color sólido antes del borde para que la 2da línea se note claramente desvanecida */
-            background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--card-bg) 55%, transparent) 40%, var(--card-bg) 85%);
+            height: 2.1em; /* cubre la 2da línea y un poco de la 1ra */
+            /* Llega a color sólido justo en el borde para un desvanecido más suave */
+            background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--card-bg) 45%, transparent) 45%, var(--card-bg) 95%);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s ease;
