@@ -221,7 +221,18 @@
             white-space: nowrap;
         }
 
-        /* Transición fluida y control de líneas */
+        /* Contenedor con transición fluida para expandir y contraer */
+        .contenedor-parrafo-aviso {
+            position: relative;
+            overflow: hidden;
+            max-height: 1.4em;
+            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .tarjeta-aviso.expandido .contenedor-parrafo-aviso {
+            max-height: 300px;
+        }
+
         .tarjeta-aviso p {
             margin: 0;
             font-size: 13px;
@@ -232,21 +243,23 @@
             white-space: pre-line;
             opacity: 1 !important;
             animation: none !important;
-            overflow: hidden;
-            max-height: 1.4em; 
-            transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .tarjeta-aviso.con-desborde p {
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            text-overflow: ellipsis;
+        /* Puntos suspensivos en color de acento */
+        .puntos-aviso {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background-color: var(--card-bg);
+            padding-left: 8px;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 13px;
+            display: none;
         }
 
-        .tarjeta-aviso.expandido p {
-            -webkit-line-clamp: unset;
-            display: block;
+        .tarjeta-aviso.con-desborde:not(.expandido) .puntos-aviso {
+            display: inline-block;
         }
 
         .contenedor-eventos {
@@ -794,32 +807,30 @@
                 htmlHeader += '</div>';
 
                 const textoCompleto = aviso.texto || aviso.contenido || '';
-                tarjeta.innerHTML = htmlHeader + '<p>' + textoCompleto + '</p>';
                 
-                const p = tarjeta.querySelector('p');
+                const contenedorP = document.createElement('div');
+                contenedorP.className = 'contenedor-parrafo-aviso';
+                
+                const p = document.createElement('p');
+                p.textContent = textoCompleto;
+                contenedorP.appendChild(p);
 
-                // Detección automática de desborde (por saltos de línea o ajuste de palabras en celular)
+                const puntos = document.createElement('span');
+                puntos.className = 'puntos-aviso';
+                puntos.textContent = '...';
+                contenedorP.appendChild(puntos);
+
+                tarjeta.innerHTML = htmlHeader;
+                tarjeta.appendChild(contenedorP);
+
+                // Detección automática de desborde adaptada a PC y celular
                 requestAnimationFrame(() => {
                     const lineHeight = parseFloat(window.getComputedStyle(p).lineHeight) || 18;
-                    const tieneDesborde = p.scrollHeight > lineHeight * 1.3;
-
-                    if (tieneDesborde) {
+                    if (p.scrollHeight > lineHeight * 1.3) {
                         tarjeta.classList.add('con-desborde');
-                        tarjeta.addEventListener('click', () => {
-                            const expandido = tarjeta.classList.toggle('expandido');
-                            if (expandido) {
-                                p.style.maxHeight = p.scrollHeight + 'px';
-                                setTimeout(() => {
-                                    if (tarjeta.classList.contains('expandido')) {
-                                        p.style.maxHeight = 'none';
-                                    }
-                                }, 300);
-                            } else {
-                                p.style.maxHeight = p.scrollHeight + 'px';
-                                void p.offsetWidth; // Forzar reflow para reiniciar la transición
-                                p.style.maxHeight = '1.4em';
-                            }
-                        });
+                        tarjeta.onclick = () => {
+                            tarjeta.classList.toggle('expandido');
+                        };
                     }
                 });
 
