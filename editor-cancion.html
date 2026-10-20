@@ -108,18 +108,40 @@
             100% { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        .btn-volver {
-            display: inline-block;
-            color: var(--text-sec);
-            text-decoration: none;
-            font-size: 13px;
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
             margin-bottom: 15px;
-            transition: color 0.2s ease;
         }
 
-        @media (hover: hover) {
-            .btn-volver:hover { color: var(--text-main); }
+        .btn-volver-admin {
+            background-color: transparent;
+            color: var(--text-sec);
+            border: 2px solid var(--text-sec);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .btn-volver-admin:hover {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--accent);
+        }
+
+        .btn-volver-admin:active { transform: scale(0.95); }
 
         .info-cabecera {
             margin-bottom: 10px;
@@ -740,6 +762,10 @@
 </head>
 <body class="modo-edicion">
     <div class="container">
+        <div class="header-superior">
+            <a href="admin-canciones.html" class="btn-volver-admin">← Volver a canciones</a>
+        </div>
+
         <div class="info-cabecera">
             <div class="titulo-row">
                 <input type="text" id="input-titulo" class="campo-titulo" placeholder="Título de la canción" autocomplete="off" spellcheck="false">

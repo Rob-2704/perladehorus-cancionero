@@ -36,7 +36,34 @@
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
+            margin-bottom: 15px;
         }
+
+        .btn-volver-admin {
+            background-color: transparent;
+            color: var(--text-sec);
+            border: 2px solid var(--text-sec);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-volver-admin:hover {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--accent);
+        }
+
+        .btn-volver-admin:active { transform: scale(0.95); }
 
         main {
             position: relative;
@@ -199,11 +226,12 @@
 <body>
     <header>
         <div class="header-superior">
-            <h1>Panel de Administración</h1>
+            <a href="index.html" class="btn-volver-admin">← Volver al inicio</a>
             <button type="button" id="btn-cerrar-sesion" class="btn-cerrar-sesion">
                 <span class="material-symbols-outlined" style="font-size:16px;">logout</span> Cerrar Sesión
             </button>
         </div>
+        <h1>Panel de Administración</h1>
         <p>Selecciona una opción para gestionar el contenido</p>
     </header>
 

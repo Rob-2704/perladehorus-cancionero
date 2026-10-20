@@ -1220,7 +1220,7 @@
                 fila.className = "fila-cancion";
                 fila.style.animationDelay = `${(Math.floor(indice / numColumnas) + (indice % numColumnas)) * 0.025}s`;
                 fila.addEventListener('animationend', () => { fila.style.animation = 'none'; fila.style.opacity = '1'; });
-                fila.onclick = () => { window.location.href = `visor?idC=${encodeURIComponent(cancion.idC)}`; };
+                fila.onclick = () => { window.location.href = `visor.html?idC=${encodeURIComponent(cancion.idC)}`; };
 
                 const claseEstado = cancion.estado || 'terminada';
                 fila.innerHTML = `
