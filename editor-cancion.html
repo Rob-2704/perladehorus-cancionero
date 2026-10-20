@@ -850,7 +850,6 @@
             </div>
             <button id="btn-guardar" class="btn-toggle-transponer" type="button" title="Guardar canción (Ctrl + S)">
                 <span id="icono-guardar" class="material-symbols-outlined">save</span>
-                <span id="texto-guardar">Guardar</span>
             </button>
         </div>
     </div>
@@ -910,7 +909,6 @@
             function marcarCambios(valor) {
                 hayCambios = valor;
                 btnGuardar.classList.toggle('pendiente-guardar', valor);
-                if (!guardando) textoGuardar.textContent = valor ? 'Guardar' : 'Guardado';
             }
 
             function actualizarEtiquetaArtista() {
@@ -1126,7 +1124,6 @@
                 ajustarAlturaTextarea();
                 cargaTerminada = true;
                 marcarCambios(false);
-                if (!idC) textoGuardar.textContent = 'Guardar';
 
                 const mostrarFondo = () => activarFondo();
                 letraContenedorEl.addEventListener('animationend', (e) => {
@@ -1149,7 +1146,6 @@
                 btnGuardar.disabled = true;
                 btnGuardar.classList.add('guardando');
                 iconoGuardar.textContent = 'progress_activity';
-                textoGuardar.textContent = 'Guardando';
 
                 const targetId = idC || `c_${Date.now()}`;
                 
@@ -1171,7 +1167,7 @@
                 try {
                     await set(ref(db, `canciones_custom/${targetId}`), objetoCancion);
                     marcarCambios(false);
-                    mostrarToast('Canción guardada correctamente.');
+                    mostrarToast('Canción guardada correctamente');
 
                     if (!idC) {
                         history.replaceState(null, '', `?idC=${encodeURIComponent(targetId)}`);
@@ -1185,7 +1181,6 @@
                     btnGuardar.disabled = false;
                     btnGuardar.classList.remove('guardando');
                     iconoGuardar.textContent = 'save';
-                    textoGuardar.textContent = hayCambios ? 'Guardar' : 'Guardado';
                 }
             }
 

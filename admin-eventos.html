@@ -296,7 +296,7 @@
 
         .btn-accion {
             border: none;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border-radius: 12px;
             font-family: 'Sono', monospace;
             font-size: 14px;
@@ -304,9 +304,18 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
             -webkit-tap-highlight-color: transparent;
+            flex: 1;
+        }
+
+        @media (min-width: 480px) {
+            .btn-accion {
+                flex: initial;
+                padding: 10px 20px;
+            }
         }
 
         .btn-accion:active { transform: scale(0.96); }
@@ -443,10 +452,13 @@
             opacity: 0;
             width: 1em;
             height: 1em;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             overflow: hidden;
             white-space: nowrap;
+            flex-shrink: 0;
             will-change: transform, opacity, visibility;
         }
 
