@@ -19,6 +19,8 @@
             max-width: 80%;
             margin: 0 auto;
             font-family: 'Sono', monospace;
+            background-color: #0d0d0d;
+            padding-bottom: 40px;
         }
 
         header {
@@ -27,6 +29,52 @@
             isolation: isolate;
             margin: 0 auto 20px auto;
         }
+
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin: 20px 0 10px 0;
+            color: var(--text-sec);
+            text-decoration: none;
+            font-size: 13px;
+            font-family: 'Sono', monospace;
+            transition: color 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .btn-volver:hover { color: var(--text-main); }
+        }
+
+        .btn-cerrar-sesion {
+            background-color: transparent;
+            color: #e71d36;
+            border: 2px solid #e71d36;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s, color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-cerrar-sesion:hover {
+            background-color: #e71d36;
+            color: #ffffff;
+        }
+
+        .btn-cerrar-sesion:active { transform: scale(0.95); }
 
         h1 {
             margin: 0;
@@ -54,6 +102,11 @@
             0% { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
             70% { opacity: 1; transform: scaleY(1.015); transform-origin: top; }
             100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+        }
+
+        @keyframes deslizarTexto {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .tarjeta-formulario {
@@ -88,6 +141,7 @@
         }
 
         @media (max-width: 600px) {
+            body { max-width: 92%; }
             h1 { font-size: 26px; }
         }
 
@@ -134,6 +188,56 @@
             box-sizing: border-box;
             transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .contenedor-vestimenta-grupo {
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-sizing: border-box;
+            transition: box-shadow 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .contenedor-vestimenta-grupo:hover { transform: translateY(-1px); }
+        .contenedor-vestimenta-grupo:focus-within { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
+
+        .select-interno, .input-interno {
+            background-color: #16161b;
+            color: var(--text-main);
+            border: 1px solid rgba(188, 151, 49, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .select-interno {
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            padding-right: 36px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+        }
+
+        .input-interno::placeholder {
+            color: var(--text-sec);
+            opacity: 0.6;
+        }
+
+        .input-admin::placeholder, .textarea-admin::placeholder {
+            color: var(--text-sec);
+            opacity: 0.6;
         }
 
         .input-admin:hover, .textarea-admin:hover { transform: translateY(-1px); }
@@ -392,6 +496,12 @@
 </head>
 <body>
     <header>
+        <div class="header-superior">
+            <a href="admin.html" class="btn-volver">← Volver al panel de administración</a>
+            <button type="button" id="btn-cerrar-sesion" class="btn-cerrar-sesion">
+                <span class="material-symbols-outlined" style="font-size:16px;">logout</span> Cerrar Sesión
+            </button>
+        </div>
         <h1>Gestor de Eventos</h1>
         <p class="subtitulo">Rondalla Perla De Horus</p>
     </header>
@@ -408,7 +518,7 @@
                 <div class="grid-campos">
                     <div class="campo-grupo col-full">
                         <label for="form-titulo">Título del Evento</label>
-                        <input type="text" id="form-titulo" class="input-admin" required autocomplete="off">
+                        <input type="text" id="form-titulo" class="input-admin" placeholder="Ej. Egresos" required autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
@@ -417,8 +527,17 @@
                     </div>
 
                     <div class="campo-grupo">
-                        <label for="form-vestimenta">Vestimenta</label>
-                        <input type="text" id="form-vestimenta" class="input-admin" autocomplete="off">
+                        <label for="form-vestimenta-select">Vestimenta</label>
+                        <div class="contenedor-vestimenta-grupo">
+                            <select id="form-vestimenta-select" class="select-interno">
+                                <option value="Traje negro con corbata roja y camisa blanca / Vestido rojo con moño rojo y saco negro">Formal Rojo (H: Traje/Corbata | M: Vestido)</option>
+                                <option value="Traje negro con corbata roja y camisa blanca / Pantalón negro con camisa negra y saco">Formal Saco (H: Traje/Corbata | M: Pantalón/Saco)</option>
+                                <option value="Pantalón negro con camisa negra">Total Black (Ambos: Pantalón/Camisa)</option>
+                                <option value="Traje negro con camisa negra / Pantalón negro con camisa negra y saco">Oscuro Formal (H: Traje | M: Pantalón/Saco)</option>
+                                <option value="otro">Otro (Especificar)</option>
+                            </select>
+                            <input type="text" id="form-vestimenta-otro" class="input-interno" placeholder="Especifique la vestimenta..." autocomplete="off" style="display: none;">
+                        </div>
                     </div>
 
                     <div class="campo-grupo">
@@ -433,7 +552,7 @@
 
                     <div class="campo-grupo">
                         <label for="form-lugar">Lugar del evento</label>
-                        <input type="text" id="form-lugar" class="input-admin" autocomplete="off">
+                        <input type="text" id="form-lugar" class="input-admin" placeholder="Ej. Tecnológico De Toluca" autocomplete="off">
                     </div>
 
                     <div class="campo-grupo">
@@ -443,7 +562,7 @@
 
                     <div class="campo-grupo col-full">
                         <label for="form-notas">Nota</label>
-                        <textarea id="form-notas" class="textarea-admin"></textarea>
+                        <textarea id="form-notas" class="textarea-admin" placeholder="Ej. Llegar al estacionamiento"></textarea>
                     </div>
 
                     <div class="campo-grupo col-full">
@@ -485,14 +604,28 @@
         import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { obtenerCanciones } from './js/api-cliente.js';
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         protegerPaginaAdmin((user) => {
+            const auth = getAuth();
+            const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+
+            btnCerrarSesion.onclick = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert('Error al cerrar sesión');
+                }
+            };
+
             const db = getDatabase();
 
             const formIdE = document.getElementById('form-id-e');
             const formTitulo = document.getElementById('form-titulo');
             const formFecha = document.getElementById('form-fecha');
-            const formVestimenta = document.getElementById('form-vestimenta');
+            const formVestimentaSelect = document.getElementById('form-vestimenta-select');
+            const formVestimentaOtro = document.getElementById('form-vestimenta-otro');
             const formHoraInicio = document.getElementById('form-hora-inicio');
             const formHoraFin = document.getElementById('form-hora-fin');
             const formLugar = document.getElementById('form-lugar');
@@ -509,6 +642,16 @@
             let listaCancionesGlobal = [];
             let cancionesSeleccionadas = [];
             let eventosGlobalMap = {};
+
+            formVestimentaSelect.addEventListener('change', () => {
+                if (formVestimentaSelect.value === 'otro') {
+                    formVestimentaOtro.style.display = 'block';
+                    formVestimentaOtro.focus();
+                } else {
+                    formVestimentaOtro.style.display = 'none';
+                    formVestimentaOtro.value = '';
+                }
+            });
 
             function activarAnimacionIconos() {
                 document.fonts.ready.then(() => {
@@ -646,7 +789,9 @@
                 formIdE.value = '';
                 formTitulo.value = '';
                 formFecha.value = '';
-                formVestimenta.value = '';
+                formVestimentaSelect.selectedIndex = 0;
+                formVestimentaOtro.style.display = 'none';
+                formVestimentaOtro.value = '';
                 formHoraInicio.value = '';
                 formHoraFin.value = '';
                 formLugar.value = '';
@@ -779,7 +924,31 @@
                 formIdE.value = idE;
                 formTitulo.value = evento.titulo || '';
                 formFecha.value = evento.fecha || '';
-                formVestimenta.value = evento.vestimenta || '';
+                
+                const vestimentaGuardada = evento.vestimenta || '';
+                let coincidenciaEncontrada = false;
+
+                for (let i = 0; i < formVestimentaSelect.options.length; i++) {
+                    if (formVestimentaSelect.options[i].value === vestimentaGuardada) {
+                        formVestimentaSelect.selectedIndex = i;
+                        coincidenciaEncontrada = true;
+                        break;
+                    }
+                }
+
+                if (coincidenciaEncontrada) {
+                    formVestimentaOtro.style.display = 'none';
+                    formVestimentaOtro.value = '';
+                } else if (vestimentaGuardada.trim() !== '') {
+                    formVestimentaSelect.value = 'otro';
+                    formVestimentaOtro.style.display = 'block';
+                    formVestimentaOtro.value = vestimentaGuardada;
+                } else {
+                    formVestimentaSelect.selectedIndex = 0;
+                    formVestimentaOtro.style.display = 'none';
+                    formVestimentaOtro.value = '';
+                }
+
                 formHoraInicio.value = evento.horaInicio || '';
                 formHoraFin.value = evento.horaFin || '';
                 formLugar.value = evento.lugar || '';
@@ -819,6 +988,16 @@
                     return;
                 }
 
+                let vestimentaFinal = formVestimentaSelect.value;
+                if (vestimentaFinal === 'otro') {
+                    vestimentaFinal = formVestimentaOtro.value.trim();
+                    if (!vestimentaFinal) {
+                        alert('Por favor especifica el detalle de la vestimenta en el campo de texto.');
+                        formVestimentaOtro.focus();
+                        return;
+                    }
+                }
+
                 let idE = formIdE.value;
 
                 if (!idE) {
@@ -830,7 +1009,7 @@
                     idE: idE,
                     titulo: formTitulo.value.trim(),
                     fecha: formFecha.value,
-                    vestimenta: formVestimenta.value.trim(),
+                    vestimenta: vestimentaFinal,
                     horaInicio: formHoraInicio.value,
                     horaFin: formHoraFin.value,
                     lugar: formLugar.value.trim(),

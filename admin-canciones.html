@@ -27,6 +27,8 @@
             max-width: 80%;
             margin: 0 auto;
             background-color: #0d0d0d;
+            font-family: 'Sono', monospace;
+            padding-bottom: 40px;
         }
 
         header {
@@ -52,6 +54,14 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
         .btn-volver {
             display: inline-block;
             margin: 20px 0 10px 0;
@@ -66,13 +76,29 @@
             .btn-volver:hover { color: var(--text-main); }
         }
 
-        .fila-titulo {
-            display: flex;
+        .btn-cerrar-sesion {
+            background-color: transparent;
+            color: #e71d36;
+            border: 2px solid #e71d36;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 6px;
+            transition: background-color 0.2s, color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .btn-cerrar-sesion:hover {
+            background-color: #e71d36;
+            color: #ffffff;
+        }
+
+        .btn-cerrar-sesion:active { transform: scale(0.95); }
 
         h1 {
             margin: 0;
@@ -85,6 +111,7 @@
         }
 
         @media (max-width: 600px) {
+            body { max-width: 92%; }
             h1 { font-size: 32px; }
         }
 
@@ -104,7 +131,7 @@
             background-color: var(--accent);
             color: var(--bg-color);
             border: none;
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 12px;
             font-family: 'Sono', monospace;
             font-size: 14px;
@@ -112,13 +139,11 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
+            white-space: nowrap;
             transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             -webkit-tap-highlight-color: transparent;
-            opacity: 0;
-            will-change: transform, opacity;
-            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s forwards;
         }
 
         @media (hover: hover) {
@@ -301,12 +326,13 @@
 </head>
 <body>
     <header>
-        <div class="fila-titulo">
-            <h1>Gestor de Canciones</h1>
-            <a href="editor-cancion.html" class="btn-crear">
-                <span class="material-symbols-outlined">add</span> Añadir canción
-            </a>
+        <div class="header-superior">
+            <a href="admin.html" class="btn-volver">← Volver al panel de administración</a>
+            <button type="button" id="btn-cerrar-sesion" class="btn-cerrar-sesion">
+                <span class="material-symbols-outlined" style="font-size:16px;">logout</span> Cerrar Sesión
+            </button>
         </div>
+        <h1>Gestor de Canciones</h1>
         <p>Toca una canción para editarla o crea una nueva</p>
     </header>
 
@@ -317,8 +343,10 @@
         </div>
 
         <div class="contenedor-filtro">
+            <a href="editor-cancion.html" class="btn-crear">
+                <span class="material-symbols-outlined" style="font-size:16px;">add</span> Añadir canción
+            </a>
             <select id="select-categoria" class="select-filtro" title="Categoría">
-                <option value="todas">Todas</option>
                 <option value="rondalla">Rondalla</option>
                 <option value="general">General</option>
             </select>
@@ -341,8 +369,21 @@
     <script type="module">
         import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { obtenerCanciones } from './js/api-cliente.js';
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         protegerPaginaAdmin((user) => {
+            const auth = getAuth();
+            const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+
+            btnCerrarSesion.onclick = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert('Error al cerrar sesión');
+                }
+            };
+
             const listaDiv = document.getElementById('lista-canciones');
             const selectCategoria = document.getElementById('select-categoria');
             const selectEstado = document.getElementById('select-estado');

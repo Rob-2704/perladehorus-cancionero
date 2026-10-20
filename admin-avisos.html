@@ -3,248 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" type="image/x-icon" href="img/icono.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sono:MONO@0..1&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
+
     <link href="style.css" rel="stylesheet">
     <title>Gestor de Avisos</title>
     <style>
-        body { 
-            max-width: 80%; 
-            margin: 0 auto; 
-            font-family: 'Sono', monospace; 
-            padding-bottom: 40px; 
+        body {
+            max-width: 80%;
+            margin: 0 auto;
+            font-family: 'Sono', monospace;
             background-color: #0d0d0d;
+            padding-bottom: 40px;
         }
-        header { 
-            margin-bottom: 20px; 
-            border-bottom: 2px solid var(--accent); 
-            padding-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 10px; 
+
+        header {
+            position: relative;
+            z-index: 100;
+            isolation: isolate;
+            margin: 0 auto 20px auto;
         }
-        h1 { 
-            margin: 0; 
-            font-size: 32px; 
-            font-weight: 700; 
-            color: var(--text-main); 
+
+        .header-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        .btn-accion { 
-            background-color: var(--accent); 
-            color: #0d0d0d; 
-            border: none; 
-            padding: 10px 18px; 
-            border-radius: 12px; 
-            font-family: 'Sono', monospace; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 8px; 
-            text-decoration: none; 
+
+        .btn-volver {
+            display: inline-block;
+            margin: 20px 0 10px 0;
+            color: var(--text-sec);
+            text-decoration: none;
+            font-size: 13px;
+            font-family: 'Sono', monospace;
+            transition: color 0.2s ease;
         }
-        .btn-accion:hover { 
-            filter: brightness(1.1); 
+
+        @media (hover: hover) {
+            .btn-volver:hover { color: var(--text-main); }
         }
-        .btn-secundario {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border: 2px solid var(--accent);
-            padding: 10px 18px;
+
+        .btn-cerrar-sesion {
+            background-color: transparent;
+            color: #e71d36;
+            border: 2px solid #e71d36;
+            padding: 8px 14px;
             border-radius: 12px;
             font-family: 'Sono', monospace;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s, color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-cerrar-sesion:hover {
+            background-color: #e71d36;
+            color: #ffffff;
+        }
+
+        .btn-cerrar-sesion:active { transform: scale(0.95); }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        p.subtitulo {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            color: var(--text-sec);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
+        }
+
+        @keyframes extenderContenedor {
+            0% { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
+            70% { opacity: 1; transform: scaleY(1.015); transform-origin: top; }
+            100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+        }
+
+        @keyframes deslizarTexto {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .tarjeta-formulario {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: extenderContenedor 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+        }
+
+        .tarjeta-formulario h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            color: var(--text-main);
+            display: flex;
             align-items: center;
             gap: 8px;
         }
-        .btn-secundario:hover {
-            background-color: var(--card-bg);
-            border-color: #ffffff;
+
+        .grid-campos {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
         }
-        .btn-grupo-acciones {
+
+        @media (max-width: 600px) {
+            body { max-width: 92%; }
+            h1 { font-size: 26px; }
+        }
+
+        @media (min-width: 600px) {
+            .grid-campos { grid-template-columns: repeat(2, 1fr); }
+            .col-full { grid-column: 1 / -1; }
+        }
+
+        .campo-grupo {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 6px;
         }
-        .btn-eliminar { 
-            background-color: #e71d36; 
-            color: #ffffff; 
-            border: none; 
-            border-radius: 10px; 
-            padding: 8px 14px; 
-            font-family: 'Sono', monospace; 
-            font-size: 13px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px; 
+
+        .campo-grupo label {
+            font-size: 11px;
+            color: var(--text-sec);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
-        .btn-editar {
+
+        .input-admin, .textarea-admin {
             background-color: var(--card-bg);
-            color: var(--accent);
+            color: var(--text-main);
             border: 2px solid var(--accent);
-            border-radius: 10px;
-            padding: 8px 14px;
+            border-radius: 12px;
+            padding: 10px 16px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
-            font-weight: bold;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .input-admin:hover, .textarea-admin:hover { transform: translateY(-1px); }
+        .input-admin:focus, .textarea-admin:focus { box-shadow: 0 0 8px rgba(188, 151, 49, 0.4); }
+
+        .textarea-admin {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .acciones-form {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .btn-accion {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: 'Sono', monospace;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-accion:active { transform: scale(0.96); }
+        .btn-guardar { background-color: var(--accent); color: var(--bg-color); }
+        .btn-guardar:hover { box-shadow: 0 0 10px rgba(188, 151, 49, 0.4); }
+        .btn-cancelar { background-color: transparent; color: var(--text-sec); border: 2px solid var(--text-sec); }
+
+        .titulo-lista {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        .grid-avisos-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .tarjeta-aviso-admin {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .info-aviso-admin {
+            display: flex;
+            flex-direction: column;
             gap: 6px;
         }
-        .btn-editar:hover {
-            background-color: var(--accent);
-            color: #0d0d0d;
-        }
-        
-        .formulario-aviso { 
-            background-color: #1E1E24 !important; 
-            border-radius: 20px; 
-            padding: 24px; 
-            margin-bottom: 30px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 16px; 
-            border: 2px solid var(--accent); 
-            opacity: 1 !important;
-        }
-        .formulario-aviso h2 { 
-            margin: 0 0 10px 0; 
-            font-size: 20px; 
-            color: var(--text-main); 
-            border-bottom: 2px solid var(--accent); 
-            padding-bottom: 8px; 
-        }
-        .grupo-campo { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 6px; 
-        }
-        .grupo-campo label { 
-            font-size: 12px; 
-            color: var(--text-sec); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
+
+        .info-aviso-admin h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
         }
 
-        .input-texto, .textarea-texto { 
-            width: 100%; 
-            background-color: #16161b !important; 
-            color: var(--text-main) !important; 
-            border: 2px solid var(--accent); 
-            border-radius: 12px; 
-            padding: 10px 16px; 
-            font-family: 'Sono', monospace; 
-            font-size: 14px; 
-            outline: none; 
-            box-sizing: border-box; 
-            opacity: 1 !important;
-        }
-        .textarea-texto { 
-            resize: vertical; 
-            min-height: 100px; 
-        }
-        .input-texto:focus, .textarea-texto:focus { 
-            border-color: #ffffff; 
+        .meta-aviso-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
         }
 
-        .grid-avisos { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 16px; 
+        .info-aviso-admin p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: var(--text-sec);
+            line-height: 1.4;
+            white-space: pre-line;
         }
-        .tarjeta-aviso-admin { 
-            background-color: #1E1E24 !important; 
-            border-radius: 16px; 
-            padding: 16px; 
-            border: 2px solid #1E1E24; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            gap: 12px; 
-            opacity: 1 !important;
+
+        .botones-item-admin {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-end;
         }
-        .tarjeta-aviso-admin:hover { 
-            border-color: var(--accent); 
+
+        .btn-mini {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-family: 'Sono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .tarjeta-aviso-admin h3 { 
-            margin: 0; 
-            font-size: 18px; 
-            color: var(--text-main); 
+
+        .btn-mini:active { transform: scale(0.94); }
+
+        @media (hover: hover) {
+            .btn-mini:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
         }
-        .tarjeta-aviso-admin .meta { 
-            font-size: 12px; 
-            color: var(--accent); 
-            font-weight: bold; 
+
+        .btn-editar { background-color: #2ec4b6; color: #fff; }
+        .btn-eliminar { background-color: #e71d36; color: #fff; }
+
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            user-select: none;
+            font-weight: normal !important;
+            font-style: normal !important;
+            font-feature-settings: 'liga';
+            -webkit-font-feature-settings: 'liga';
+            visibility: hidden;
+            opacity: 0;
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            will-change: transform, opacity, visibility;
         }
-        .tarjeta-aviso-admin p { 
-            margin: 0; 
-            font-size: 13px; 
-            color: var(--text-sec); 
-            white-space: pre-line; 
+
+        .fuente-cargada {
+            visibility: visible !important;
+            animation: popIconoPlay 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
         }
-        .cargando { 
-            text-align: center; 
-            color: var(--accent); 
-            padding: 40px; 
-            grid-column: 1 / -1; 
+
+        @keyframes popIconoPlay {
+            0% { opacity: 0; transform: scale(0.2); }
+            70% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
-        @media (max-width: 600px) { 
-            body { max-width: 92%; } 
-            h1 { font-size: 24px; } 
+
+        .cargando {
+            text-align: center;
+            color: var(--accent);
+            padding: 20px;
+            font-family: 'Sono', monospace;
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body>
     <header>
-        <div>
-            <h1>Gestión de Avisos</h1>
-            <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--text-sec);">Publica y administra los avisos para la aplicación</p>
+        <div class="header-superior">
+            <a href="admin.html" class="btn-volver">← Volver al panel de administración</a>
+            <button type="button" id="btn-cerrar-sesion" class="btn-cerrar-sesion">
+                <span class="material-symbols-outlined" style="font-size:16px;">logout</span> Cerrar Sesión
+            </button>
         </div>
+        <h1>Gestor de Avisos</h1>
+        <p class="subtitulo">Publica y administra los avisos para la aplicación</p>
     </header>
 
     <main>
-        <div class="formulario-aviso">
-            <h2 id="titulo-formulario">Nuevo Aviso</h2>
-            <div class="grupo-campo">
-                <label for="input-titulo">Título del Aviso</label>
-                <input type="text" id="input-titulo" class="input-texto" placeholder="Ej. Ensayo general obligatorio" autocomplete="off">
-            </div>
-            <div class="grupo-campo">
-                <label for="input-fecha">Fecha (Opcional)</label>
-                <input type="date" id="input-fecha" class="input-texto">
-            </div>
-            <div class="grupo-campo">
-                <label for="textarea-texto">Contenido del Aviso</label>
-                <textarea id="textarea-texto" class="textarea-texto" placeholder="Escribe los detalles del aviso aquí..."></textarea>
-            </div>
-            <div class="btn-grupo-acciones">
-                <button id="btn-guardar" class="btn-accion">
-                    <span class="material-symbols-outlined">save</span> <span id="texto-btn-guardar">Publicar Aviso</span>
-                </button>
-                <button id="btn-cancelar-edicion" class="btn-secundario" style="display: none;">
-                    <span class="material-symbols-outlined">close</span> Cancelar Edición
-                </button>
-            </div>
+        <div class="tarjeta-formulario">
+            <h2 id="titulo-form">
+                <span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Aviso
+            </h2>
+
+            <form id="form-aviso" onsubmit="return false;">
+                <input type="hidden" id="form-id-a">
+
+                <div class="grid-campos">
+                    <div class="campo-grupo col-full">
+                        <label for="form-titulo">Título del Aviso</label>
+                        <input type="text" id="form-titulo" class="input-admin" placeholder="Ej. Ensayo general" required autocomplete="off">
+                    </div>
+
+                    <div class="campo-grupo col-full">
+                        <label for="form-fecha">Fecha (Opcional)</label>
+                        <input type="date" id="form-fecha" class="input-admin">
+                    </div>
+
+                    <div class="campo-grupo col-full">
+                        <label for="form-texto">Contenido del Aviso</label>
+                        <textarea id="form-texto" class="textarea-admin" placeholder="Escribe los detalles del aviso aquí..."></textarea>
+                    </div>
+                </div>
+
+                <div class="acciones-form">
+                    <button type="button" id="btn-cancelar-form" class="btn-accion btn-cancelar" style="display:none;">
+                        Cancelar
+                    </button>
+                    <button type="button" id="btn-guardar-aviso" class="btn-accion btn-guardar">
+                        <span class="material-symbols-outlined">save</span> <span id="texto-btn-guardar">Publicar Aviso</span>
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <div class="titulo-seccion" style="font-size: 18px; margin-bottom: 12px; color: var(--text-main);">
+        <div class="titulo-lista">
             <span class="material-symbols-outlined">campaign</span> Avisos Publicados
         </div>
-        <div id="grid-avisos" class="grid-avisos">
+
+        <div id="grid-avisos-admin" class="grid-avisos-admin">
             <div class="cargando">Cargando avisos...</div>
         </div>
     </main>
@@ -252,40 +406,62 @@
     <script type="module">
         import { protegerPaginaAdmin } from './js/auth-guard.js';
         import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         protegerPaginaAdmin((user) => {
+            const auth = getAuth();
+            const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+
+            btnCerrarSesion.onclick = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert('Error al cerrar sesión');
+                }
+            };
+
             const db = getDatabase();
 
-            const inputTitulo = document.getElementById('input-titulo');
-            const inputFecha = document.getElementById('input-fecha');
-            const textareaTexto = document.getElementById('textarea-texto');
-            const btnGuardar = document.getElementById('btn-guardar');
+            const formIdA = document.getElementById('form-id-a');
+            const formTitulo = document.getElementById('form-titulo');
+            const formFecha = document.getElementById('form-fecha');
+            const formTexto = document.getElementById('form-texto');
+            const btnGuardarAviso = document.getElementById('btn-guardar-aviso');
             const textoBtnGuardar = document.getElementById('texto-btn-guardar');
-            const btnCancelarEdicion = document.getElementById('btn-cancelar-edicion');
-            const tituloFormulario = document.getElementById('titulo-formulario');
-            const gridAvisos = document.getElementById('grid-avisos');
-
-            let idAvisoEditando = null;
+            const btnCancelarForm = document.getElementById('btn-cancelar-form');
+            const tituloForm = document.getElementById('titulo-form');
+            const gridAvisosAdmin = document.getElementById('grid-avisos-admin');
 
             const hoy = new Date();
-            inputFecha.value = `\${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+            formFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 
-            function limpiarFormulario() {
-                idAvisoEditando = null;
-                inputTitulo.value = '';
-                textareaTexto.value = '';
-                inputFecha.value = `\${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-                tituloFormulario.textContent = 'Nuevo Aviso';
-                textoBtnGuardar.textContent = 'Publicar Aviso';
-                btnCancelarEdicion.style.display = 'none';
+            function activarAnimacionIconos() {
+                document.fonts.ready.then(() => {
+                    document.querySelectorAll('.material-symbols-outlined').forEach(icono => {
+                        icono.classList.add('fuente-cargada');
+                    });
+                });
             }
 
-            btnCancelarEdicion.addEventListener('click', limpiarFormulario);
+            function resetearFormulario() {
+                formIdA.value = '';
+                formTitulo.value = '';
+                formTexto.value = '';
+                formFecha.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+                
+                tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">add_circle</span> Crear Nuevo Aviso';
+                textoBtnGuardar.textContent = 'Publicar Aviso';
+                btnCancelarForm.style.display = 'none';
+                activarAnimacionIconos();
+            }
 
-            btnGuardar.addEventListener('click', async () => {
-                const titulo = inputTitulo.value.trim();
-                const fecha = inputFecha.value;
-                const texto = textareaTexto.value.trim();
+            btnCancelarForm.onclick = resetearFormulario;
+
+            btnGuardarAviso.onclick = async () => {
+                const titulo = formTitulo.value.trim();
+                const fecha = formFecha.value;
+                const texto = formTexto.value.trim();
 
                 if (!titulo || !texto) {
                     alert("Por favor completa el título y el contenido del aviso.");
@@ -293,41 +469,41 @@
                 }
 
                 try {
-                    if (idAvisoEditando) {
-                        await set(ref(db, `anuncios/\${idAvisoEditando}`), {
-                            idA: idAvisoEditando,
+                    let idA = formIdA.value;
+                    if (idA) {
+                        await set(ref(db, `anuncios/${idA}`), {
+                            idA,
                             titulo,
                             fecha,
                             texto
                         });
-                        alert("¡Aviso actualizado con éxito!");
                     } else {
                         const avisosRef = ref(db, 'anuncios');
                         const nuevoAvisoRef = push(avisosRef);
+                        idA = nuevoAvisoRef.key;
                         await set(nuevoAvisoRef, {
-                            idA: nuevoAvisoRef.key,
+                            idA,
                             titulo,
                             fecha,
                             texto
                         });
-                        alert("¡Aviso publicado con éxito!");
                     }
 
-                    limpiarFormulario();
+                    resetearFormulario();
                 } catch (err) {
                     console.error("Error al guardar aviso:", err);
                     alert("No se pudo guardar el aviso.");
                 }
-            });
+            };
 
             function cargarAvisosAdmin() {
                 const avisosRef = ref(db, 'anuncios');
                 onValue(avisosRef, (snapshot) => {
                     const datos = snapshot.val();
-                    gridAvisos.innerHTML = '';
+                    gridAvisosAdmin.innerHTML = '';
 
                     if (!datos) {
-                        gridAvisos.innerHTML = '<div class="cargando">No hay avisos publicados.</div>';
+                        gridAvisosAdmin.innerHTML = '<div style="text-align:center; color:var(--text-sec); font-size:13px; padding:20px; grid-column:1/-1;">No hay avisos publicados. ¡Crea el primero arriba!</div>';
                         return;
                     }
 
@@ -341,60 +517,68 @@
 
                         let htmlMeta = '';
                         if (aviso.fecha) {
-                            htmlMeta = `<span class="meta">\${aviso.fecha}</span>`;
+                            htmlMeta = `
+                                <div class="meta-aviso-admin">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">calendar_today</span> 
+                                    ${aviso.fecha}
+                                </div>
+                            `;
                         }
 
                         tarjeta.innerHTML = `
-                            <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                    <h3>${aviso.titulo}</h3>${htmlMeta}
-                                </div>
-                                <p>\${aviso.texto || aviso.contenido || ''}</p>
+                            <div class="info-aviso-admin">
+                                <h3>${aviso.titulo}</h3>
+                                ${htmlMeta}
+                                <p>${aviso.texto || aviso.contenido || ''}</p>
                             </div>
-                            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                <button class="btn-editar" data-id="\${aviso.idA}">
-                                    <span class="material-symbols-outlined" style="font-size:16px;">edit</span> Editar
+                            <div class="botones-item-admin">
+                                <button class="btn-mini btn-editar" data-id="${aviso.idA}">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">edit</span> Editar
                                 </button>
-                                <button class="btn-eliminar" data-id="\${aviso.idA}">
-                                    <span class="material-symbols-outlined" style="font-size:16px;">delete</span> Eliminar
+                                <button class="btn-mini btn-eliminar" data-id="${aviso.idA}">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">delete</span> Borrar
                                 </button>
                             </div>
                         `;
 
-                        tarjeta.querySelector('.btn-editar').addEventListener('click', () => {
-                            idAvisoEditando = aviso.idA;
-                            inputTitulo.value = aviso.titulo || '';
-                            inputFecha.value = aviso.fecha || '';
-                            textareaTexto.value = aviso.texto || aviso.contenido || '';
-                            tituloFormulario.textContent = 'Editar Aviso';
+                        tarjeta.querySelector('.btn-editar').onclick = () => {
+                            formIdA.value = aviso.idA;
+                            formTitulo.value = aviso.titulo || '';
+                            formFecha.value = aviso.fecha || '';
+                            formTexto.value = aviso.texto || aviso.contenido || '';
+                            
+                            tituloForm.innerHTML = '<span class="material-symbols-outlined" id="icono-form">edit_note</span> Editar Aviso';
                             textoBtnGuardar.textContent = 'Actualizar Aviso';
-                            btnCancelarEdicion.style.display = 'inline-flex';
+                            btnCancelarForm.style.display = 'inline-flex';
+                            activarAnimacionIconos();
                             window.scrollTo({ top: 0, behavior: 'smooth' });
-                        });
+                        };
 
-                        tarjeta.querySelector('.btn-eliminar').addEventListener('click', async () => {
-                            if (confirm(`¿Estás seguro de eliminar el aviso "\${aviso.titulo}"?`)) {
+                        tarjeta.querySelector('.btn-eliminar').onclick = async () => {
+                            if (confirm(`¿Estás seguro de eliminar el aviso "${aviso.titulo}"?`)) {
                                 try {
-                                    await remove(ref(db, `anuncios/\${aviso.idA}`));
-                                    if (idAvisoEditando === aviso.idA) {
-                                        limpiarFormulario();
+                                    await remove(ref(db, `anuncios/${aviso.idA}`));
+                                    if (formIdA.value === aviso.idA) {
+                                        resetearFormulario();
                                     }
                                 } catch (e) {
                                     alert("No se pudo eliminar el aviso.");
                                 }
                             }
-                        });
+                        };
 
                         fragmento.appendChild(tarjeta);
                     });
 
-                    gridAvisos.appendChild(fragmento);
+                    gridAvisosAdmin.appendChild(fragmento);
+                    activarAnimacionIconos();
                 }, () => {
-                    gridAvisos.innerHTML = '<div class="cargando">Error al cargar avisos.</div>';
+                    gridAvisosAdmin.innerHTML = '<div class="cargando">Error al cargar avisos.</div>';
                 });
             }
 
             cargarAvisosAdmin();
+            activarAnimacionIconos();
         });
     </script>
 </body>

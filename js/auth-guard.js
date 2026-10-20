@@ -83,25 +83,6 @@ estilosAuth.textContent = `
     }
     .auth-card button:active { transform: scale(0.96); }
     .auth-error { color: #e71d36; font-size: 12px; text-align: center; display: none; }
-    .btn-cerrar-sesion {
-        background: transparent;
-        border: 1.5px solid #e71d36;
-        color: #e71d36;
-        border-radius: 10px;
-        padding: 6px 12px;
-        font-family: 'Sono', monospace;
-        font-size: 12px;
-        font-weight: bold;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.2s;
-    }
-    .btn-cerrar-sesion:hover {
-        background: #e71d36;
-        color: #ffffff;
-    }
 `;
 document.head.appendChild(estilosAuth);
 
@@ -162,26 +143,10 @@ function quitarModalLogin() {
     if (overlay) overlay.remove();
 }
 
-function agregarBotonCerrarSesion() {
-    if (document.getElementById('btn-logout-global')) return;
-    const header = document.querySelector('header');
-    if (!header) return;
-
-    const btnLogout = document.createElement('button');
-    btnLogout.id = 'btn-logout-global';
-    btnLogout.className = 'btn-cerrar-sesion';
-    btnLogout.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">logout</span> Salir`;
-    btnLogout.title = "Cerrar sesión de administrador";
-    btnLogout.onclick = () => signOut(auth);
-
-    header.appendChild(btnLogout);
-}
-
 export function protegerPaginaAdmin(callbackPermitido) {
     onAuthStateChanged(auth, (user) => {
         if (user && ADMINS_PERMITIDOS.includes(user.email.toLowerCase())) {
             quitarModalLogin();
-            agregarBotonCerrarSesion();
             if (callbackPermitido) callbackPermitido(user);
         } else {
             if (user) {
