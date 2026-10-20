@@ -1187,12 +1187,6 @@
                 }
             });
 
-            document.getElementById('btn-volver').addEventListener('click', (e) => {
-                if (hayCambios && !confirm('Tienes cambios sin guardar. ¿Salir de todas formas?')) {
-                    e.preventDefault();
-                }
-            });
-
             cargarCancionExistente();
         });
     </script>
