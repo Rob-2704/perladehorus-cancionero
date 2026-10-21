@@ -17,6 +17,7 @@ const ASSETS_TO_CACHE = [
   './js/api-cliente.js',
   './js/auth-guard.js',
   './js/modulo-acordes.js',
+  './js/modulo-audio-acorde.js',
   './js/modulo-autoscroll.js',
   './js/modulo-transponer.js',
   './img/icono.png',
