@@ -790,8 +790,8 @@
                 return;
             }
 
-            // Filtrar estrictamente para ignorar eventos que hayan podido colarse
-            const avisos = Object.values(datos).filter(a => a && typeof a === 'object' && !('lugar' in a) && !('canciones' in a));
+            // Filtrado estricto para asegurar que solo se muestren anuncios reales (sin propiedades de eventos)
+            const avisos = Object.values(datos).filter(a => a && typeof a === 'object' && !('lugar' in a) && !('canciones' in a) && !('idE' in a));
             if (avisos.length === 0) {
                 seccionAvisos.style.display = 'none';
                 return;
@@ -953,7 +953,7 @@
                 return;
             }
 
-            // Filtrar estrictamente para asegurarse de procesar solo eventos válidos
+            // Filtrado estricto para aceptar únicamente elementos que tengan estructura de evento
             const eventos = Object.values(datos).filter(e => e && typeof e === 'object' && ('lugar' in e || 'horaInicio' in e || 'canciones' in e || 'idE' in e));
             if (eventos.length === 0) {
                 mostrarSoloAviso();
@@ -1211,8 +1211,10 @@
 
         async function init() {
             try {
+                // Iniciar la carga en paralelo de avisos y eventos sin parpadeos prematuros
                 cargarAvisosOptimizados();
                 cargarEventosOptimizados();
+                
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
                 cancionesGlobal = (await obtenerCanciones()).slice().sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 

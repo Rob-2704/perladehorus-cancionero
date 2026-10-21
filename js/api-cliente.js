@@ -394,13 +394,10 @@ export async function obtenerContenidoCancion(idC) {
 const nodosEnMemoria = new Map();
 
 export async function obtenerNodo(ruta, { alActualizar } = {}) {
-    // Normalizar la ruta eliminando cualquier carácter extraño o sufijo $ sobrante
     const rutaLimpia = ruta.replace(/[^a-zA-Z0-9_\-]/g, '');
     if (!rutaLimpia) throw new Error('Ruta no válida: ' + ruta);
 
-    // Se asigna una clave de versión limpia (nodo_v2) para aislar avisos de eventos totalmente
     const claveIDB = `nodo_v2:\${rutaLimpia}`;
-    
     let datos = nodosEnMemoria.has(rutaLimpia) ? nodosEnMemoria.get(rutaLimpia) : undefined;
 
     if (datos === undefined) {
@@ -415,7 +412,7 @@ export async function obtenerNodo(ruta, { alActualizar } = {}) {
     const refrescar = async () => {
         try {
             const fresco = await pedirJSONConReintento(`${DB_URL}/${rutaLimpia}.json`, TIMEOUT_NODO_MS, 1);
-            if (fresco !== null && frescaEstructuraValida(rutaLimpia, fresco)) {
+            if (fresco !== null) {
                 const cambio = JSON.stringify(fresco) !== JSON.stringify(datos);
                 nodosEnMemoria.set(rutaLimpia, fresco);
                 idbEscribir([[claveIDB, fresco]]).catch(() => {});
@@ -449,22 +446,4 @@ export async function obtenerNodo(ruta, { alActualizar } = {}) {
     } catch (e) {
         return null;
     }
-}
-
-// Validación interna para asegurar que los datos obtenidos pertenezcan al tipo correcto
-function frescaEstructuraValida(ruta, datos) {
-    if (!datos || typeof datos !== 'object') return false;
-    const valores = Object.values(datos);
-    if (valores.length === 0) return true;
-    
-    const primerElemento = valores[0];
-    if (ruta === 'anuncios') {
-        // Un anuncio NO debería tener la propiedad 'lugar' ni 'horaInicio' ni 'canciones'
-        return !('lugar' in primerElemento) && !('canciones' in primerElemento);
-    }
-    if (ruta === 'eventos') {
-        // Un evento SIEMPRE suele incluir idE, lugar, horaInicio o canciones
-        return ('lugar' in primerElemento) || ('horaInicio' in primerElemento) || ('canciones' in primerElemento) || ('idE' in primerElemento);
-    }
-    return true;
 }
