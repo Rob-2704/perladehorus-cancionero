@@ -1,18 +1,18 @@
 const DB_URL = 'https://rondalla-f04a4-default-rtdb.firebaseio.com';
 
-const STORAGE_KEY = 'cache_canciones_perla_v1'; // caché antiguo (localStorage), solo lectura/migración
+const STORAGE_KEY = 'cache_canciones_perla_v1';
 const IDB_NOMBRE = 'perla-cache';
 const IDB_TABLA = 'kv';
 const PREFIJO_CANCION = 'c:';
-const CLAVE_ANTIGUA_IDB = 'canciones_v2'; // versión anterior: toda la base en una sola entrada
+const CLAVE_ANTIGUA_IDB = 'canciones_v2';
 
 const TIMEOUT_LISTA_MS = 20000;
 const TIMEOUT_CANCION_MS = 10000;
-const TIMEOUT_NODO_MS = 3000; // Timeout optimizado y rápido para nodos (avisos, eventos)
+const TIMEOUT_NODO_MS = 3000;
 const ESPERA_CANCION_CON_CACHE_MS = 1500; 
 const MIN_ENTRE_SINCRONIZACIONES_MS = 60000;
 
-// ───────── Estado de guardado (misma API de antes) ─────────
+// ───────── Estado de guardado ─────────
 
 let callbacksEstadoGuardado = [];
 let estadoActualGuardado = 'guardando';
@@ -28,7 +28,6 @@ function notificarEstadoGuardado(nuevoEstado) {
     callbacksEstadoGuardado.forEach(cb => { try { cb(nuevoEstado); } catch (e) {} });
 }
 
-// Para que la página se redibuje cuando la actualización en segundo plano trae cambios
 const callbacksActualizacion = [];
 export function alActualizarCanciones(callback) {
     callbacksActualizacion.push(callback);
@@ -84,7 +83,7 @@ const idbEscribir = (pares, borrar = []) => transaccionIDB('readwrite', s => {
 
 const idbLeerPrefijo = prefijo => transaccionIDB('readonly', s => {
     const salida = {};
-    const cursor = s.openCursor(IDBKeyRange.bound(prefijo, prefijo + ''));
+    const cursor = s.openCursor(IDBKeyRange.bound(prefijo, prefijo + '\uffff'));
     cursor.onsuccess = () => {
         const actual = cursor.result;
         if (actual) {
@@ -174,7 +173,7 @@ async function pedirJSON(url, timeoutMs) {
     const temporizador = setTimeout(() => controlador.abort(), timeoutMs);
     try {
         const respuesta = await fetch(url, { signal: controlador.signal });
-        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+        if (!respuesta.ok) throw new Error(`HTTP \${respuesta.status}`);
         return await respuesta.json();
     } finally {
         clearTimeout(temporizador);
@@ -196,7 +195,7 @@ async function pedirJSONConReintento(url, timeoutMs, intentos = 2) {
 
 const sinConexion = () => typeof navigator !== 'undefined' && navigator.onLine === false;
 
-// ───────── Sincronización de la lista completa (Diferida para cargar al final) ─────────
+// ───────── Sincronización de canciones ─────────
 
 let descargaEnCurso = null;
 let cargaInicialEnCurso = null;
@@ -208,7 +207,7 @@ function descargarCanciones() {
     ultimoIntentoSincronizacion = Date.now();
     notificarEstadoGuardado('guardando');
 
-    descargaEnCurso = pedirJSONConReintento(`${DB_URL}/canciones.json`, TIMEOUT_LISTA_MS)
+    descargaEnCurso = pedirJSONConReintento(`\${DB_URL}/canciones.json`, TIMEOUT_LISTA_MS)
         .then(datos => {
             const nuevo = normalizarCanciones(datos);
             const anterior = cacheCanciones;
@@ -239,7 +238,6 @@ function descargarCanciones() {
 function sincronizar(forzar = false) {
     if (descargaEnCurso || sinConexion()) return;
     if (!forzar && Date.now() - ultimoIntentoSincronizacion < MIN_ENTRE_SINCRONIZACIONES_MS) return;
-    // Se ejecuta de forma diferida para no quitarle recursos de red a eventos/avisos
     setTimeout(() => {
         descargarCanciones().catch(() => {});
     }, 800);
@@ -250,7 +248,6 @@ async function cargarCanciones() {
 
     if (!cargaInicialEnCurso) {
         cargaInicialEnCurso = (async () => {
-            // Añadimos una pequeña pausa inicial para garantizar que los eventos y avisos tengan prioridad absoluta en la UI
             await new Promise(r => setTimeout(r, 300));
 
             const local = await leerCacheLocal();
@@ -303,7 +300,7 @@ export async function obtenerCanciones() {
         };
     });
 
-    if (lista.every(c => /^\d+\$/.test(c.idC))) {
+    if (lista.every(c => /^\d+$/.test(c.idC))) {
         lista.sort((a, b) => Number(a.idC) - Number(b.idC));
     }
     return lista;
@@ -392,45 +389,47 @@ export async function obtenerContenidoCancion(idC) {
     };
 }
 
-// ───────── Eventos y Avisos (Prioridad Alta - Carga Inmediata) ─────────
+// ───────── Eventos y Avisos (Con claves totalmente independientes) ─────────
 
 const nodosEnMemoria = new Map();
 
-/**
- * Lee un nodo de la base (p. ej. 'eventos' o 'avisos').
- * Diseñado para resolver de manera inmediata antes que cualquier proceso de canciones.
- */
 export async function obtenerNodo(ruta, { alActualizar } = {}) {
-    if (!/^[\w\-\/]+\$/.test(ruta)) throw new Error('Ruta no válida: ' + ruta);
+    // Normalizar la ruta eliminando cualquier carácter extraño o sufijo $ sobrante
+    const rutaLimpia = ruta.replace(/[^a-zA-Z0-9_\-]/g, '');
+    if (!rutaLimpia) throw new Error('Ruta no válida: ' + ruta);
 
-    const clave = `nodo:${ruta}`;
-    let datos = nodosEnMemoria.has(ruta) ? nodosEnMemoria.get(ruta) : undefined;
+    // Se asigna una clave de versión limpia (nodo_v2) para aislar avisos de eventos totalmente
+    const claveIDB = `nodo_v2:\${rutaLimpia}`;
+    
+    let datos = nodosEnMemoria.has(rutaLimpia) ? nodosEnMemoria.get(rutaLimpia) : undefined;
 
     if (datos === undefined) {
         try { 
-            datos = await idbLeer(clave); 
+            datos = await idbLeer(claveIDB); 
             if (datos !== undefined && datos !== null) {
-                nodosEnMemoria.set(ruta, datos);
+                nodosEnMemoria.set(rutaLimpia, datos);
             }
         } catch (e) {}
     }
 
     const refrescar = async () => {
         try {
-            const fresco = await pedirJSONConReintento(`${DB_URL}/${ruta}.json`, TIMEOUT_NODO_MS, 1);
-            const cambio = JSON.stringify(fresco) !== JSON.stringify(datos);
-            nodosEnMemoria.set(ruta, fresco);
-            idbEscribir([[clave, fresco]]).catch(() => {});
-            if (cambio && alActualizar && datos !== undefined) { 
-                try { alActualizar(fresco); } catch (e) {} 
+            const fresco = await pedirJSONConReintento(`${DB_URL}/${rutaLimpia}.json`, TIMEOUT_NODO_MS, 1);
+            if (fresco !== null && frescaEstructuraValida(rutaLimpia, fresco)) {
+                const cambio = JSON.stringify(fresco) !== JSON.stringify(datos);
+                nodosEnMemoria.set(rutaLimpia, fresco);
+                idbEscribir([[claveIDB, fresco]]).catch(() => {});
+                if (cambio && alActualizar && datos !== undefined) { 
+                    try { alActualizar(fresco); } catch (e) {} 
+                }
+                return fresco;
             }
-            return fresco;
+            return datos || null;
         } catch (e) {
             return null;
         }
     };
 
-    // Si ya tenemos datos en caché local, los devolvemos al instante y actualizamos de fondo de forma silenciosa
     if (datos !== undefined && datos !== null) {
         if (!sinConexion()) {
             refrescar().catch(() => {});
@@ -440,15 +439,32 @@ export async function obtenerNodo(ruta, { alActualizar } = {}) {
 
     if (sinConexion()) return null;
 
-    // Si no hay caché, se ejecuta de inmediato con máxima prioridad de red para evitar retrasos visuales
     try {
         const promesaRed = refrescar();
         const resultadoRapido = await Promise.race([
             promesaRed,
             new Promise(r => setTimeout(() => r(null), TIMEOUT_NODO_MS))
         ]);
-        return resultadoRapido !== null ? resultadoRapido : (nodosEnMemoria.get(ruta) || null);
+        return resultadoRapido !== null ? resultadoRapido : (nodosEnMemoria.get(rutaLimpia) || null);
     } catch (e) {
         return null;
     }
+}
+
+// Validación interna para asegurar que los datos obtenidos pertenezcan al tipo correcto
+function frescaEstructuraValida(ruta, datos) {
+    if (!datos || typeof datos !== 'object') return false;
+    const valores = Object.values(datos);
+    if (valores.length === 0) return true;
+    
+    const primerElemento = valores[0];
+    if (ruta === 'anuncios') {
+        // Un anuncio NO debería tener la propiedad 'lugar' ni 'horaInicio' ni 'canciones'
+        return !('lugar' in primerElemento) && !('canciones' in primerElemento);
+    }
+    if (ruta === 'eventos') {
+        // Un evento SIEMPRE suele incluir idE, lugar, horaInicio o canciones
+        return ('lugar' in primerElemento) || ('horaInicio' in primerElemento) || ('canciones' in primerElemento) || ('idE' in primerElemento);
+    }
+    return true;
 }
