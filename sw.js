@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cancionero-perla-1.71';
+const CACHE_NAME = 'cancionero-perla-1.72';
 
 const ASSETS_TO_CACHE = [
   './',

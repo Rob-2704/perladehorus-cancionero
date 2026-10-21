@@ -205,7 +205,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (!titulo || !wrapperRender) return;
 
-    // Márgenes equilibrados para separar del título pero mantener el botón pegado abajo
     wrapperRender.style.marginTop = "4px";
     wrapperRender.style.marginBottom = "-12px";
 
@@ -429,7 +428,8 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const esMovil = window.innerWidth <= 600;
     const canvas = document.createElement('canvas');
     
-    const anchoCanvas = esMovil ? 114 : 150;
+    // Ancho optimizado para simetría perfecta en móvil
+    const anchoCanvas = esMovil ? 124 : 150;
     const altoCanvas = esMovil ? 104 : 124; 
     const dpr = window.devicePixelRatio || 1;
 
@@ -447,7 +447,8 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const trastesArr = datos.strings.trim().toUpperCase().split(/\s+/);
     const trasteBase = datos.trasteInicio || 1;
 
-    const xInicio = esMovil ? 24 : 32;
+    // xInicio ajustado simétricamente para móvil y escritorio
+    const xInicio = esMovil ? 30 : 32;
     const yInicio = esMovil ? 10 : 12; 
     const anchoDiapason = esMovil ? 65 : 85;
     const altoDiapason = esMovil ? 70 : 88; 
