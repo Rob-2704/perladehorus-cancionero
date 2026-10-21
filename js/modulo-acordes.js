@@ -205,9 +205,8 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (!titulo || !wrapperRender) return;
 
-    // Acerca el diagrama hacia arriba (cerca del título)
-    wrapperRender.style.marginTop = "-12px";
-    // Reduce el espacio inferior para acercarlo al botón de reproducir
+    // Márgenes equilibrados para separar del título pero mantener el botón pegado abajo
+    wrapperRender.style.marginTop = "4px";
     wrapperRender.style.marginBottom = "-12px";
 
     let textoLimpio = nombreAcordeRaw.trim().replace(/[\s-\-❚❙]/g, '');        
@@ -431,7 +430,7 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const canvas = document.createElement('canvas');
     
     const anchoCanvas = esMovil ? 114 : 150;
-    const altoCanvas = esMovil ? 98 : 118; // Altura total más compacta para acercar el botón
+    const altoCanvas = esMovil ? 104 : 124; 
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = anchoCanvas * dpr;
@@ -449,7 +448,7 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const trasteBase = datos.trasteInicio || 1;
 
     const xInicio = esMovil ? 24 : 32;
-    const yInicio = esMovil ? 8 : 10; 
+    const yInicio = esMovil ? 10 : 12; 
     const anchoDiapason = esMovil ? 65 : 85;
     const altoDiapason = esMovil ? 70 : 88; 
     const numCuerdas = 6, numTrastesVisibles = 4;
