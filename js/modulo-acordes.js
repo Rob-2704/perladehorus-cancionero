@@ -52,8 +52,8 @@ function aplicarAlteraciones(formulaBase, textoAlteracion) {
     let formula = [...formulaBase];
 
     tokens.forEach(token => {
-        const coincideAdd = token.match(/^add(\d+)\$/);
-        const coincideAlt = token.match(/^([#b]?)(\d+)\$/);
+        const coincideAdd = token.match(/^add(\d+)$/);
+        const coincideAlt = token.match(/^([#b]?)(\d+)$/);
 
         if (coincideAdd) {
             const grado = parseInt(coincideAdd[1]);
@@ -257,17 +257,17 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         sufijoJson = "";
     }
 
-    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?\$/);
+    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?$/);
     let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
     let textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
 
-    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)\$/i);
+    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)$/i);
     if (matchSusAlt) {
         sufijoBase = matchSusAlt[1];
         textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchSusAlt[2]})`) : `(${matchSusAlt[2]})`;
     }
 
-    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)\$/i);
+    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)$/i);
     if (matchAddDirecto) {
         sufijoBase = matchAddDirecto[1];
         const tokenAdd = matchAddDirecto[2];
@@ -368,6 +368,7 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
         } catch (error) {
             wrapperRender.innerHTML = `<div style="font-size:11px; color:#ff3333;">Error de auto-cálculo</div>`;
+            wrapperRender.dataset.strings = "";
         }
     }
 
@@ -404,6 +405,9 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
 export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     wrapper.innerHTML = ""; 
+
+    // Guarda los trastes para que el botón de reproducir sepa qué acorde tocar
+    wrapper.dataset.strings = datos.strings;
 
     const esMovil = window.innerWidth <= 600;
     const canvas = document.createElement('canvas');
