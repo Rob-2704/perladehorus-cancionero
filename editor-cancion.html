@@ -865,7 +865,10 @@
         protegerPaginaAdmin((user) => {
             const db = getDatabase();
             const params = new URLSearchParams(window.location.search);
-            const idC = params.get('idC');
+            const idCParam = params.get('idC');
+
+            // Variable global para mantener el ID fijo durante toda la sesión en el editor
+            window.__idActual = idCParam || null;
 
             const body = document.body;
             const inputTitulo = document.getElementById('input-titulo');
@@ -1078,7 +1081,7 @@
                 actualizarEtiquetaArtista();
                 actualizarPuntoEstado();
 
-                if (!idC) {
+                if (!window.__idActual) {
                     inputTitulo.focus();
                     finalizarCarga();
                     return;
@@ -1087,13 +1090,13 @@
                 inputTitulo.placeholder = 'Cargando...';
 
                 try {
-                    const snapshot = await get(ref(db, `canciones/${idC}`));
+                    const snapshot = await get(ref(db, `canciones/${window.__idActual}`));
                     let data = null;
 
                     if (snapshot.exists()) {
                         data = snapshot.val();
                     } else {
-                        const original = await obtenerContenidoCancion(idC);
+                        const original = await obtenerContenidoCancion(window.__idActual);
                         if (original && !original.error) data = original;
                         else mostrarToast('No se pudo cargar la canción: ' + ((original && original.error) || 'no encontrada'), true);
                     }
@@ -1125,7 +1128,7 @@
                 ajustarAlturaTextarea();
                 cargaTerminada = true;
                 marcarCambios(false);
-                if (!idC) textoGuardar.textContent = 'Guardar';
+                if (!window.__idActual) textoGuardar.textContent = 'Guardar';
 
                 const mostrarFondo = () => activarFondo();
                 letraContenedorEl.addEventListener('animationend', (e) => {
@@ -1150,7 +1153,26 @@
                 iconoGuardar.textContent = 'progress_activity';
                 textoGuardar.textContent = 'Guardando';
 
-                const targetId = idC || `c_${Date.now()}`;
+                // Si ya tenemos un ID en la sesión, lo usamos para modificar el existente; si no, calculamos el siguiente consecutivo
+                let targetId = window.__idActual;
+
+                if (!targetId) {
+                    try {
+                        const snapTodas = await get(ref(db, 'canciones'));
+                        const listado = snapTodas.val() || {};
+                        let maxNum = 0;
+                        Object.keys(listado).forEach(k => {
+                            const num = parseInt(k, 10);
+                            if (!isNaN(num) && num > maxNum) {
+                                maxNum = num;
+                            }
+                        });
+                        targetId = String(maxNum + 1);
+                    } catch (e) {
+                        targetId = String(Date.now());
+                    }
+                    window.__idActual = targetId;
+                }
                 
                 let contenidoFinal = inputContenido.value;
                 const valorCapo = selectCapoEditor.value;
@@ -1172,9 +1194,8 @@
                     marcarCambios(false);
                     mostrarToast('Canción guardada correctamente');
 
-                    if (!idC) {
+                    if (!idCParam) {
                         history.replaceState(null, '', `?idC=${encodeURIComponent(targetId)}`);
-                        window.__idActual = targetId;
                     }
                 } catch (err) {
                     console.error("Error guardando en Firebase:", err);
