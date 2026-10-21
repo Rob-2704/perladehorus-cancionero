@@ -8,8 +8,8 @@ const CLAVE_ANTIGUA_IDB = 'canciones_v2'; // versión anterior: toda la base en 
 
 const TIMEOUT_LISTA_MS = 20000;
 const TIMEOUT_CANCION_MS = 10000;
-const TIMEOUT_NODO_MS = 4000; // Timeout optimizado y más rápido para nodos (avisos, eventos)
-const ESPERA_CANCION_CON_CACHE_MS = 1500; // máx. que se espera la versión fresca si ya hay copia guardada
+const TIMEOUT_NODO_MS = 3000; // Timeout optimizado y rápido para nodos (avisos, eventos)
+const ESPERA_CANCION_CON_CACHE_MS = 1500; 
 const MIN_ENTRE_SINCRONIZACIONES_MS = 60000;
 
 // ───────── Estado de guardado (misma API de antes) ─────────
@@ -196,7 +196,7 @@ async function pedirJSONConReintento(url, timeoutMs, intentos = 2) {
 
 const sinConexion = () => typeof navigator !== 'undefined' && navigator.onLine === false;
 
-// ───────── Sincronización de la lista completa ─────────
+// ───────── Sincronización de la lista completa (Diferida para cargar al final) ─────────
 
 let descargaEnCurso = null;
 let cargaInicialEnCurso = null;
@@ -239,7 +239,10 @@ function descargarCanciones() {
 function sincronizar(forzar = false) {
     if (descargaEnCurso || sinConexion()) return;
     if (!forzar && Date.now() - ultimoIntentoSincronizacion < MIN_ENTRE_SINCRONIZACIONES_MS) return;
-    descargarCanciones().catch(() => {});
+    // Se ejecuta de forma diferida para no quitarle recursos de red a eventos/avisos
+    setTimeout(() => {
+        descargarCanciones().catch(() => {});
+    }, 800);
 }
 
 async function cargarCanciones() {
@@ -247,6 +250,9 @@ async function cargarCanciones() {
 
     if (!cargaInicialEnCurso) {
         cargaInicialEnCurso = (async () => {
+            // Añadimos una pequeña pausa inicial para garantizar que los eventos y avisos tengan prioridad absoluta en la UI
+            await new Promise(r => setTimeout(r, 300));
+
             const local = await leerCacheLocal();
 
             if (local && Object.keys(local.datos).length > 0) {
@@ -386,13 +392,13 @@ export async function obtenerContenidoCancion(idC) {
     };
 }
 
-// ───────── Optimizada para Eventos y Avisos ─────────
+// ───────── Eventos y Avisos (Prioridad Alta - Carga Inmediata) ─────────
 
 const nodosEnMemoria = new Map();
 
 /**
  * Lee un nodo de la base (p. ej. 'eventos' o 'avisos').
- * Optimizado con carga instantánea por caché en memoria/IDB y fallback rápido.
+ * Diseñado para resolver de manera inmediata antes que cualquier proceso de canciones.
  */
 export async function obtenerNodo(ruta, { alActualizar } = {}) {
     if (!/^[\w\-\/]+\$/.test(ruta)) throw new Error('Ruta no válida: ' + ruta);
@@ -424,7 +430,7 @@ export async function obtenerNodo(ruta, { alActualizar } = {}) {
         }
     };
 
-    // Si ya tenemos datos locales, los devolvemos de inmediato y actualizamos en segundo plano de manera silenciosa
+    // Si ya tenemos datos en caché local, los devolvemos al instante y actualizamos de fondo de forma silenciosa
     if (datos !== undefined && datos !== null) {
         if (!sinConexion()) {
             refrescar().catch(() => {});
@@ -434,7 +440,7 @@ export async function obtenerNodo(ruta, { alActualizar } = {}) {
 
     if (sinConexion()) return null;
 
-    // Si es la primera vez y no hay caché local, ejecutamos con un tiempo límite de respaldo para no bloquear la UI
+    // Si no hay caché, se ejecuta de inmediato con máxima prioridad de red para evitar retrasos visuales
     try {
         const promesaRed = refrescar();
         const resultadoRapido = await Promise.race([
