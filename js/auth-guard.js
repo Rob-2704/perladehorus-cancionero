@@ -22,7 +22,8 @@ export const auth = getAuth(app);
 
 // Lista de correos electrónicos autorizados para administrar
 export const ADMINS_PERMITIDOS = [
-    "elgamer00727@gmail.com" // <-- CAMBIA O AÑADE AQUÍ LOS CORREOS DE LOS ADMINISTRADORES
+    "elgamer00727@gmail.com",
+    "todoeschido21@gmail.com"
 ];
 
 // Inyectar estilos para el modal de Login
