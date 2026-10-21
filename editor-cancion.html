@@ -867,7 +867,6 @@
             const params = new URLSearchParams(window.location.search);
             const idCParam = params.get('idC');
 
-            // Variable global para mantener el ID fijo durante toda la sesión en el editor
             window.__idActual = idCParam || null;
 
             const body = document.body;
@@ -924,8 +923,10 @@
             }
 
             function ajustarAlturaTextarea() {
+                const scrollActual = window.scrollY;
                 inputContenido.style.height = 'auto';
                 inputContenido.style.height = Math.max(inputContenido.scrollHeight, 320) + 'px';
+                window.scrollTo(0, scrollActual);
             }
 
             function separarCapo(contenido) {
@@ -1054,9 +1055,11 @@
                 if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
                     e.preventDefault();
                     const { selectionStart: ini, selectionEnd: fin, value } = inputContenido;
+                    const scrollActual = window.scrollY;
                     inputContenido.value = value.slice(0, ini) + '    ' + value.slice(fin);
                     inputContenido.selectionStart = inputContenido.selectionEnd = ini + 4;
                     inputContenido.dispatchEvent(new Event('input'));
+                    window.scrollTo(0, scrollActual);
                 }
             });
 
@@ -1153,7 +1156,6 @@
                 iconoGuardar.textContent = 'progress_activity';
                 textoGuardar.textContent = 'Guardando';
 
-                // Si ya tenemos un ID en la sesión, lo usamos para modificar el existente; si no, calculamos el siguiente consecutivo
                 let targetId = window.__idActual;
 
                 if (!targetId) {
