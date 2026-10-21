@@ -1087,7 +1087,7 @@
                 inputTitulo.placeholder = 'Cargando...';
 
                 try {
-                    const snapshot = await get(ref(db, `canciones_custom/${idC}`));
+                    const snapshot = await get(ref(db, `canciones/${idC}`));
                     let data = null;
 
                     if (snapshot.exists()) {
@@ -1168,7 +1168,7 @@
                 };
 
                 try {
-                    await set(ref(db, `canciones_custom/${targetId}`), objetoCancion);
+                    await set(ref(db, `canciones/${targetId}`), objetoCancion);
                     marcarCambios(false);
                     mostrarToast('Canción guardada correctamente');
 

@@ -1,10 +1,9 @@
-// api-cliente.js — Conectado a Firebase con caché local automática al abrir index y control offline
+// api-cliente.js — Conectado a Firebase a la colección principal de canciones
 const STORAGE_KEY = 'cache_canciones_perla_v1';
 let cacheCanciones = null;
 
-// Suscriptores del estado de guardado
 let callbacksEstadoGuardado = [];
-let estadoActualGuardado = 'guardando'; // 'guardando' | 'completado' | 'offline'
+let estadoActualGuardado = 'guardando';
 
 export function alCambiarEstadoGuardado(callback) {
     callbacksEstadoGuardado.push(callback);
@@ -23,7 +22,6 @@ async function cargarDatosFirebase() {
 
     notificarEstadoGuardado('guardando');
 
-    // 1. Si el dispositivo está offline, cargar de inmediato desde localStorage
     if (!navigator.onLine) {
         try {
             const guardado = localStorage.getItem(STORAGE_KEY);
@@ -53,7 +51,7 @@ async function cargarDatosFirebase() {
             appId: "1:835273996097:web:f1258c2f461ef6613513c0"
         };
 
-        const app = appModule.initializeApp(firebaseConfig);
+        const app = appModule.getApps().length === 0 ? appModule.initializeApp(firebaseConfig) : appModule.getApps()[0];
         const db = dbModule.getDatabase(app);
 
         const fetchConTimeout = (promise, ms = 3500) => {
@@ -64,27 +62,19 @@ async function cargarDatosFirebase() {
             return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
         };
 
-        const promesaFirebase = Promise.all([
-            dbModule.get(dbModule.ref(db, 'canciones')),
-            dbModule.get(dbModule.ref(db, 'canciones_custom'))
-        ]);
-
-        const [snapshotCanciones, snapshotCustom] = await fetchConTimeout(promesaFirebase, 3500);
-
+        const snapshotCanciones = await fetchConTimeout(dbModule.get(dbModule.ref(db, 'canciones')), 3500);
         const datosCanciones = snapshotCanciones.val() || {};
-        const datosCustom = snapshotCustom.val() || {};
 
-        const combinadas = { ...datosCanciones, ...datosCustom };
-        cacheCanciones = combinadas;
+        cacheCanciones = datosCanciones;
 
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(datosCanciones));
         } catch (e) {
             console.warn("No se pudo guardar en el almacenamiento local:", e);
         }
 
         notificarEstadoGuardado('completado');
-        return combinadas;
+        return datosCanciones;
     } catch (err) {
         console.warn("Modo offline o error de red. Cargando desde almacenamiento local...", err);
         
@@ -102,7 +92,6 @@ async function cargarDatosFirebase() {
     }
 }
 
-// Iniciar la sincronización y guardado local en segundo plano tan pronto como se importe el módulo en index.html
 if (typeof window !== 'undefined') {
     cargarDatosFirebase().catch(() => {});
 }
@@ -140,17 +129,12 @@ export async function obtenerContenidoCancion(idC) {
                 messagingSenderId: "835273996097",
                 appId: "1:835273996097:web:f1258c2f461ef6613513c0"
             };
-            const app = appModule.initializeApp(firebaseConfig);
+            const app = appModule.getApps().length === 0 ? appModule.initializeApp(firebaseConfig) : appModule.getApps()[0];
             const db = dbModule.getDatabase(app);
 
-            const snapCustom = await dbModule.get(dbModule.ref(db, `canciones_custom/\${idC}`));
-            if (snapCustom.exists()) {
-                c = snapCustom.val();
-            } else {
-                const snapNorm = await dbModule.get(dbModule.ref(db, `canciones/\${idC}`));
-                if (snapNorm.exists()) {
-                    c = snapNorm.val();
-                }
+            const snapNorm = await dbModule.get(dbModule.ref(db, `canciones/${idC}`));
+            if (snapNorm.exists()) {
+                c = snapNorm.val();
             }
         } catch (e) {}
     }
