@@ -231,17 +231,19 @@
             animation: none !important;
             overflow: hidden;
             position: relative;
-            max-height: 2.8em;
+            max-height: 2.8em; /* 2 líneas visibles; la segunda se desvanece si hay más texto */
             transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
+        /* Degradado que indica que el texto continúa (solo si el aviso es largo) */
         .tarjeta-aviso p::after {
             content: '';
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
-            height: 2.1em;
+            height: 2.1em; /* cubre la 2da línea y un poco de la 1ra */
+            /* Llega a color sólido justo en el borde para un desvanecido más suave */
             background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--card-bg) 45%, transparent) 45%, var(--card-bg) 95%);
             pointer-events: none;
             opacity: 0;
@@ -250,6 +252,7 @@
 
         .tarjeta-aviso.colapsable:not(.expandido) p::after { opacity: 1; }
 
+        /* Solo se siente clicable si realmente hay más texto que mostrar */
         .tarjeta-aviso:not(.colapsable) { cursor: default; }
         @media (hover: hover) {
             .tarjeta-aviso:not(.colapsable):hover { transform: none; }
@@ -260,7 +263,7 @@
             flex-direction: column;
             gap: 8px;
             margin-bottom: 6px;
-            padding: 6px 24px;
+            padding: 6px 24px; /* margen lateral extra para que el hover (scale) no se recorte, ni en pantallas anchas */
             margin-left: -24px;
             margin-right: -24px;
             overflow: hidden;
@@ -269,12 +272,16 @@
             box-sizing: border-box;
         }
 
+        /* Degradado inferior: deja asomar la siguiente tarjeta desvanecida para indicar que hay más eventos.
+           --fade es animable (@property); en navegadores sin soporte simplemente cambia sin transición. */
         @property --fade {
             syntax: '<length>';
             inherits: false;
             initial-value: 0px;
         }
 
+        /* El degradado empieza a la mitad de la 2da tarjeta (la que asoma) y llega a transparente en el corte.
+           --fade-colapsado lo calcula el JS (distancia desde ese punto hasta el fondo del contenedor). */
         .contenedor-eventos.con-mascara {
             -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), rgba(0,0,0,.5) calc(100% - var(--fade) * .35), transparent);
             mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), rgba(0,0,0,.5) calc(100% - var(--fade) * .35), transparent);
@@ -684,7 +691,7 @@
     </main>
 
     <script type="module">
-        import { obtenerCanciones, obtenerContenidoCancion, alCambiarEstadoGuardado, obtenerNodo } from './js/api-cliente.js';
+        import { obtenerCanciones, obtenerContenidoCancion, alCambiarEstadoGuardado } from './js/api-cliente.js';
         import { detectarTonalidad, nombreTonalidad, leerAlteracionGuardada } from './js/modulo-transponer.js';
 
         const listaDiv = document.getElementById('lista-canciones');
@@ -783,16 +790,10 @@
             return rangoHoras ? `${textoFecha} · ${rangoHoras}` : textoFecha;
         }
 
-        // --- GESTIÓN Y RENDERIZADO DE AVISOS ---
+        // --- GESTIÓN Y RENDERIZADO DE AVISOS OFFLINE ---
         function procesarYRenderizarAvisos(datos) {
-            if (!datos || typeof datos !== 'object') {
-                seccionAvisos.style.display = 'none';
-                return;
-            }
-
-            // Filtrado estricto para asegurar que solo se muestren anuncios reales (sin propiedades de eventos)
-            const avisos = Object.values(datos).filter(a => a && typeof a === 'object' && !('lugar' in a) && !('canciones' in a) && !('idE' in a));
-            if (avisos.length === 0) {
+            const avisos = Object.values(datos);
+            if (!Array.isArray(avisos) || avisos.length === 0) {
                 seccionAvisos.style.display = 'none';
                 return;
             }
@@ -804,6 +805,7 @@
                 const tarjeta = document.createElement('div');
                 tarjeta.className = 'tarjeta-aviso';
                 
+                // Aplicar animación de entrada escalonada idéntica a las canciones
                 tarjeta.style.animationDelay = `${indice * 0.03}s`;
                 tarjeta.addEventListener('animationend', () => {
                     tarjeta.style.animation = 'none';
@@ -822,19 +824,20 @@
                 
                 const p = tarjeta.querySelector('p');
 
+                // Evento para expandir y contraer con cálculo dinámico de altura para animación fluida
                 tarjeta.addEventListener('click', () => {
-                    if (!tarjeta.classList.contains('colapsable')) return;
+                    if (!tarjeta.classList.contains('colapsable')) return; // Texto corto: nada que expandir
                     const expandido = tarjeta.classList.toggle('expandido');
                     if (expandido) {
                         p.style.maxHeight = p.scrollHeight + 'px';
                         setTimeout(() => {
                             if (tarjeta.classList.contains('expandido')) {
-                                p.style.maxHeight = 'none';
+                                p.style.maxHeight = 'none'; // Permite flexibilidad si cambia el tamaño
                             }
                         }, 300);
                     } else {
                         p.style.maxHeight = p.scrollHeight + 'px';
-                        void p.offsetWidth;
+                        void p.offsetWidth; // Forzar reflow para reiniciar la transición
                         p.style.maxHeight = '2.8em';
                     }
                 });
@@ -847,6 +850,7 @@
             activarAnimacionIconos();
         }
 
+        // Marca como "colapsable" solo los avisos cuyo texto no cabe en 2 líneas
         function actualizarAvisosColapsables() {
             contenedorAvisos.querySelectorAll('.tarjeta-aviso').forEach(tarjeta => {
                 if (tarjeta.classList.contains('expandido')) return;
@@ -855,29 +859,65 @@
             });
         }
 
+        // Re-medir cuando cargue la fuente (cambia el ancho del texto) o cambie el tamaño de ventana
         document.fonts.ready.then(actualizarAvisosColapsables);
         window.addEventListener('resize', actualizarAvisosColapsables);
 
-        async function cargarAvisosOptimizados() {
-            try {
-                const datos = await obtenerNodo('anuncios', {
-                    alActualizar: (fresco) => {
-                        if (fresco) procesarYRenderizarAvisos(fresco);
-                    }
-                });
+        async function cargarAvisosFirebase() {
+            if (!navigator.onLine) {
+                try {
+                    const guardado = localStorage.getItem('cache_avisos_perla');
+                    if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
+                } catch (e) {}
+                seccionAvisos.style.display = 'none';
+                return;
+            }
 
-                if (datos) {
-                    procesarYRenderizarAvisos(datos);
-                } else {
+            try {
+                const [appModule, dbModule] = await Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+                ]);
+                const firebaseConfig = {
+                    apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+                    authDomain: "rondalla-f04a4.firebaseapp.com",
+                    databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+                    projectId: "rondalla-f04a4",
+                    storageBucket: "rondalla-f04a4.firebasestorage.app",
+                    messagingSenderId: "835273996097",
+                    appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+                };
+                const app = appModule.getApps().length === 0 ? appModule.initializeApp(firebaseConfig) : appModule.getApps()[0];
+                const db = dbModule.getDatabase(app);
+
+                dbModule.onValue(dbModule.ref(db, 'anuncios'), (snapshot) => {
+                    const datos = snapshot.val();
+                    if (datos) {
+                        try { localStorage.setItem('cache_avisos_perla', JSON.stringify(datos)); } catch (e) {}
+                        procesarYRenderizarAvisos(datos);
+                    } else {
+                        seccionAvisos.style.display = 'none';
+                    }
+                }, () => {
+                    try {
+                        const guardado = localStorage.getItem('cache_avisos_perla');
+                        if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
+                    } catch (e) {}
                     seccionAvisos.style.display = 'none';
-                }
+                });
             } catch (err) {
+                try {
+                    const guardado = localStorage.getItem('cache_avisos_perla');
+                    if (guardado) { procesarYRenderizarAvisos(JSON.parse(guardado)); return; }
+                } catch (e) {}
                 seccionAvisos.style.display = 'none';
             }
         }
 
         let tarjetasCompactas = 1;
 
+        // Cuánto de la tarjeta que asoma (la 2da) queda visible al colapsar, y desde qué punto de ella
+        // empieza el degradado. Ambos son fracciones de su altura (0 = arriba, 1 = abajo).
         const ASOMO_FRACCION = 0.85;
         const DEGRADADO_DESDE = 0.5;
 
@@ -890,10 +930,12 @@
             const base = Math.ceil(ultima.getBoundingClientRect().bottom - topContenedor) + 6;
             if (todas.length <= tarjetasCompactas) return base;
 
+            // La tarjeta que asoma es la siguiente a las visibles (la 2da)
             const asomada = todas[tarjetasCompactas];
             const altoAsomada = asomada.offsetHeight;
             const topAsomada = asomada.getBoundingClientRect().top - topContenedor;
             const alturaColapsada = Math.round(topAsomada + altoAsomada * ASOMO_FRACCION);
+            // El degradado arranca a la mitad de la 2da tarjeta y llega a transparente en el corte
             const inicioDegradado = topAsomada + altoAsomada * DEGRADADO_DESDE;
             contenedorEventos.style.setProperty('--fade-colapsado', `${Math.round(alturaColapsada - inicioDegradado)}px`);
             return Math.max(alturaColapsada, base);
@@ -946,16 +988,9 @@
             activarAnimacionIconos();
         }
 
-        // --- GESTIÓN Y RENDERIZADO DE EVENTOS ---
         function procesarYRenderizarEventos(datos) {
-            if (!datos || typeof datos !== 'object') {
-                mostrarSoloAviso();
-                return;
-            }
-
-            // Filtrado estricto para aceptar únicamente elementos que tengan estructura de evento
-            const eventos = Object.values(datos).filter(e => e && typeof e === 'object' && ('lugar' in e || 'horaInicio' in e || 'canciones' in e || 'idE' in e));
-            if (eventos.length === 0) {
+            const eventos = Object.values(datos);
+            if (!Array.isArray(eventos) || eventos.length === 0) {
                 mostrarSoloAviso();
                 return;
             }
@@ -979,13 +1014,14 @@
             contenedorEventos.innerHTML = '';
 
             const hayProximos = ordenados.some(e => e.esHoy || (e.tieneFecha && !e.esPasado));
-            tarjetasCompactas = 1;
+            tarjetasCompactas = 1; // 1 tarjeta completa; la 2ª asoma desvanecida
             if (!hayProximos) contenedorEventos.appendChild(crearAvisoSinProximos());
 
             let desplegado = false, enAnimacion = false, separadorEl = null, separadorInsertado = false;
 
             ordenados.forEach((evento, idx) => {
                 if (evento.esPasado && !separadorInsertado) {
+                    // Siempre visible: si cae dentro de la zona recortada, el contenedor ya la esconde solo
                     separadorEl = document.createElement('div');
                     separadorEl.className = 'separador-eventos-pasados';
                     separadorEl.innerHTML = `<span>Eventos anteriores</span>`;
@@ -996,6 +1032,7 @@
                 const tarjeta = document.createElement('div');
                 const esProximo = idx === primerFuturoIdx;
                 let claseExtra = evento.esHoy ? 'hoy' : (esProximo ? 'proximo' : (evento.esPasado ? 'pasado' : ''));
+                // Las tarjetas extra ya no se ocultan: el contenedor las recorta y el degradado las desvanece
 
                 tarjeta.className = `tarjeta-evento ${claseExtra}`;
                 tarjeta.onclick = () => { window.location.href = `evento.html?idE=${encodeURIComponent(evento.idE)}`; };
@@ -1003,7 +1040,7 @@
                 const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
                 tarjeta.innerHTML = `
                     <div class="tarjeta-evento-header">
-                        <h3>${evento.titulo || 'Evento'}</h3>
+                        <h3>${evento.titulo}</h3>
                         ${evento.esHoy ? '<span class="badge-hoy">Hoy</span>' : (esProximo ? '<span class="badge-proximo">Próximo</span>' : '')}
                     </div>
                     <div class="meta-evento">
@@ -1018,6 +1055,7 @@
             seccionEventos.style.display = 'block';
             const hayMasEventos = contenedorEventos.querySelectorAll('.tarjeta-evento').length > tarjetasCompactas;
 
+            // Estado inicial: colapsado (con degradado si hay más eventos que mostrar)
             contenedorEventos.classList.toggle('con-mascara', hayMasEventos);
             contenedorEventos.classList.toggle('colapsado', hayMasEventos);
             iconoToggleEventos.textContent = 'expand_more';
@@ -1025,7 +1063,7 @@
             requestAnimationFrame(() => {
                 contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
                 if (hayMasEventos) {
-                    contenedorEventos.style.overflow = 'hidden';
+                    contenedorEventos.style.overflow = 'hidden'; // debe seguir recortando para que asome la tarjeta
                 } else {
                     setTimeout(() => { contenedorEventos.style.overflow = 'visible'; }, 300);
                 }
@@ -1040,12 +1078,12 @@
 
                     if (desplegado) {
                         contenedorEventos.style.overflow = 'hidden';
-                        contenedorEventos.classList.remove('colapsado');
+                        contenedorEventos.classList.remove('colapsado'); // el degradado se desvanece animado
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight + 12}px`;
                         setTimeout(() => {
                             contenedorEventos.style.maxHeight = 'none';
                             contenedorEventos.style.overflow = 'visible';
-                            contenedorEventos.classList.remove('con-mascara');
+                            contenedorEventos.classList.remove('con-mascara'); // sin máscara para no recortar el hover
                             enAnimacion = false;
                         }, 330);
                         iconoToggleEventos.textContent = 'expand_less';
@@ -1054,7 +1092,7 @@
                         contenedorEventos.classList.add('con-mascara');
                         contenedorEventos.style.maxHeight = `${contenedorEventos.scrollHeight}px`;
                         void contenedorEventos.offsetWidth;
-                        contenedorEventos.classList.add('colapsado');
+                        contenedorEventos.classList.add('colapsado'); // el degradado reaparece animado
                         contenedorEventos.style.maxHeight = `${calcularAlturaCompacta()}px`;
                         setTimeout(() => { enAnimacion = false; }, 300);
                         iconoToggleEventos.textContent = 'expand_more';
@@ -1064,20 +1102,50 @@
             activarAnimacionIconos();
         }
 
-        async function cargarEventosOptimizados() {
-            try {
-                const datos = await obtenerNodo('eventos', {
-                    alActualizar: (fresco) => {
-                        if (fresco) procesarYRenderizarEventos(fresco);
-                    }
-                });
+        async function cargarEventosFirebase() {
+            if (!navigator.onLine) {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                } catch (e) {}
+                mostrarSoloAviso();
+                return;
+            }
 
-                if (datos) {
-                    procesarYRenderizarEventos(datos);
-                } else {
+            try {
+                const [appModule, dbModule] = await Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"),
+                    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js")
+                ]);
+                const firebaseConfig = {
+                    apiKey: "AIzaSyA3g3DmWC_mYrA2RFj75sOoX9kolmzKINA",
+                    authDomain: "rondalla-f04a4.firebaseapp.com",
+                    databaseURL: "https://rondalla-f04a4-default-rtdb.firebaseio.com",
+                    projectId: "rondalla-f04a4",
+                    storageBucket: "rondalla-f04a4.firebasestorage.app",
+                    messagingSenderId: "835273996097",
+                    appId: "1:835273996097:web:f1258c2f461ef6613513c0"
+                };
+                const app = appModule.getApps().length === 0 ? appModule.initializeApp(firebaseConfig) : appModule.getApps()[0];
+                const db = dbModule.getDatabase(app);
+                dbModule.onValue(dbModule.ref(db, 'eventos'), (snapshot) => {
+                    const datos = snapshot.val();
+                    if (datos) {
+                        try { localStorage.setItem('cache_eventos_perla', JSON.stringify(datos)); } catch (e) {}
+                        procesarYRenderizarEventos(datos);
+                    } else { mostrarSoloAviso(); }
+                }, () => {
+                    try {
+                        const guardado = localStorage.getItem('cache_eventos_perla');
+                        if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                    } catch (e) {}
                     mostrarSoloAviso();
-                }
+                });
             } catch (err) {
+                try {
+                    const guardado = localStorage.getItem('cache_eventos_perla');
+                    if (guardado) { procesarYRenderizarEventos(JSON.parse(guardado)); return; }
+                } catch (e) {}
                 mostrarSoloAviso();
             }
         }
@@ -1211,10 +1279,8 @@
 
         async function init() {
             try {
-                // Iniciar la carga en paralelo de avisos y eventos sin parpadeos prematuros
-                cargarAvisosOptimizados();
-                cargarEventosOptimizados();
-                
+                cargarAvisosFirebase();
+                cargarEventosFirebase();
                 const ORDEN_ESTADO = { terminada: 0, revisar: 1, pendiente: 2 };
                 cancionesGlobal = (await obtenerCanciones()).slice().sort((a, b) => (ORDEN_ESTADO[a.estado] ?? 0) - (ORDEN_ESTADO[b.estado] ?? 0));
 
