@@ -52,8 +52,8 @@ function aplicarAlteraciones(formulaBase, textoAlteracion) {
     let formula = [...formulaBase];
 
     tokens.forEach(token => {
-        const coincideAdd = token.match(/^add(\d+)$/);
-        const coincideAlt = token.match(/^([#b]?)(\d+)$/);
+        const coincideAdd = token.match(/^add(\d+)\$/);
+        const coincideAlt = token.match(/^([#b]?)(\d+)\$/);
 
         if (coincideAdd) {
             const grado = parseInt(coincideAdd[1]);
@@ -151,13 +151,12 @@ export function procesarLetraYAcordes(textoOriginal, sistema = 'ANGLOSAJON') {
                 textoEntreAcordes = textoProcesado.slice(finAcordeOriginal, matches[i + 1].index);
             }
 
-            // Prevención de colisión: si el acorde creció y no hay espacio suficiente, agregamos un respiro
             if (distanciaAlSiguiente <= 3 && diff > 0 && textoEntreAcordes.length < diff + 1) {
                 resultado += ' ';
             }
 
             if (distanciaAlSiguiente <= 3) {
-                // Mantiene el espaciado original entre acordes cercanos
+                // Mantiene el espaciado original
             } else {
                 let restoTexto = textoProcesado.slice(finAcordeOriginal);
                 let matchEspacios = restoTexto.match(/^ */);
@@ -206,8 +205,13 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
     if (!titulo || !wrapperRender) return;
 
+    // Acerca el diagrama hacia arriba (cerca del título)
+    wrapperRender.style.marginTop = "-12px";
+    // Reduce el espacio inferior para acercarlo al botón de reproducir
+    wrapperRender.style.marginBottom = "-12px";
+
     let textoLimpio = nombreAcordeRaw.trim().replace(/[\s-\-❚❙]/g, '');        
-    titulo.textContent = convertirAcordeASistema(textoLimpio.replace('_', '/'), sistema);
+    const nombreFormateado = convertirAcordeASistema(textoLimpio.replace('_', '/'), sistema);
 
     let partesBajo = textoLimpio.split('_');
     let acordeEstructura = partesBajo[0];
@@ -257,17 +261,17 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         sufijoJson = "";
     }
 
-    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?$/);
+    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?\$/);
     let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
     let textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
 
-    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)$/i);
+    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)\$/i);
     if (matchSusAlt) {
         sufijoBase = matchSusAlt[1];
         textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchSusAlt[2]})`) : `(${matchSusAlt[2]})`;
     }
 
-    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)$/i);
+    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)\$/i);
     if (matchAddDirecto) {
         sufijoBase = matchAddDirecto[1];
         const tokenAdd = matchAddDirecto[2];
@@ -296,13 +300,29 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
     caja.style.display = "block";
     caja.style.position = "fixed"; 
 
+    if (badgeorigen) badgeorigen.textContent = "";
+    titulo.textContent = nombreFormateado;
+
+    let iconoHTML = '';
     if (datosManuales) {
-        if (badgeorigen) badgeorigen.textContent = "Diccionario (Manual)";
+        iconoHTML = `<span class="material-symbols-outlined" style="position: absolute; top: 12px; right: 12px; font-size: 18px; color: var(--accent, #bc9731);" title="Diccionario Manual">menu_book</span>`;
+    } else {
+        iconoHTML = `<span class="material-symbols-outlined" style="position: absolute; top: 12px; right: 12px; font-size: 18px; color: #2ec4b6;" title="Generado Automáticamente">auto_awesome</span>`;
+    }
+
+    let iconoExistente = caja.querySelector('.icono-origen-acorde');
+    if (iconoExistente) iconoExistente.remove();
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = iconoHTML;
+    const elIcono = tempDiv.firstElementChild;
+    elIcono.classList.add('icono-origen-acorde');
+    caja.appendChild(elIcono);
+
+    if (datosManuales) {
         dibujarAcordeCanvasExpandido(wrapperRender, datosManuales);
     } else {
         try {
-            if (badgeorigen) badgeorigen.textContent = "Armonía Inteligente (Auto)";
-
             let notaRaizNormalizada = EQUIVALENCIAS_BEMOLES[raiz] || raiz;
             let semitonoRaiz = NOMBRES_NOTAS.indexOf(notaRaizNormalizada);
             if (semitonoRaiz === -1) semitonoRaiz = 0;
@@ -405,15 +425,13 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
 
 export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     wrapper.innerHTML = ""; 
-
-    // Guarda los trastes para que el botón de reproducir sepa qué acorde tocar
     wrapper.dataset.strings = datos.strings;
 
     const esMovil = window.innerWidth <= 600;
     const canvas = document.createElement('canvas');
     
-    const anchoCanvas = esMovil ? 110 : 140;
-    const altoCanvas = esMovil ? 120 : 150;
+    const anchoCanvas = esMovil ? 114 : 150;
+    const altoCanvas = esMovil ? 98 : 118; // Altura total más compacta para acercar el botón
     const dpr = window.devicePixelRatio || 1;
 
     canvas.width = anchoCanvas * dpr;
@@ -430,10 +448,10 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
     const trastesArr = datos.strings.trim().toUpperCase().split(/\s+/);
     const trasteBase = datos.trasteInicio || 1;
 
-    const xInicio = esMovil ? 20 : 25;
-    const yInicio = esMovil ? 20 : 25;
+    const xInicio = esMovil ? 24 : 32;
+    const yInicio = esMovil ? 8 : 10; 
     const anchoDiapason = esMovil ? 65 : 85;
-    const altoDiapason = esMovil ? 80 : 105;
+    const altoDiapason = esMovil ? 70 : 88; 
     const numCuerdas = 6, numTrastesVisibles = 4;
     
     const espacioCuerdas = anchoDiapason / (numCuerdas - 1);
@@ -449,7 +467,7 @@ export function dibujarAcordeCanvasExpandido(wrapper, datos) {
         ctx.fillStyle = "#2ec4b6"; 
         ctx.font = esMovil ? "bold 8px monospace" : "bold 10px monospace"; 
         ctx.textAlign = "right";
-        ctx.fillText(`Fr. ${trasteBase}`, xInicio - 4, yInicio + (espacioTrastes / 2) + 3);
+        ctx.fillText(`Fr. ${trasteBase}`, xInicio - 6, yInicio + (espacioTrastes / 2) + 3);
     }
 
     ctx.lineWidth = 1; ctx.strokeStyle = "#717171";
