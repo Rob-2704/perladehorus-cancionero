@@ -8,6 +8,7 @@ const CLAVE_ANTIGUA_IDB = 'canciones_v2'; // versión anterior: toda la base en 
 
 const TIMEOUT_LISTA_MS = 20000;
 const TIMEOUT_CANCION_MS = 10000;
+const TIMEOUT_NODO_MS = 4000; // Timeout optimizado y más rápido para nodos (avisos, eventos)
 const ESPERA_CANCION_CON_CACHE_MS = 1500; // máx. que se espera la versión fresca si ya hay copia guardada
 const MIN_ENTRE_SINCRONIZACIONES_MS = 60000;
 
@@ -83,7 +84,7 @@ const idbEscribir = (pares, borrar = []) => transaccionIDB('readwrite', s => {
 
 const idbLeerPrefijo = prefijo => transaccionIDB('readonly', s => {
     const salida = {};
-    const cursor = s.openCursor(IDBKeyRange.bound(prefijo, prefijo + '￿'));
+    const cursor = s.openCursor(IDBKeyRange.bound(prefijo, prefijo + ''));
     cursor.onsuccess = () => {
         const actual = cursor.result;
         if (actual) {
@@ -96,7 +97,6 @@ const idbLeerPrefijo = prefijo => transaccionIDB('readonly', s => {
 
 // ───────── Datos ─────────
 
-// Firebase puede devolver un arreglo (con null en huecos) o un objeto. El id 0 no existe.
 function normalizarCanciones(datos) {
     const salida = {};
     if (!datos || typeof datos !== 'object') return salida;
@@ -124,8 +124,8 @@ function calcularCambios(anterior, nuevo) {
     return { cambiadas, eliminadas };
 }
 
-let cacheCanciones = null;       // {id: cancion} en memoria
-let cacheEstaEnIDB = false;      // false si vino del caché antiguo y aún hay que migrarlo
+let cacheCanciones = null;       
+let cacheEstaEnIDB = false;      
 
 async function leerCacheLocal() {
     try {
@@ -151,7 +151,7 @@ async function guardarCacheLocal(nuevo, cambios, hayBaseEnIDB) {
     const aEscribir = hayBaseEnIDB ? cambios.cambiadas : Object.keys(nuevo);
     aEscribir.forEach(id => pares.push([PREFIJO_CANCION + id, nuevo[id]]));
     if (hayBaseEnIDB) cambios.eliminadas.forEach(id => borrar.push(PREFIJO_CANCION + id));
-    else borrar.push(CLAVE_ANTIGUA_IDB); // migración: se descarta la entrada gigante anterior
+    else borrar.push(CLAVE_ANTIGUA_IDB); 
 
     pares.push(['meta:ultima', Date.now()]);
 
@@ -188,7 +188,7 @@ async function pedirJSONConReintento(url, timeoutMs, intentos = 2) {
             return await pedirJSON(url, timeoutMs);
         } catch (e) {
             ultimoError = e;
-            if (i < intentos - 1) await new Promise(r => setTimeout(r, 700 * (i + 1)));
+            if (i < intentos - 1) await new Promise(r => setTimeout(r, 400 * (i + 1)));
         }
     }
     throw ultimoError;
@@ -216,7 +216,6 @@ function descargarCanciones() {
             const huboCambios = cambios.cambiadas.length > 0 || cambios.eliminadas.length > 0;
 
             cacheCanciones = nuevo;
-            // Se guarda en segundo plano; no hace falta esperar para mostrar
             guardarCacheLocal(nuevo, cambios, cacheEstaEnIDB && !!anterior);
 
             notificarEstadoGuardado('completado');
@@ -251,7 +250,6 @@ async function cargarCanciones() {
             const local = await leerCacheLocal();
 
             if (local && Object.keys(local.datos).length > 0) {
-                // Hay copia guardada: se muestra ya y se actualiza detrás
                 cacheCanciones = local.datos;
                 cacheEstaEnIDB = local.enIDB;
 
@@ -261,7 +259,6 @@ async function cargarCanciones() {
                 return cacheCanciones;
             }
 
-            // Primera vez (sin copia): hay que esperar a la red
             if (sinConexion()) {
                 notificarEstadoGuardado('offline');
                 return {};
@@ -280,7 +277,6 @@ async function cargarCanciones() {
 }
 
 if (typeof window !== 'undefined') {
-    // Al recuperar la conexión o volver a la app, se busca lo más reciente
     window.addEventListener('online', () => { if (cacheCanciones) sincronizar(true); });
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && cacheCanciones) sincronizar(false);
@@ -301,8 +297,7 @@ export async function obtenerCanciones() {
         };
     });
 
-    // La lista empieza en el 1 (el 0 no existe) y va en orden numérico
-    if (lista.every(c => /^\d+$/.test(c.idC))) {
+    if (lista.every(c => /^\d+\$/.test(c.idC))) {
         lista.sort((a, b) => Number(a.idC) - Number(b.idC));
     }
     return lista;
@@ -318,7 +313,6 @@ async function leerCancionLocal(idC) {
         if (guardada) return guardada;
     } catch (e) {}
 
-    // Respaldo: caché antiguo (aún sin migrar)
     const local = await leerCacheLocal();
     return local && local.datos[idC] ? local.datos[idC] : null;
 }
@@ -331,8 +325,6 @@ function guardarCancionFresca(idC, fresca, previa) {
 
 let sincronizacionProgramada = false;
 function programarSincronizacionCompleta() {
-    // Si se entró directo a una canción, la base completa se baja un rato después,
-    // sin competir con la carga de la canción, para que todo quede disponible sin conexión.
     if (sincronizacionProgramada || cacheCanciones || sinConexion()) return;
     sincronizacionProgramada = true;
     setTimeout(() => { cargarCanciones().catch(() => {}); }, 4000);
@@ -354,7 +346,6 @@ export async function obtenerContenidoCancion(idC) {
         try {
             let fresca;
             if (c) {
-                // Ya hay copia guardada: se espera poco; si la red tarda, se sigue en segundo plano
                 const resultado = await Promise.race([
                     peticion,
                     new Promise(r => setTimeout(() => r(ESPERA_AGOTADA), ESPERA_CANCION_CON_CACHE_MS))
@@ -395,44 +386,62 @@ export async function obtenerContenidoCancion(idC) {
     };
 }
 
-// ───────── Otros nodos (eventos, avisos…) con el mismo esquema: guardado local + actualización ─────────
+// ───────── Optimizada para Eventos y Avisos ─────────
 
 const nodosEnMemoria = new Map();
 
 /**
  * Lee un nodo de la base (p. ej. 'eventos' o 'avisos').
- * Si hay copia guardada la devuelve al instante y actualiza detrás; si algo cambió,
- * llama a alActualizar(datosNuevos). Sin copia, espera a la red.
+ * Optimizado con carga instantánea por caché en memoria/IDB y fallback rápido.
  */
 export async function obtenerNodo(ruta, { alActualizar } = {}) {
-    if (!/^[\w\-\/]+$/.test(ruta)) throw new Error('Ruta no válida: ' + ruta);
+    if (!/^[\w\-\/]+\$/.test(ruta)) throw new Error('Ruta no válida: ' + ruta);
 
     const clave = `nodo:${ruta}`;
     let datos = nodosEnMemoria.has(ruta) ? nodosEnMemoria.get(ruta) : undefined;
 
     if (datos === undefined) {
-        try { datos = await idbLeer(clave); } catch (e) {}
+        try { 
+            datos = await idbLeer(clave); 
+            if (datos !== undefined && datos !== null) {
+                nodosEnMemoria.set(ruta, datos);
+            }
+        } catch (e) {}
     }
 
     const refrescar = async () => {
-        const fresco = await pedirJSONConReintento(`${DB_URL}/${ruta}.json`, TIMEOUT_CANCION_MS);
-        const cambio = JSON.stringify(fresco) !== JSON.stringify(datos);
-        nodosEnMemoria.set(ruta, fresco);
-        idbEscribir([[clave, fresco]]).catch(() => {});
-        datos = fresco;
-        if (cambio && alActualizar) { try { alActualizar(fresco); } catch (e) {} }
-        return fresco;
+        try {
+            const fresco = await pedirJSONConReintento(`${DB_URL}/${ruta}.json`, TIMEOUT_NODO_MS, 1);
+            const cambio = JSON.stringify(fresco) !== JSON.stringify(datos);
+            nodosEnMemoria.set(ruta, fresco);
+            idbEscribir([[clave, fresco]]).catch(() => {});
+            if (cambio && alActualizar && datos !== undefined) { 
+                try { alActualizar(fresco); } catch (e) {} 
+            }
+            return fresco;
+        } catch (e) {
+            return null;
+        }
     };
 
+    // Si ya tenemos datos locales, los devolvemos de inmediato y actualizamos en segundo plano de manera silenciosa
     if (datos !== undefined && datos !== null) {
-        nodosEnMemoria.set(ruta, datos);
-        if (!sinConexion()) refrescar().catch(() => {});
+        if (!sinConexion()) {
+            refrescar().catch(() => {});
+        }
         return datos;
     }
 
     if (sinConexion()) return null;
+
+    // Si es la primera vez y no hay caché local, ejecutamos con un tiempo límite de respaldo para no bloquear la UI
     try {
-        return await refrescar();
+        const promesaRed = refrescar();
+        const resultadoRapido = await Promise.race([
+            promesaRed,
+            new Promise(r => setTimeout(() => r(null), TIMEOUT_NODO_MS))
+        ]);
+        return resultadoRapido !== null ? resultadoRapido : (nodosEnMemoria.get(ruta) || null);
     } catch (e) {
         return null;
     }
