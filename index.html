@@ -273,7 +273,7 @@
         }
 
         /* Degradado inferior: deja asomar la siguiente tarjeta desvanecida para indicar que hay más eventos.
-           --fade es animable (@property); en navegadores sin soporte simplemente cambia sin transición. */
+           --fade is animable (@property); en navegadores sin soporte simplemente cambia sin transición. */
         @property --fade {
             syntax: '<length>';
             inherits: false;
@@ -1032,14 +1032,20 @@
                 const tarjeta = document.createElement('div');
                 const esProximo = idx === primerFuturoIdx;
                 let claseExtra = evento.esHoy ? 'hoy' : (esProximo ? 'proximo' : (evento.esPasado ? 'pasado' : ''));
+                // Las tarjetas extra ya no se ocultan: el contenedor las recorta y el degradado las desvanece
 
                 tarjeta.className = `tarjeta-evento ${claseExtra}`;
                 tarjeta.onclick = () => { window.location.href = `evento.html?idE=${encodeURIComponent(evento.idE)}`; };
 
                 const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
+                
+                // Formatear el título para colorear "(Cancelado)" de rojo
+                const tituloOriginal = evento.titulo || '';
+                const tituloFormateado = tituloOriginal.replace(/\(Cancelado\)/gi, '<span style="color: #e71d36;">(Cancelado)</span>');
+
                 tarjeta.innerHTML = `
                     <div class="tarjeta-evento-header">
-                        <h3>${evento.titulo}</h3>
+                        <h3>${tituloFormateado}</h3>
                         ${evento.esHoy ? '<span class="badge-hoy">Hoy</span>' : (esProximo ? '<span class="badge-proximo">Próximo</span>' : '')}
                     </div>
                     <div class="meta-evento">
