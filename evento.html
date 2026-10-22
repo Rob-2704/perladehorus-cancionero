@@ -859,7 +859,8 @@
                     return;
                 }
 
-                tituloEventoEl.textContent = evento.titulo || 'Evento';
+                const tituloOriginal = evento.titulo || 'Evento';
+                tituloEventoEl.innerHTML = tituloOriginal.replace(/\(Cancelado\)/gi, '<span style="color: #e71d36;">(Cancelado)</span>');
 
                 const tieneLugarTexto = evento.lugar && evento.lugar.trim() !== '';
                 const tieneLugarLink = evento.linkLugar && evento.linkLugar.trim() !== '';

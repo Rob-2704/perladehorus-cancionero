@@ -1001,12 +1001,18 @@
 
             const ordenados = eventos.map(e => {
                 const tieneFecha = e.fecha && e.fecha.trim() !== '';
-                let fechaObj = tieneFecha ? new Date(e.fecha.split('-')[0], (e.fecha.split('-')[1] || 1) - 1, e.fecha.split('-')[2] || 1) : null;
+                let fechaObj = null;
+                if (tieneFecha) {
+                    const f = e.fecha.split('-');
+                    const h = e.horaInicio ? e.horaInicio.split(':') : [0, 0];
+                    fechaObj = new Date(f[0], (f[1] || 1) - 1, f[2] || 1, Number(h[0]) || 0, Number(h[1]) || 0);
+                }
                 return { ...e, fechaObj, tieneFecha, esHoy: tieneFecha && e.fecha === fechaHoyStr, esPasado: tieneFecha && e.fecha < fechaHoyStr };
             }).sort((a, b) => {
                 const grupoA = a.esPasado ? 2 : (!a.tieneFecha ? 1 : 0);
                 const grupoB = b.esPasado ? 2 : (!b.tieneFecha ? 1 : 0);
                 if (grupoA !== grupoB) return grupoA - grupoB;
+                // Si ambos son eventos pasados, orden del más reciente al más antiguo tomando en cuenta fecha y hora (b.fechaObj - a.fechaObj)
                 return a.esPasado ? (b.fechaObj - a.fechaObj) : (a.fechaObj - b.fechaObj);
             });
 
@@ -1032,7 +1038,6 @@
                 const tarjeta = document.createElement('div');
                 const esProximo = idx === primerFuturoIdx;
                 let claseExtra = evento.esHoy ? 'hoy' : (esProximo ? 'proximo' : (evento.esPasado ? 'pasado' : ''));
-                // Las tarjetas extra ya no se ocultan: el contenedor las recorta y el degradado las desvanece
 
                 tarjeta.className = `tarjeta-evento ${claseExtra}`;
                 tarjeta.onclick = () => { window.location.href = `evento.html?idE=${encodeURIComponent(evento.idE)}`; };

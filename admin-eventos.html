@@ -833,9 +833,12 @@
                         const numCanciones = Array.isArray(evento.canciones) ? evento.canciones.length : 0;
                         const textoLugar = evento.lugar && evento.lugar.trim() !== '' ? evento.lugar : 'Lugar por definir';
 
+                        const tituloOriginal = evento.titulo || '';
+                        const tituloFormateado = tituloOriginal.replace(/\(Cancelado\)/gi, '<span style="color: #e71d36;">(Cancelado)</span>');
+
                         div.innerHTML = `
                             <div class="info-evento-admin">
-                                <h3>${evento.titulo}</h3>
+                                <h3>${tituloFormateado}</h3>
                                 <div class="meta-evento-admin">
                                     <span class="meta-item-admin">
                                         <span class="material-symbols-outlined" style="font-size:15px;">schedule</span> 
