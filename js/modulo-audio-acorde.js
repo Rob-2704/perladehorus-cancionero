@@ -1,10 +1,3 @@
-// Reproduce el acorde mostrado en la caja emergente con sonido de guitarra REAL.
-//
-// Usa grabaciones de una guitarra acústica (una nota por archivo) guardadas en
-// js/samples/guitar/. Cada cuerda se toca con la grabación de la nota más cercana,
-// ajustando el tono con playbackRate cuando hace falta.
-// Si las grabaciones no se pueden cargar, usa una síntesis de cuerda pulsada como respaldo.
-
 // Afinación estándar (cuerda 6 → 1): E2 A2 D3 G3 B3 E4, en números MIDI
 const MIDI_CUERDAS_AIRE = [40, 45, 50, 55, 59, 64];
 
