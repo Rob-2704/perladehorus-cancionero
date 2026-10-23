@@ -446,6 +446,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Área táctil ampliada: no cambia el diseño, solo agranda la zona clicable */
+        .acorde-link { position: relative; }
+        .acorde-link::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            bottom: -10px;
+            left: -7px;
+            right: -7px;
+        }
+
         .barra-compas {
             color: var(--bg-color);
             font-weight: bold;

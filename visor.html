@@ -454,6 +454,19 @@
             border-radius: 3px;
             -webkit-tap-highlight-color: transparent;
         }
+
+        /* Área táctil ampliada: no cambia el diseño, solo agranda la zona clicable */
+        .acorde-link { position: relative; }
+        .acorde-link::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            bottom: -10px;
+            left: -7px;
+            right: -7px;
+        }
+        /* Evita que el área ampliada de los acordes de los bordes genere scroll vertical */
+        .letra-texto { overflow-y: hidden; }
                 
         .barra-compas { 
             color: var(--bg-color);
