@@ -26,8 +26,8 @@ function obtenerContexto() {
     return audioCtx;
 }
 
-function midiAFrecuencia(midi) {
-    return 440 * Math.pow(2, (midi - 69) / 12);
+function midiAFrecuencia(midi, la4 = 440) {
+    return la4 * Math.pow(2, (midi - 69) / 12);
 }
 
 function nombreArchivo(midi) {
@@ -153,6 +153,55 @@ export async function reproducirAcorde(stringsStr) {
     });
 }
 
+/**
+ * Toca una sola nota (número MIDI) con las mismas grabaciones de guitarra que los acordes.
+ * Lo usa el afinador como nota de referencia. Las grabaciones están afinadas en LA = 440 Hz;
+ * `la4` desplaza el tono (p. ej. 432) con playbackRate.
+ * Devuelve la duración aproximada (s) de lo que sonará, o 0 si no se pudo reproducir.
+ */
+export async function reproducirNota(midi, la4 = 440) {
+    const ctx = obtenerContexto();
+    if (!ctx) return 0;
+
+    const midiMuestra = Math.min(Math.max(midi, MIDI_MIN), MIDI_MAX);
+    let buffer;
+    try {
+        buffer = await cargarMuestra(ctx, midiMuestra);
+    } catch (error) {
+        console.warn('Muestras de guitarra no disponibles, usando síntesis:', error);
+        reproducirSintetizado(ctx, [midi], la4);
+        return 2.4;
+    }
+
+    const salida = crearSalida(ctx);
+    const inicio = ctx.currentTime + 0.02;
+
+    const fuente = ctx.createBufferSource();
+    fuente.buffer = buffer;
+    fuente.playbackRate.value = Math.pow(2, (midi - midiMuestra) / 12) * (la4 / 440);
+
+    const duracion = Math.min(buffer.duration / fuente.playbackRate.value, 4);
+    const fin = inicio + duracion;
+
+    const ganancia = ctx.createGain();
+    ganancia.gain.setValueAtTime(1, inicio);
+    ganancia.gain.setValueAtTime(1, Math.max(inicio, fin - 0.6));
+    ganancia.gain.linearRampToValueAtTime(0.0001, fin);
+
+    fuente.connect(ganancia);
+    ganancia.connect(salida);
+    fuente.start(inicio);
+    fuente.stop(fin + 0.05);
+    return duracion;
+}
+
+/** Precarga la grabación de una nota (opcional). */
+export function precargarNota(midi) {
+    const ctx = obtenerContexto();
+    if (!ctx) return;
+    cargarMuestra(ctx, Math.min(Math.max(midi, MIDI_MIN), MIDI_MAX)).catch(() => {});
+}
+
 // ───────── Respaldo: síntesis de cuerda pulsada (Karplus-Strong) ─────────
 
 function crearBufferCuerda(ctx, frecuencia, duracion = 3) {
@@ -182,7 +231,7 @@ function crearBufferCuerda(ctx, frecuencia, duracion = 3) {
     return { buffer, tasa: frecuencia / (sr / periodo) };
 }
 
-function reproducirSintetizado(ctx, midis) {
+function reproducirSintetizado(ctx, midis, la4 = 440) {
     const maestro = crearSalida(ctx);
     const filtro = ctx.createBiquadFilter();
     filtro.type = 'lowpass';
@@ -194,7 +243,7 @@ function reproducirSintetizado(ctx, midis) {
 
     const ahora = ctx.currentTime + 0.02;
     midis.forEach((midi, n) => {
-        const { buffer, tasa } = crearBufferCuerda(ctx, midiAFrecuencia(midi));
+        const { buffer, tasa } = crearBufferCuerda(ctx, midiAFrecuencia(midi, la4));
         const fuente = ctx.createBufferSource();
         fuente.buffer = buffer;
         fuente.playbackRate.value = tasa;

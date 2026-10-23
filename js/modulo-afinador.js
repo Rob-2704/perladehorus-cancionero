@@ -17,8 +17,7 @@ export const NOTAS_LATINO = ['DO', 'DO♯', 'RE', 'RE♯', 'MI', 'FA', 'FA♯', 
 export const INSTRUMENTOS = {
     cromatico: { nombre: 'Cromático', cuerdas: null },
     guitarra:  { nombre: 'Guitarra',  cuerdas: [40, 45, 50, 55, 59, 64] }, // E2 A2 D3 G3 B3 E4
-    bajo:      { nombre: 'Bajo',      cuerdas: [28, 33, 38, 43] },         // E1 A1 D2 G2
-    ukulele:   { nombre: 'Ukulele',   cuerdas: [67, 60, 64, 69] }          // G4 C4 E4 A4 (re-entrante)
+    bajo:      { nombre: 'Bajo',      cuerdas: [28, 33, 38, 43] }          // E1 A1 D2 G2
 };
 
 export function midiAFrecuencia(midi, la4 = 440) {

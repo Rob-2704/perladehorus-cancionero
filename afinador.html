@@ -503,9 +503,8 @@
                 <span class="material-symbols-outlined icono-ajuste">music_note</span>
                 <select id="select-instrumento" class="select-ajuste">
                     <option value="guitarra">Guitarra</option>
-                    <option value="cromatico">Cromático (cualquier nota)</option>
                     <option value="bajo">Bajo</option>
-                    <option value="ukulele">Ukulele</option>
+                    <option value="cromatico">Cromático (cualquier nota)</option>
                 </select>
             </label>
 
@@ -582,8 +581,9 @@
     <script type="module">
         import {
             TAM_VENTANA, CLARIDAD_MINIMA, INSTRUMENTOS,
-            detectarTono, analizarNota, nombreNota, octavaDeMidi, midiAFrecuencia
+            detectarTono, analizarNota, nombreNota, octavaDeMidi
         } from './js/modulo-afinador.js';
+        import { reproducirNota, precargarNota } from './js/modulo-audio-acorde.js';
 
         // ───────── Elementos ─────────
         const $ = (id) => document.getElementById(id);
@@ -629,7 +629,6 @@
         let centsSuave = 0, midiPrevio = null;
         let enAfinadoDesde = 0, bloqueada = false;
         let silencioHasta = 0;                 // pausa mientras suena el tono de referencia
-        let tonoActual = null;
 
         function leer(clave, def) { try { return localStorage.getItem(clave) ?? def; } catch (_) { return def; } }
         function guardar(clave, valor) { try { localStorage.setItem(clave, valor); } catch (_) {} }
@@ -717,6 +716,7 @@
                 b.addEventListener('click', () => alTocarCuerda(midi));
                 filaCuerdas.appendChild(b);
             });
+            cuerdas.forEach(precargarNota);   // deja las grabaciones listas (y en caché sin conexión)
             refrescarCuerdas(null);
         }
 
@@ -758,40 +758,12 @@
             return ctx;
         }
 
-        function tocarReferencia(midi) {
-            const c = asegurarContexto();
-            if (!c) return;
-            if (tonoActual) { try { tonoActual.parar(); } catch (_) {} }
-
-            const freq = midiAFrecuencia(midi, la4);
-            const onda = c.createPeriodicWave(
-                new Float32Array([0, 1, 0.55, 0.32, 0.18, 0.09, 0.05]),
-                new Float32Array(7)
-            );
-            const osc = c.createOscillator();
-            osc.setPeriodicWave(onda);
-            osc.frequency.value = freq;
-
-            const g = c.createGain();
-            const t0 = c.currentTime;
-            g.gain.setValueAtTime(0.0001, t0);
-            g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.03);
-            g.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.6);
-            osc.connect(g); g.connect(c.destination);
-            osc.start(t0); osc.stop(t0 + 2.7);
-
+        // Misma grabación de guitarra y mismo módulo que usa el visor para los acordes
+        async function tocarReferencia(midi) {
             // Mientras suena, el micrófono lo escucharía: se pausa la detección
-            silencioHasta = performance.now() + 2800;
-            tonoActual = {
-                parar() {
-                    try {
-                        g.gain.cancelScheduledValues(c.currentTime);
-                        g.gain.setValueAtTime(g.gain.value, c.currentTime);
-                        g.gain.linearRampToValueAtTime(0.0001, c.currentTime + 0.05);
-                        osc.stop(c.currentTime + 0.06);
-                    } catch (_) {}
-                }
-            };
+            silencioHasta = performance.now() + 4000;
+            const duracion = await reproducirNota(midi, la4);
+            silencioHasta = performance.now() + Math.min(duracion, 3) * 1000 + 150;
         }
 
         // ───────── Referencia LA ─────────
