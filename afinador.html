@@ -2,7 +2,7 @@
 <html lang="es-mx">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <link rel="icon" type="image/x-icon" href="img/icono.png">
     <link rel="manifest" href="manifest.json">
@@ -32,10 +32,11 @@
             font-family: 'Sono', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 40px 40px 130px 40px;
+            padding: 20px 16px 120px 16px;
             margin: 0;
             position: relative;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container { max-width: 720px; margin: 0 auto; min-width: 0; }
@@ -51,118 +52,108 @@
             flex-shrink: 0;
         }
 
-        /* ───── Animaciones (mismo estilo que el resto del sitio) ───── */
+        /* ───── Animaciones ───── */
         @keyframes extenderContenedor {
-            0% { opacity: 0; transform: scaleY(0.7); transform-origin: top; }
-            70% { opacity: 1; transform: scaleY(1.025); transform-origin: top; }
+            0% { opacity: 0; transform: scaleY(0.8); transform-origin: top; }
             100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
         }
         @keyframes desplegarCortina {
-            0% { opacity: 0; max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; transform: scaleY(0); transform-origin: top; }
-            70% { opacity: 1; max-height: 300px; margin-bottom: 10px; padding-top: 12px; padding-bottom: 12px; transform: scaleY(1.05); transform-origin: top; }
-            100% { opacity: 1; max-height: 400px; margin-bottom: 10px; padding-top: 12px; padding-bottom: 12px; transform: scaleY(1); transform-origin: top; }
+            0% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+            100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
         }
         @keyframes popControl {
-            0% { opacity: 0; transform: scale(0.4); }
-            75% { opacity: 1; transform: scale(1.15); }
+            0% { opacity: 0; transform: scale(0.6); }
             100% { opacity: 1; transform: scale(1); }
         }
         @keyframes deslizarTexto {
-            0% { opacity: 0; transform: translateY(-10px); }
+            0% { opacity: 0; transform: translateY(-8px); }
             100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes deslizarElementoInferior {
-            0% { opacity: 0; transform: translateY(45px); }
-            70% { opacity: 1; transform: translateY(-4px); }
+            0% { opacity: 0; transform: translateY(30px); }
             100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes subirToast {
-            0% { opacity: 0; transform: translate(-50%, 20px); }
+            0% { opacity: 0; transform: translate(-50%, 15px); }
             100% { opacity: 1; transform: translate(-50%, 0); }
         }
         @keyframes latido {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
+            50% { transform: scale(1.05); }
         }
 
         /* ───── Cabecera ───── */
-        .header-superior { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 15px; }
+        .header-superior { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 
         .btn-volver-admin {
             background-color: transparent;
             color: var(--text-sec);
-            border: 2px solid var(--text-sec);
-            padding: 8px 14px;
+            border: 1.5px solid var(--text-sec);
+            padding: 6px 12px;
             border-radius: 12px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             text-decoration: none;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
-        .btn-volver-admin:hover { background-color: var(--card-bg); color: var(--text-main); border-color: var(--accent); }
-        .btn-volver-admin:active { transform: scale(0.95); }
+        .btn-volver-admin:active { transform: scale(0.96); }
 
         h1 {
             margin: 0;
-            font-size: 32px;
+            font-size: clamp(24px, 6vw, 32px);
             font-weight: 700;
             letter-spacing: -0.5px;
             opacity: 0;
-            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: deslizarTexto 0.25s forwards;
         }
         .subtitulo {
-            margin: 5px 0 14px 0;
-            font-size: 13px;
+            margin: 4px 0 12px 0;
+            font-size: 12px;
             color: var(--text-sec);
             border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             opacity: 0;
-            animation: deslizarTexto 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
+            animation: deslizarTexto 0.25s 0.05s forwards;
         }
 
         /* ───── Ajustes ───── */
         .contenedor-ajustes {
             background: var(--card-bg);
-            padding: 12px 22px;
-            border-radius: 50px;
+            padding: 12px;
+            border-radius: 20px;
             margin-bottom: 14px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px 3%;
-            overflow: hidden;
-            animation: desplegarCortina 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            gap: 10px;
         }
 
         .grupo-ajuste {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             opacity: 0;
-            animation: popControl 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: popControl 0.2s forwards;
         }
-        .grupo-ajuste:nth-child(1) { animation-delay: 0.10s; }
-        .grupo-ajuste:nth-child(2) { animation-delay: 0.16s; }
-        .grupo-ajuste:nth-child(3) { animation-delay: 0.22s; }
 
-        .icono-ajuste { color: var(--accent); font-size: 24px; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .icono-ajuste { color: var(--accent); font-size: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
         .select-ajuste {
             background-color: var(--bg-color);
             color: var(--text-main);
-            border: 2px solid var(--accent);
+            border: 1.5px solid var(--accent);
             border-radius: 50px;
-            padding: 6px 34px 6px 16px;
+            padding: 6px 30px 6px 12px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
+            font-size: 12px;
             outline: none;
             cursor: pointer;
             -webkit-appearance: none;
@@ -170,81 +161,72 @@
             -webkit-tap-highlight-color: transparent;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 14px;
-            transition: border-color 0.2s ease;
+            background-position: right 10px center;
+            background-size: 12px;
         }
-        .select-ajuste:focus { border-color: var(--text-main); }
         .select-ajuste option { background-color: var(--card-bg); color: var(--text-main); }
 
-        /* Referencia LA: [−] 440 Hz [+] */
         .stepper {
             display: inline-flex;
             align-items: center;
             background: rgba(255, 255, 255, 0.07);
             border-radius: 50px;
-            padding: 3px;
+            padding: 2px;
         }
         .stepper button {
-            width: 34px; height: 34px;
+            width: 32px; height: 32px;
             border: none; border-radius: 50%;
             background: transparent;
             color: var(--text-main);
             font-family: 'Sono', sans-serif;
-            font-size: 18px; font-weight: 700;
+            font-size: 16px; font-weight: 700;
             cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: background-color 0.2s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .stepper button:active { background: rgba(255, 255, 255, 0.18); transform: scale(0.9); }
-        @media (hover: hover) { .stepper button:hover { background: rgba(255, 255, 255, 0.12); } }
+        .stepper button:active { background: rgba(255, 255, 255, 0.2); }
 
         .valor-la {
-            min-width: 98px;
+            min-width: 75px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            line-height: 1.1;
             user-select: none;
         }
-        .valor-la small { display: block; font-size: 10px; color: var(--text-sec); font-weight: 400; }
+        .valor-la small { display: block; font-size: 9px; color: var(--text-sec); }
 
-        .chips-ref { display: inline-flex; gap: 6px; }
+        .chips-ref { display: inline-flex; gap: 4px; }
         .chip {
-            border: 2px solid var(--accent);
+            border: 1.5px solid var(--accent);
             background: var(--bg-color);
             color: var(--text-main);
             border-radius: 50px;
-            padding: 4px 12px;
+            padding: 4px 10px;
             font-family: 'Sono', monospace;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .chip:active { transform: scale(0.94); }
+        .chip:active { transform: scale(0.95); }
         .chip.activa { background: var(--accent); color: var(--bg-color); }
 
         .btn-cifrado {
-            border: 2px solid var(--accent);
+            border: 1.5px solid var(--accent);
             background: var(--bg-color);
             color: var(--text-main);
             border-radius: 50px;
-            height: 34px;
-            padding: 0 14px;
+            height: 32px;
+            padding: 0 12px;
             font-family: 'Sono', monospace;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .btn-cifrado:active { transform: scale(0.94); }
         .btn-cifrado span { color: var(--text-sec); font-weight: 400; }
         .btn-cifrado b { color: var(--accent); }
 
@@ -252,29 +234,29 @@
         .tarjeta-afinador {
             position: relative;
             background: var(--card-bg);
-            border-radius: 30px;
-            padding: 22px 20px 20px 20px;
+            border-radius: 24px;
+            padding: 16px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
             overflow: hidden;
             opacity: 0;
-            animation: extenderContenedor 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.15) 0.1s forwards;
+            animation: extenderContenedor 0.35s 0.05s forwards;
             transition: box-shadow 0.3s ease;
             --color-estado: var(--text-sec);
         }
-        .tarjeta-afinador.afinada { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--ok), 0 0 36px rgba(46, 196, 182, 0.25); }
+        .tarjeta-afinador.afinada { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--ok), 0 0 24px rgba(46, 196, 182, 0.25); }
         .tarjeta-afinador.nota-ok    { --color-estado: var(--ok); }
         .tarjeta-afinador.nota-cerca { --color-estado: var(--warn); }
         .tarjeta-afinador.nota-lejos { --color-estado: var(--mal); }
 
-        .medidor { width: 100%; max-width: 440px; height: auto; display: block; margin: 0 auto; overflow: visible; }
+        .medidor { width: 100%; max-width: 360px; max-height: 35vh; height: auto; display: block; margin: 0 auto; overflow: visible; }
         .medidor .pista { fill: none; stroke: #2a2a33; stroke-width: 10; stroke-linecap: round; }
         .medidor .zona-ok { fill: none; stroke: var(--ok); stroke-width: 10; opacity: 0.35; transition: opacity 0.2s ease; }
         .tarjeta-afinador.nota-ok .zona-ok { opacity: 1; }
         .medidor .marca { stroke: #55555f; stroke-width: 1.5; stroke-linecap: round; }
         .medidor .marca.mayor { stroke: var(--text-sec); stroke-width: 2.5; }
-        .medidor text { fill: var(--text-sec); font-family: 'Sono', monospace; font-size: 11px; text-anchor: middle; font-variation-settings: 'MONO' 1; }
-        .medidor .signo { font-size: 20px; fill: var(--accent); font-family: system-ui, 'Segoe UI Symbol', 'Sono', sans-serif; font-weight: 700; }
+        .medidor text { fill: var(--text-sec); font-family: 'Sono', monospace; font-size: 11px; text-anchor: middle; }
+        .medidor .signo { font-size: 20px; fill: var(--accent); font-family: system-ui, 'Segoe UI Symbol', sans-serif; font-weight: 700; }
 
         .aguja {
             transform-origin: 160px 168px;
@@ -285,14 +267,13 @@
         .aguja line { stroke: var(--color-estado); stroke-width: 3; stroke-linecap: round; transition: stroke 0.2s ease; }
         .aguja circle { fill: var(--color-estado); transition: fill 0.2s ease; }
 
-        .lectura { margin-top: -6px; }
+        .lectura { margin-top: -10px; }
 
         .nota-grande {
-            font-size: clamp(64px, 19vw, 96px);
+            font-size: clamp(52px, 16vw, 84px);
             font-weight: 700;
             line-height: 1;
-            letter-spacing: -2px;
-            font-variation-settings: 'MONO' 0;
+            letter-spacing: -1px;
             color: var(--text-main);
             transition: color 0.2s ease;
             min-height: 1em;
@@ -301,78 +282,77 @@
         .tarjeta-afinador.escuchando.nota-cerca .nota-grande,
         .tarjeta-afinador.escuchando.nota-lejos .nota-grande { color: var(--color-estado); }
         .tarjeta-afinador.afinada .nota-grande { animation: latido 0.5s ease 1; }
-        .nota-grande .octava { font-size: 0.32em; letter-spacing: 0; color: var(--text-sec); margin-left: 4px; vertical-align: baseline; font-weight: 400; }
+        .nota-grande .octava { font-size: 0.32em; letter-spacing: 0; color: var(--text-sec); margin-left: 2px; vertical-align: baseline; font-weight: 400; }
         .nota-grande.vacia { color: #3a3a44 !important; }
 
-        .datos-lectura { display: flex; justify-content: center; align-items: baseline; gap: 18px; margin-top: 6px; font-family: 'Sono', monospace; font-variation-settings: 'MONO' 1; }
-        .dato { font-size: 14px; color: var(--text-sec); min-width: 90px; }
-        .dato b { color: var(--text-main); font-weight: 600; font-size: 16px; }
+        .datos-lectura { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-top: 4px; font-family: 'Sono', monospace; }
+        .dato { font-size: 13px; color: var(--text-sec); min-width: 80px; }
+        .dato b { color: var(--text-main); font-weight: 600; font-size: 15px; }
 
         .mensaje {
-            margin: 12px auto 0 auto;
-            min-height: 22px;
-            font-size: 14px;
+            margin: 8px auto 0 auto;
+            min-height: 20px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-estado);
             transition: color 0.2s ease;
         }
 
-        .barra-nivel { margin: 14px auto 0 auto; width: 60%; max-width: 240px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+        .barra-nivel { margin: 10px auto 0 auto; width: 50%; max-width: 200px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
         .barra-nivel div { height: 100%; width: 0%; background: var(--accent); border-radius: 4px; transition: width 0.08s linear; }
 
         /* Capa de arranque */
         .capa-inicio {
             position: absolute;
             inset: 0;
-            background: rgba(30, 30, 36, 0.92);
-            -webkit-backdrop-filter: blur(3px);
-            backdrop-filter: blur(3px);
+            background: rgba(30, 30, 36, 0.94);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            padding: 20px;
+            gap: 12px;
+            padding: 16px;
             z-index: 5;
             transition: opacity 0.25s ease;
         }
         .capa-inicio.oculta { opacity: 0; pointer-events: none; }
-        .capa-inicio p { margin: 0; max-width: 300px; font-size: 13px; line-height: 1.5; color: var(--text-sec); }
+        .capa-inicio p { margin: 0; max-width: 280px; font-size: 12px; line-height: 1.4; color: var(--text-sec); }
 
         .btn-grande {
-            display: inline-flex; align-items: center; gap: 10px;
+            display: inline-flex; align-items: center; gap: 8px;
             background: var(--accent); color: var(--bg-color);
             border: none; border-radius: 50px;
-            padding: 14px 26px;
-            font-family: 'Sono', sans-serif; font-size: 15px; font-weight: 700;
+            padding: 12px 22px;
+            font-family: 'Sono', sans-serif; font-size: 14px; font-weight: 700;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
             animation: pulsoDorado 1.8s ease-out infinite;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes pulsoDorado { 0% { box-shadow: 0 0 0 0 rgba(188, 151, 49, 0.55); } 100% { box-shadow: 0 0 0 22px rgba(188, 151, 49, 0); } }
-        .btn-grande:active { transform: scale(1.08); }
-        .btn-grande .material-symbols-outlined { font-size: 22px; }
+        @keyframes pulsoDorado { 0% { box-shadow: 0 0 0 0 rgba(188, 151, 49, 0.55); } 100% { box-shadow: 0 0 0 18px rgba(188, 151, 49, 0); } }
+        .btn-grande:active { transform: scale(0.96); }
 
         /* ───── Cuerdas ───── */
-        .zona-cuerdas { margin-top: 18px; opacity: 0; animation: deslizarTexto 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards; }
+        .zona-cuerdas { margin-top: 14px; opacity: 0; animation: deslizarTexto 0.3s 0.15s forwards; }
         .zona-cuerdas[hidden] { display: none; }
 
         .titulo-cuerdas {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            margin: 0 4px 10px 4px;
-            font-size: 12px; color: var(--text-sec);
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            margin: 0 2px 8px 2px;
+            font-size: 11px; color: var(--text-sec);
         }
-        .titulo-cuerdas .acciones { display: inline-flex; gap: 8px; }
-        .chip.icono { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; }
-        .chip.icono .material-symbols-outlined { font-size: 16px; }
+        .titulo-cuerdas .acciones { display: inline-flex; gap: 6px; }
+        .chip.icono { display: inline-flex; align-items: center; gap: 2px; padding: 3px 8px; }
+        .chip.icono .material-symbols-outlined { font-size: 14px; }
 
-        .fila-cuerdas { display: flex; justify-content: center; flex-wrap: nowrap; gap: clamp(5px, 2vw, 10px); }
+        .fila-cuerdas { display: flex; justify-content: center; flex-wrap: nowrap; gap: 6px; }
 
         .cuerda {
             position: relative;
-            flex: 0 1 62px; min-width: 0;
+            flex: 1 1 0;
+            max-width: 58px;
             aspect-ratio: 1 / 1;
             padding: 0;
             border-radius: 50%;
@@ -380,53 +360,50 @@
             background: var(--card-bg);
             color: var(--text-main);
             font-family: 'Sono', sans-serif;
-            font-size: 15px; font-weight: 700;
+            font-size: 14px; font-weight: 700;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 1px; line-height: 1;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
-        .cuerda small { font-size: 9px; font-weight: 400; color: var(--text-sec); }
-        .cuerda:active { transform: scale(1.12); }
-        @media (hover: hover) { .cuerda:hover { transform: scale(1.08); } }
+        .cuerda small { font-size: 8px; font-weight: 400; color: var(--text-sec); }
+        .cuerda:active { transform: scale(1.08); }
         .cuerda.cercana { border-color: var(--text-main); }
         .cuerda.fijada { background: var(--accent); color: var(--bg-color); }
-        .cuerda.fijada small { color: var(--bg-color); opacity: 0.7; }
+        .cuerda.fijada small { color: var(--bg-color); opacity: 0.8; }
         .cuerda.hecha { border-color: var(--ok); }
         .cuerda.hecha::after {
             content: "check";
             font-family: 'Material Symbols Outlined';
-            position: absolute; top: -5px; right: -5px;
-            width: 20px; height: 20px; border-radius: 50%;
+            position: absolute; top: -3px; right: -3px;
+            width: 18px; height: 18px; border-radius: 50%;
             background: var(--ok); color: var(--bg-color);
-            font-size: 14px; font-weight: 700;
+            font-size: 12px; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
-            font-variation-settings: 'FILL' 1, 'wght' 600;
         }
 
-        .ayuda-cuerdas { margin: 12px 4px 0 4px; text-align: center; font-size: 11px; line-height: 1.5; color: var(--text-sec); }
+        .ayuda-cuerdas { margin: 10px 2px 0 2px; text-align: center; font-size: 10px; line-height: 1.4; color: var(--text-sec); }
 
         /* ───── Panel flotante inferior ───── */
-        #panel-flotante-wrapper { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 999; }
-        .fila-inferior { display: flex; align-items: center; gap: 12px; width: 360px; max-width: 90vw; }
+        #panel-flotante-wrapper { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999; }
+        .fila-inferior { display: flex; align-items: center; gap: 10px; width: calc(100vw - 32px); max-width: 360px; }
 
-        .panel-flotante { background: var(--card-bg); border-radius: 50px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        .panel-flotante { background: var(--card-bg); border-radius: 50px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); }
 
         #panel-estado {
             flex: 1; min-width: 0;
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            padding: 12px 14px 12px 18px;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            padding: 10px 12px 10px 16px;
             opacity: 0;
-            animation: deslizarElementoInferior 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) 0.22s forwards;
+            animation: deslizarElementoInferior 0.28s 0.1s forwards;
         }
-        #texto-estado { font-size: 12px; font-weight: 600; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #texto-estado { font-size: 11px; font-weight: 600; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #texto-estado.activo { color: var(--ok); }
 
         .btn-vibrar {
-            width: 38px; height: 38px; flex-shrink: 0;
+            width: 34px; height: 34px; flex-shrink: 0;
             border-radius: 50%; border: none;
             background: rgba(255, 255, 255, 0.07);
             color: var(--text-sec);
@@ -434,54 +411,56 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .btn-vibrar .material-symbols-outlined { font-size: 22px; }
+        .btn-vibrar .material-symbols-outlined { font-size: 18px; }
         .btn-vibrar.activo { background: var(--accent); color: var(--bg-color); }
-        .btn-vibrar:active { transform: scale(1.12); }
+        .btn-vibrar:active { transform: scale(1.08); }
         .btn-vibrar[hidden] { display: none; }
 
         .btn-mic {
-            width: 62px; height: 62px; flex-shrink: 0;
+            width: 54px; height: 54px; flex-shrink: 0;
             border-radius: 50px; border: 2px solid var(--card-bg);
             background: var(--card-bg); color: var(--accent);
             display: flex; align-items: center; justify-content: center;
             padding: 0; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
             opacity: 0;
-            animation: deslizarElementoInferior 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+            animation: deslizarElementoInferior 0.28s 0.15s forwards;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
-        .btn-mic .material-symbols-outlined { font-size: 28px; font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .btn-mic .material-symbols-outlined { font-size: 24px; }
         .btn-mic.activo { border-color: var(--ok); color: var(--ok); }
-        .btn-mic:active { transform: scale(1.12) !important; }
-        @media (hover: hover) { .btn-mic:hover { transform: scale(1.1) !important; } }
+        .btn-mic:active { transform: scale(1.08); }
 
         /* ───── Toast ───── */
         .toast {
-            position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
+            position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
             background: var(--card-bg); color: var(--text-main);
-            border: 2px solid var(--accent); border-radius: 24px;
-            padding: 10px 20px;
-            font-family: 'Sono', monospace; font-size: 13px; line-height: 1.4;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 1100; max-width: 90vw; text-align: center; display: none;
+            border: 1.5px solid var(--accent); border-radius: 20px;
+            padding: 8px 16px;
+            font-family: 'Sono', monospace; font-size: 12px; line-height: 1.3;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1100; max-width: 88vw; text-align: center; display: none;
         }
-        .toast.visible { display: block; animation: subirToast 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .toast.visible { display: block; animation: subirToast 0.2s forwards; }
         .toast.error { border-color: var(--mal); }
 
+        /* Adaptabilidad Celulares */
         @media (max-width: 600px) {
-            body { padding: 40px 12px 130px 12px; }
-            h1 { font-size: 28px; }
-            .contenedor-ajustes { flex-direction: column; align-items: stretch; padding: 14px 16px; border-radius: 24px; gap: 12px; }
-            .grupo-ajuste { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
-            .select-ajuste { flex: 1; }
-            .tarjeta-afinador { padding: 18px 12px 18px 12px; border-radius: 26px; }
-            .cuerda { font-size: 13px; }
+            body { padding: 14px 12px 110px 12px; }
+            .contenedor-ajustes {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+            .grupo-ajuste { width: 100%; justify-content: space-between; }
+            .grupo-ajuste:nth-child(1) { grid-column: span 2; }
+            .select-ajuste { width: 100%; }
+            .tarjeta-afinador { padding: 12px 8px; }
         }
-        @media (max-width: 380px) { .fila-inferior { width: 90vw; } }
 
         @media (prefers-reduced-motion: reduce) {
             .btn-grande { animation: none; }
@@ -716,7 +695,7 @@
                 b.addEventListener('click', () => alTocarCuerda(midi));
                 filaCuerdas.appendChild(b);
             });
-            cuerdas.forEach(precargarNota);   // deja las grabaciones listas (y en caché sin conexión)
+            cuerdas.forEach(precargarNota);   // deja las grabaciones listas
             refrescarCuerdas(null);
         }
 
@@ -729,7 +708,7 @@
             });
             btnAuto.classList.toggle('activa', notaFijada === null);
             textoModo.textContent = notaFijada === null
-                ? 'Detección automática de cuerda'
+                ? 'Detección automática'
                 : `Afinando: ${etiquetaNota(notaFijada, true)}`;
         }
 
@@ -747,7 +726,7 @@
         btnAuto.addEventListener('click', () => { notaFijada = null; reiniciarLectura(); refrescarCuerdas(null); });
         btnReiniciar.addEventListener('click', () => { afinadas.clear(); refrescarCuerdas(null); });
 
-        // ───────── Sonido de referencia (para afinar de oído) ─────────
+        // ───────── Sonido de referencia ─────────
         function asegurarContexto() {
             if (!ctx) {
                 const AC = window.AudioContext || window.webkitAudioContext;
@@ -758,9 +737,7 @@
             return ctx;
         }
 
-        // Misma grabación de guitarra y mismo módulo que usa el visor para los acordes
         async function tocarReferencia(midi) {
-            // Mientras suena, el micrófono lo escucharía: se pausa la detección
             silencioHasta = performance.now() + 4000;
             const duracion = await reproducirNota(midi, la4);
             silencioHasta = performance.now() + Math.min(duracion, 3) * 1000 + 150;
@@ -782,7 +759,6 @@
         $('btn-la-mas').addEventListener('click', () => cambiarLa(la4 + 1));
         document.querySelectorAll('.chip[data-la]').forEach(c => c.addEventListener('click', () => cambiarLa(Number(c.dataset.la))));
 
-        // Mantener presionado − / + para cambiar rápido
         [['btn-la-menos', -1], ['btn-la-mas', 1]].forEach(([id, paso]) => {
             const b = $(id);
             let temporizador = null, intervalo = null;
@@ -824,7 +800,7 @@
             btnVibrar.title = vibrar ? 'Vibrará al estar afinado' : 'Vibración desactivada';
         }
         if (!hayVibracion) {
-            btnVibrar.hidden = true; // iPhone/Safari no permite vibrar desde la web
+            btnVibrar.hidden = true;
         } else {
             pintarBtnVibrar();
             btnVibrar.addEventListener('click', () => {
@@ -849,7 +825,6 @@
             if (!c) { mostrarToast('Tu navegador no soporta audio web.', true); return; }
 
             try {
-                // Sin procesado: el cancelador de eco y el control de ganancia deforman el tono
                 flujo = await navigator.mediaDevices.getUserMedia({
                     audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
                     video: false
@@ -857,7 +832,7 @@
             } catch (err) {
                 const nombre = err && err.name;
                 if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
-                    mostrarToast('Permiso del micrófono denegado. Actívalo en los ajustes del navegador para este sitio.', true);
+                    mostrarToast('Permiso del micrófono denegado.', true);
                 } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
                     mostrarToast('No se encontró ningún micrófono.', true);
                 } else {
@@ -871,7 +846,7 @@
             analizador.fftSize = TAM_VENTANA;
             analizador.smoothingTimeConstant = 0;
             fuente = c.createMediaStreamSource(flujo);
-            fuente.connect(analizador);       // sin conectar a destination: no hay retorno de audio
+            fuente.connect(analizador);
 
             escuchando = true;
             reiniciarLectura();
@@ -904,7 +879,6 @@
         $('btn-activar').addEventListener('click', activarMicrofono);
         btnMic.addEventListener('click', () => { escuchando ? apagarMicrofono() : activarMicrofono(); });
 
-        // Privacidad y batería: se apaga el micrófono si la página queda oculta
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && escuchando) {
                 apagarMicrofono();
@@ -955,7 +929,7 @@
         function ciclo(ahora) {
             if (!escuchando) return;
             rafId = requestAnimationFrame(ciclo);
-            if (ahora - ultimoCuadro < 28) return;   // ~35 lecturas por segundo
+            if (ahora - ultimoCuadro < 28) return;
             ultimoCuadro = ahora;
 
             analizador.getFloatTimeDomainData(buffer);
@@ -963,7 +937,7 @@
 
             nivel.style.width = Math.min(100, Math.sqrt(r.volumen / 0.12) * 100) + '%';
 
-            if (ahora < silencioHasta) return;       // está sonando el tono de referencia
+            if (ahora < silencioHasta) return;
 
             const valida = r.frecuencia > 0 && r.claridad >= CLARIDAD_MINIMA;
             if (valida) {
@@ -971,7 +945,6 @@
                     const med = mediana(historial);
                     const dif = Math.abs(1200 * Math.log2(r.frecuencia / med));
                     if (dif > 70) {
-                        // Salto brusco (octava falsa, ruido…): se ignora salvo que se repita
                         atipicos++;
                         if (atipicos >= 4) { historial = []; atipicos = 0; }
                         else return actualizarSiSilencio(ahora);
@@ -1000,7 +973,6 @@
         function pintarLectura(freq, ahora) {
             const info = analizarNota(freq, la4, cuerdasActuales(), notaFijada);
 
-            // Suavizado de la aguja (se salta si cambió la nota objetivo)
             if (midiPrevio !== info.midi) {
                 centsSuave = info.cents;
                 midiPrevio = info.midi;
@@ -1012,7 +984,6 @@
             const abs = Math.abs(centsSuave);
             const estado = abs <= TOLERANCIA_OK ? 'ok' : (abs <= TOLERANCIA_CERCA ? 'cerca' : 'lejos');
 
-            // Bloqueo "afinada": se sostiene unos instantes dentro de la tolerancia
             if (estado === 'ok') {
                 if (!enAfinadoDesde) enAfinadoDesde = ahora;
                 if (!bloqueada && ahora - enAfinadoDesde > 380) {
