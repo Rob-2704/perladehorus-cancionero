@@ -1,4 +1,3 @@
-// Constantes musicales para el cálculo automático (Fallback)
 const FORMULAS_TEORICAS = {
     "":       [0, 4, 7], "m":      [0, 3, 7], "7":      [0, 4, 7, 10], 
     "m7":     [0, 3, 7, 10], "maj7":   [0, 4, 7, 11], "dim":    [0, 3, 6], 
@@ -17,6 +16,8 @@ const GRADOS_A_REEMPLAZAR = {
     11: [16, 17, 18],
     13: [20, 21, 22]
 };
+
+const MAPA_NOTAS = { do: 0, re: 2, mi: 4, fa: 5, sol: 7, la: 9, si: 11, c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
 
 const MAPA_A_LATINO = {
     'C': 'DO', 'D': 'RE', 'E': 'MI', 'F': 'FA', 'G': 'SOL', 'A': 'LA', 'B': 'SI'
@@ -52,8 +53,8 @@ function aplicarAlteraciones(formulaBase, textoAlteracion) {
     let formula = [...formulaBase];
 
     tokens.forEach(token => {
-        const coincideAdd = token.match(/^add(\d+)\$/);
-        const coincideAlt = token.match(/^([#b]?)(\d+)\$/);
+        const coincideAdd = token.match(/^add(\d+)$/);
+        const coincideAlt = token.match(/^([#b]?)(\d+)$/);
 
         if (coincideAdd) {
             const grado = parseInt(coincideAdd[1]);
@@ -82,12 +83,379 @@ function aplicarAlteraciones(formulaBase, textoAlteracion) {
     return formula;
 }
 
-const AFINACION_GUITARRA = [4, 9, 2, 7, 11, 4]; 
-const NOMBRES_NOTAS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-const EQUIVALENCIAS_BEMOLES = { "Db":"C#", "Eb":"D#", "Gb":"F#", "Ab":"G#", "Bb":"A#" };
-const traductorAcordes = {
-    'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
-};
+// ───────────────────────── Teoría y generador de digitaciones ─────────────────────────
+
+// Afinación estándar (cuerda 6 → 1): E2 A2 D3 G3 B3 E4, en números MIDI
+const AFINACION = [40, 45, 50, 55, 59, 64];
+const TRASTE_MAXIMO = 15;
+
+export const NOMBRES_SOSTENIDOS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+export const NOMBRES_BEMOLES    = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+// tones: semitonos desde la raíz · grados: etiqueta de cada nota · req: notas que no pueden faltar
+// alias: cómo se suele escribir (minúsculas, sin espacios) para el buscador
+export const TIPOS = [
+    // Tríadas
+    { id: '',       sim: '',        nombre: 'Mayor',                       grupo: 'Tríadas',  tones: [0, 4, 7],            grados: ['1', '3', '5'],               req: [0, 4, 7],      alias: ['', 'maj', 'major', 'mayor'] },
+    { id: 'm',      sim: 'm',       nombre: 'Menor',                       grupo: 'Tríadas',  tones: [0, 3, 7],            grados: ['1', '♭3', '5'],              req: [0, 3, 7],      alias: ['m', 'min', 'minor', 'menor', '-'] },
+    { id: 'dim',    sim: 'dim',     nombre: 'Disminuido',                  grupo: 'Tríadas',  tones: [0, 3, 6],            grados: ['1', '♭3', '♭5'],             req: [0, 3, 6],      alias: ['dim', '°', 'º', 'disminuido'] },
+    { id: 'aug',    sim: 'aug',     nombre: 'Aumentado',                   grupo: 'Tríadas',  tones: [0, 4, 8],            grados: ['1', '3', '♯5'],              req: [0, 4, 8],      alias: ['aug', '+', 'aumentado', '#5'] },
+    { id: 'sus2',   sim: 'sus2',    nombre: 'Suspendido 2',                grupo: 'Tríadas',  tones: [0, 2, 7],            grados: ['1', '2', '5'],               req: [0, 2, 7],      alias: ['sus2'] },
+    { id: 'sus4',   sim: 'sus4',    nombre: 'Suspendido 4',                grupo: 'Tríadas',  tones: [0, 5, 7],            grados: ['1', '4', '5'],               req: [0, 5, 7],      alias: ['sus4', 'sus'] },
+    { id: '5',      sim: '5',       nombre: 'Quinta (power chord)',        grupo: 'Tríadas',  tones: [0, 7],               grados: ['1', '5'],                    req: [0, 7],         alias: ['5'], minCuerdas: 3 },
+
+    // Sextas
+    { id: '6',      sim: '6',       nombre: 'Sexta',                       grupo: 'Sextas',   tones: [0, 4, 7, 9],         grados: ['1', '3', '5', '6'],          req: [0, 4, 9],      alias: ['6'] },
+    { id: 'm6',     sim: 'm6',      nombre: 'Menor con sexta',             grupo: 'Sextas',   tones: [0, 3, 7, 9],         grados: ['1', '♭3', '5', '6'],         req: [0, 3, 9],      alias: ['m6', 'min6', '-6'] },
+    { id: '69',     sim: '6/9',     nombre: 'Sexta con novena',            grupo: 'Sextas',   tones: [0, 4, 7, 9, 2],      grados: ['1', '3', '5', '6', '9'],     req: [0, 4, 9, 2],   alias: ['69', '6add9'] },
+
+    // Séptimas
+    { id: '7',      sim: '7',       nombre: 'Séptima (dominante)',         grupo: 'Séptimas', tones: [0, 4, 7, 10],        grados: ['1', '3', '5', '♭7'],         req: [0, 4, 10],     alias: ['7', 'dom7'] },
+    { id: 'maj7',   sim: 'maj7',    nombre: 'Séptima mayor',               grupo: 'Séptimas', tones: [0, 4, 7, 11],        grados: ['1', '3', '5', '7'],          req: [0, 4, 11],     alias: ['maj7', 'major7', 'δ', 'δ7'] },
+    { id: 'm7',     sim: 'm7',      nombre: 'Menor con séptima',           grupo: 'Séptimas', tones: [0, 3, 7, 10],        grados: ['1', '♭3', '5', '♭7'],        req: [0, 3, 10],     alias: ['m7', 'min7', '-7', 'menor7'] },
+    { id: 'mmaj7',  sim: 'm(maj7)', nombre: 'Menor con séptima mayor',     grupo: 'Séptimas', tones: [0, 3, 7, 11],        grados: ['1', '♭3', '5', '7'],         req: [0, 3, 11],     alias: ['mmaj7', 'minmaj7', 'm#7'] },
+    { id: 'dim7',   sim: 'dim7',    nombre: 'Disminuido con séptima',      grupo: 'Séptimas', tones: [0, 3, 6, 9],         grados: ['1', '♭3', '♭5', '♭♭7'],      req: [0, 3, 6, 9],   alias: ['dim7', '°7', 'º7'] },
+    { id: 'm7b5',   sim: 'm7b5',    nombre: 'Semidisminuido',              grupo: 'Séptimas', tones: [0, 3, 6, 10],        grados: ['1', '♭3', '♭5', '♭7'],       req: [0, 3, 6, 10],  alias: ['m7b5', 'ø', 'ø7', 'min7b5', 'm7-5'] },
+    { id: '7sus4',  sim: '7sus4',   nombre: 'Séptima suspendida',          grupo: 'Séptimas', tones: [0, 5, 7, 10],        grados: ['1', '4', '5', '♭7'],         req: [0, 5, 10],     alias: ['7sus4', '7sus'] },
+    { id: '7b5',    sim: '7b5',     nombre: 'Séptima con quinta bemol',    grupo: 'Séptimas', tones: [0, 4, 6, 10],        grados: ['1', '3', '♭5', '♭7'],        req: [0, 4, 6, 10],  alias: ['7b5', '7-5'] },
+    { id: '7#5',    sim: '7#5',     nombre: 'Séptima aumentada',           grupo: 'Séptimas', tones: [0, 4, 8, 10],        grados: ['1', '3', '♯5', '♭7'],        req: [0, 4, 8, 10],  alias: ['7#5', 'aug7', '7aug', '+7', '7+5'] },
+    { id: 'maj7#5', sim: 'maj7#5',  nombre: 'Séptima mayor aumentada',     grupo: 'Séptimas', tones: [0, 4, 8, 11],        grados: ['1', '3', '♯5', '7'],         req: [0, 4, 8, 11],  alias: ['maj7#5', 'maj7aug', 'maj7+5'] },
+    { id: 'maj7#11',sim: 'maj7#11', nombre: 'Séptima mayor con ♯11',       grupo: 'Séptimas', tones: [0, 4, 7, 11, 6],     grados: ['1', '3', '5', '7', '♯11'],   req: [0, 4, 11, 6],  alias: ['maj7#11'] },
+
+    // Con novena
+    { id: 'add9',   sim: 'add9',    nombre: 'Añadida 9 (add9)',            grupo: 'Con novena', tones: [0, 4, 7, 2],       grados: ['1', '3', '5', '9'],          req: [0, 4, 2],      alias: ['add9'] },
+    { id: 'madd9',  sim: 'madd9',   nombre: 'Menor añadida 9',             grupo: 'Con novena', tones: [0, 3, 7, 2],       grados: ['1', '♭3', '5', '9'],         req: [0, 3, 2],      alias: ['madd9', 'minadd9'] },
+    { id: '9',      sim: '9',       nombre: 'Novena',                      grupo: 'Con novena', tones: [0, 4, 7, 10, 2],   grados: ['1', '3', '5', '♭7', '9'],    req: [0, 4, 10, 2],  alias: ['9', 'dom9'] },
+    { id: 'm9',     sim: 'm9',      nombre: 'Menor con novena',            grupo: 'Con novena', tones: [0, 3, 7, 10, 2],   grados: ['1', '♭3', '5', '♭7', '9'],   req: [0, 3, 10, 2],  alias: ['m9', 'min9', '-9'] },
+    { id: 'maj9',   sim: 'maj9',    nombre: 'Novena mayor',                grupo: 'Con novena', tones: [0, 4, 7, 11, 2],   grados: ['1', '3', '5', '7', '9'],     req: [0, 4, 11, 2],  alias: ['maj9', 'major9'] },
+    { id: '9sus4',  sim: '9sus4',   nombre: 'Novena suspendida',           grupo: 'Con novena', tones: [0, 5, 7, 10, 2],   grados: ['1', '4', '5', '♭7', '9'],    req: [0, 5, 10, 2],  alias: ['9sus4', '9sus'] },
+
+    // Alterados
+    { id: '7b9',    sim: '7b9',     nombre: 'Séptima con ♭9',              grupo: 'Alterados', tones: [0, 4, 7, 10, 1],    grados: ['1', '3', '5', '♭7', '♭9'],   req: [0, 4, 10, 1],  alias: ['7b9'] },
+    { id: '7#9',    sim: '7#9',     nombre: 'Séptima con ♯9',              grupo: 'Alterados', tones: [0, 4, 7, 10, 3],    grados: ['1', '3', '5', '♭7', '♯9'],   req: [0, 4, 10, 3],  alias: ['7#9'] },
+    { id: '7#11',   sim: '7#11',    nombre: 'Séptima con ♯11',             grupo: 'Alterados', tones: [0, 4, 7, 10, 6],    grados: ['1', '3', '5', '♭7', '♯11'],  req: [0, 4, 10, 6],  alias: ['7#11'] },
+    { id: '7b13',   sim: '7b13',    nombre: 'Séptima con ♭13',             grupo: 'Alterados', tones: [0, 4, 7, 10, 8],    grados: ['1', '3', '5', '♭7', '♭13'],  req: [0, 4, 10, 8],  alias: ['7b13'] },
+
+    // Oncenas y trecenas
+    { id: '11',     sim: '11',      nombre: 'Oncena',                      grupo: 'Oncenas y trecenas', tones: [0, 4, 7, 10, 2, 5], grados: ['1', '3', '5', '♭7', '9', '11'], req: [0, 10, 5],    alias: ['11'] },
+    { id: 'm11',    sim: 'm11',     nombre: 'Menor con oncena',            grupo: 'Oncenas y trecenas', tones: [0, 3, 7, 10, 2, 5], grados: ['1', '♭3', '5', '♭7', '9', '11'], req: [0, 3, 10, 5], alias: ['m11', 'min11'] },
+    { id: '13',     sim: '13',      nombre: 'Trecena',                     grupo: 'Oncenas y trecenas', tones: [0, 4, 7, 10, 2, 9], grados: ['1', '3', '5', '♭7', '9', '13'], req: [0, 4, 10, 9], alias: ['13'] },
+    { id: 'm13',    sim: 'm13',     nombre: 'Menor con trecena',           grupo: 'Oncenas y trecenas', tones: [0, 3, 7, 10, 2, 9], grados: ['1', '♭3', '5', '♭7', '9', '13'], req: [0, 3, 10, 9], alias: ['m13', 'min13'] },
+    { id: 'maj13',  sim: 'maj13',   nombre: 'Trecena mayor',               grupo: 'Oncenas y trecenas', tones: [0, 4, 7, 11, 2, 9], grados: ['1', '3', '5', '7', '9', '13'],  req: [0, 4, 11, 9], alias: ['maj13', 'major13'] }
+];
+
+export const TIPO_POR_ID = Object.fromEntries(TIPOS.map(t => [t.id, t]));
+
+// ───────────────────────── Generación ─────────────────────────
+
+/**
+ * Busca digitaciones para un acorde.
+ * @param {number} raiz     0–11 (0 = DO)
+ * @param {object} tipo     elemento de TIPOS
+ * @param {number|null} bajo  nota del bajo (0–11) o null para la raíz
+ * @param {number} maximo   cuántas devolver (1 = solo la más cómoda)
+ * @returns {Array<{strings:string, cejilla:boolean, trasteInicio:number, cuerdasCejilla:number[]|null, trasteMin:number, abierto:boolean, dedos:number}>}
+ */
+export function generarDigitaciones(raiz, tipo, bajo = null, maximo = 12, relajado = false) {
+    const tonos = tipo.tones.map(i => (raiz + i) % 12);
+    const requeridas = tipo.req.map(i => (raiz + i) % 12);
+    const pcBajo = (bajo === null || bajo === undefined) ? raiz : bajo;
+    const permitidas = new Set([...tonos, pcBajo]);
+    const minCuerdas = tipo.minCuerdas || 4;
+
+    const encontradas = new Map();
+    const frets = new Array(6).fill(-1);
+
+    for (let base = 1; base + 3 <= TRASTE_MAXIMO; base++) {
+        // Notas posibles por cuerda dentro de esta ventana (las cuerdas al aire solo en la primera)
+        const opciones = AFINACION.map(midi => {
+            const lista = [];
+            if (base === 1 && permitidas.has(midi % 12)) lista.push(0);
+            for (let f = base; f <= base + 3; f++) {
+                if (permitidas.has((midi + f) % 12)) lista.push(f);
+            }
+            return lista;
+        });
+
+        // estado: 0 = aún no suena ninguna, 1 = sonando, 2 = ya terminaron las cuerdas que suenan
+        const recorrer = (s, estado) => {
+            if (s === 6) { evaluar(); return; }
+
+            frets[s] = -1;
+            recorrer(s + 1, estado === 1 ? 2 : estado);
+
+            if (estado !== 2) {
+                for (const f of opciones[s]) {
+                    frets[s] = f;
+                    recorrer(s + 1, 1);
+                }
+                frets[s] = -1;
+            }
+        };
+
+        const evaluar = () => {
+            let sonando = 0, primera = -1;
+            const pcs = new Set();
+            const pisadas = [];
+            for (let s = 0; s < 6; s++) {
+                const f = frets[s];
+                if (f < 0) continue;
+                sonando++;
+                if (primera < 0) primera = s;
+                pcs.add((AFINACION[s] + f) % 12);
+                if (f > 0) pisadas.push([s, f]);
+            }
+            if (sonando < minCuerdas) return;
+            if ((AFINACION[primera] + frets[primera]) % 12 !== pcBajo) return;
+            for (const r of requeridas) if (!pcs.has(r)) return;
+
+            const clave = frets.map(f => (f < 0 ? 'X' : f)).join(' ');
+            if (encontradas.has(clave)) return;
+
+            let trasteMin = 0, trasteMax = 0;
+            if (pisadas.length) {
+                trasteMin = Math.min(...pisadas.map(p => p[1]));
+                trasteMax = Math.max(...pisadas.map(p => p[1]));
+            }
+
+            // Dedos: cejilla solo si hace falta (más de 4 notas pisadas)
+            let dedos = pisadas.length;
+            let cejilla = null;
+            if (pisadas.length > 4) {
+                const enMin = pisadas.filter(p => p[1] === trasteMin);
+                if (enMin.length >= 2) {
+                    const i0 = enMin[0][0], i1 = enMin[enMin.length - 1][0];
+                    let valida = true;
+                    for (let s = i0; s <= i1; s++) if (frets[s] < trasteMin) { valida = false; break; }
+                    if (valida) {
+                        cejilla = [i0 + 1, i1 + 1];
+                        dedos = 1 + pisadas.filter(p => p[1] > trasteMin).length;
+                    }
+                }
+            }
+            if (dedos > 4) return;
+
+            const abiertas = frets.filter(f => f === 0).length;
+            const tonosCubiertos = tonos.filter(t => pcs.has(t)).length;
+            const puntaje =
+                dedos * 2 +
+                (6 - sonando) * 1.5 +
+                (trasteMax - trasteMin) * 1.0 +
+                (cejilla ? 1.5 : 0) +
+                trasteMin * 0.25 -
+                abiertas * 0.5 -
+                tonosCubiertos * 0.8;
+
+            // Qué parte del diapasón se dibuja: si hay cejilla o pasa del traste 4, se empieza en el traste más bajo
+            const trasteInicio = (cejilla || trasteMax > 4) ? Math.max(1, trasteMin) : 1;
+
+            encontradas.set(clave, {
+                strings: clave,
+                cejilla: !!cejilla,
+                trasteInicio,
+                cuerdasCejilla: cejilla,
+                trasteMin,
+                abierto: abiertas > 0,
+                dedos,
+                puntaje
+            });
+        };
+
+        recorrer(0, 0);
+    }
+
+    // Si ninguna forma cumple todo, se pide solo raíz y tercera (o su sustituto) y se permiten 3 cuerdas
+    if (!encontradas.size && !relajado) {
+        return generarDigitaciones(raiz, { ...tipo, req: tipo.req.slice(0, 2), minCuerdas: 3 }, bajo, maximo, true);
+    }
+
+    // Quita las versiones "recortadas": misma forma que otra, pero sin cuerdas al aire que sí podrían sonar
+    const lista = [...encontradas.values()];
+    const trastes = lista.map(d => d.strings.split(' ').map(x => (x === 'X' ? -1 : parseInt(x, 10))));
+    const todas = lista.filter((d, i) => !lista.some((o, j) => {
+        if (i === j) return false;
+        const a = trastes[i], b = trastes[j];
+        let extra = false;
+        for (let s = 0; s < 6; s++) {
+            if (a[s] >= 0 && a[s] !== b[s]) return false;      // debe conservar todas sus notas
+            if (a[s] < 0 && b[s] >= 0) {
+                if (b[s] !== 0) return false;                  // lo añadido solo puede ser cuerda al aire
+                extra = true;
+            }
+        }
+        return extra;
+    })).sort((a, b) => a.puntaje - b.puntaje);
+    if (maximo <= 1) return todas.slice(0, 1);
+
+    // Variedad: como máximo 3 por zona del mástil
+    const porZona = new Map();
+    const elegidas = [];
+    for (const d of todas) {
+        const zona = d.abierto ? 0 : Math.floor(d.trasteMin / 3) + 1;
+        const n = porZona.get(zona) || 0;
+        if (n >= 3) continue;
+        porZona.set(zona, n + 1);
+        elegidas.push(d);
+        if (elegidas.length >= maximo) break;
+    }
+    return elegidas.sort((a, b) => (a.abierto === b.abierto ? 0 : (a.abierto ? -1 : 1)) || a.trasteMin - b.trasteMin || a.puntaje - b.puntaje);
+}
+
+// ───────────────────────── Interpretar el nombre de un acorde ─────────────────────────
+
+const ALIAS = new Map();
+TIPOS.forEach(t => t.alias.forEach(a => { if (!ALIAS.has(a)) ALIAS.set(a, t.id); }));
+
+function leerNota(texto) {
+    const m = texto.match(/^(do|re|mi|fa|sol|la|si|[a-g])([#b])?/i);
+    if (!m) return null;
+    let pc = MAPA_NOTAS[m[1].toLowerCase()];
+    if (m[2] === '#') pc = (pc + 1) % 12;
+    if (m[2] === 'b') pc = (pc + 11) % 12;
+    return { pc, resto: texto.slice(m[0].length) };
+}
+
+function normalizarSufijo(s) {
+    s = s.replace(/[()\s]/g, '').replace(/♯/g, '#').replace(/♭/g, 'b');
+    if (s === 'M') return '';
+    if (/^M/.test(s) && !/^maj/i.test(s)) s = 'maj' + s.slice(1);
+    return s.toLowerCase().replace('añadida', 'add');
+}
+
+/** Interpreta "Fa#m7", "Do/Mi", "Bbmaj7", "C6/9"… → {raiz, tipo, bajo} o null */
+export function interpretarAcorde(texto) {
+    if (!texto) return null;
+    let t = texto.trim().replace(/♯/g, '#').replace(/♭/g, 'b').replace(/6\/9/g, '69');
+    if (!t) return null;
+
+    let textoBajo = null;
+    const barra = t.lastIndexOf('/');
+    if (barra > 0) { textoBajo = t.slice(barra + 1); t = t.slice(0, barra); }
+
+    const raiz = leerNota(t);
+    if (!raiz) return null;
+
+    const idTipo = ALIAS.get(normalizarSufijo(raiz.resto));
+    if (idTipo === undefined) return null;
+
+    let bajo = null;
+    if (textoBajo) {
+        const nb = leerNota(textoBajo.trim());
+        if (!nb || nb.resto.trim() !== '') return null;
+        bajo = nb.pc;
+    }
+    return { raiz: raiz.pc, tipo: idTipo, bajo: bajo === raiz.pc ? null : bajo };
+}
+
+// ───────────────────────── Nombre de acorde → digitación automática ─────────────────────────
+
+function pcDeNota(nombre) {
+    const m = (nombre || '').match(/^([A-G])(#|b)?$/);
+    if (!m) return -1;
+    let pc = MAPA_NOTAS[m[1].toLowerCase()];
+    if (m[2] === '#') pc = (pc + 1) % 12;
+    if (m[2] === 'b') pc = (pc + 11) % 12;
+    return pc;
+}
+
+/**
+ * Separa un nombre de acorde ("Am7", "Sol#m", "C_G"…) en raíz, resto y bajo.
+ * Es la misma lectura que usaba la caja emergente, ahora compartida con el generador.
+ */
+export function analizarNombreAcorde(nombreRaw) {
+    const textoLimpio = nombreRaw.trim().replace(/[\s-\-❚❙]/g, '');
+    const partes = textoLimpio.split('_');
+    const estructura = partes[0];
+    const bajoRaw = partes[1] || null;
+
+    let raiz = '';
+    let alteraciones = '';
+    const estructuraUpper = estructura.toUpperCase();
+
+    for (const notaLatina of Object.keys(MAPA_A_ANGLO)) {
+        if (estructuraUpper.startsWith(notaLatina)) {
+            raiz = MAPA_A_ANGLO[notaLatina];
+            alteraciones = estructura.substring(notaLatina.length);
+            break;
+        }
+    }
+    if (!raiz) {
+        raiz = estructura.substring(0, 1).toUpperCase();
+        alteraciones = estructura.substring(1);
+    }
+    if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
+        raiz += alteraciones.substring(0, 1);
+        alteraciones = alteraciones.substring(1);
+    }
+
+    let notaBajo = null;
+    if (bajoRaw) {
+        const bajoUpper = bajoRaw.toUpperCase();
+        for (const notaLatina of Object.keys(MAPA_A_ANGLO)) {
+            if (bajoUpper.startsWith(notaLatina)) {
+                notaBajo = MAPA_A_ANGLO[notaLatina] + bajoUpper.substring(notaLatina.length).toLowerCase();
+                break;
+            }
+        }
+        if (!notaBajo) notaBajo = bajoRaw.substring(0, 1).toUpperCase() + bajoRaw.substring(1);
+    }
+
+    return { textoLimpio, raiz, alteraciones, notaBajo };
+}
+
+/** Para sufijos que no están en la tabla TIPOS: arma el acorde con las fórmulas teóricas. */
+function tipoDesdeFormula(alteraciones) {
+    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?$/);
+    let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
+    let textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
+
+    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)$/i);
+    if (matchSusAlt) {
+        sufijoBase = matchSusAlt[1];
+        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchSusAlt[2]})`) : `(${matchSusAlt[2]})`;
+    }
+
+    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)$/i);
+    if (matchAddDirecto) {
+        sufijoBase = matchAddDirecto[1];
+        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchAddDirecto[2]})`) : `(${matchAddDirecto[2]})`;
+    }
+
+    const base = sufijoBase.toLowerCase();
+    if (base === 'min' || base === 'm') sufijoBase = 'm';
+    else if (base === 'min7' || base === 'm7') sufijoBase = 'm7';
+    else if (base === 'maj') sufijoBase = '';
+
+    const formula = aplicarAlteraciones(FORMULAS_TEORICAS[sufijoBase] || FORMULAS_TEORICAS[''], textoAlteracion);
+    const tones = [...new Set(formula.map(i => i % 12))];
+    // Imprescindibles: todo menos la quinta justa y, en acordes con muchas notas, la 9 y la 11
+    const req = tones.filter(t => !(t === 7 && tones.length >= 4) && !((t === 2 || t === 5) && tones.length >= 5));
+    return { id: '?', sim: alteraciones, nombre: alteraciones, grupo: '', tones, grados: [], req: req.length ? req : [0], alias: [] };
+}
+
+/**
+ * Calcula la digitación más cómoda de un acorde que no está en el diccionario manual.
+ * @param {{raiz:string, alteraciones:string, notaBajo:string|null}} analisis  resultado de analizarNombreAcorde
+ */
+export function digitacionAutomatica({ raiz, alteraciones, notaBajo }) {
+    const pcRaiz = pcDeNota(raiz);
+    if (pcRaiz < 0) return null;
+
+    let pcBajo = notaBajo ? pcDeNota(notaBajo) : null;
+    if (pcBajo !== null && pcBajo < 0) pcBajo = null;
+    if (pcBajo === pcRaiz) pcBajo = null;
+
+    let tipo = null;
+    const conocido = interpretarAcorde(raiz + alteraciones);
+    if (conocido && conocido.raiz === pcRaiz) tipo = TIPO_POR_ID[conocido.tipo];
+    if (!tipo) tipo = tipoDesdeFormula(alteraciones);
+
+    const mejor = generarDigitaciones(pcRaiz, tipo, pcBajo, 1)[0];
+    if (!mejor) return null;
+    return { strings: mejor.strings, cejilla: mejor.cejilla, trasteInicio: mejor.trasteInicio, cuerdasCejilla: mejor.cuerdasCejilla };
+}
+
+// ───────────────────────── Texto de las canciones ─────────────────────────
 
 export function crearRegexAcordes() {
     const nucleoAcorde = `([CDEFGAB]|DO|RE|MI|FA|SOL|LA|SI)(#|b)?((?:maj|min|dim|aug|m)?)(?:(sus4|sus2|sus(?:[#b]?\\d+)?|add\\d+|5|6|7|8|9|10|11|12|13)+)?`;
@@ -208,47 +576,9 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
     wrapperRender.style.marginTop = "4px";
     wrapperRender.style.marginBottom = "-12px";
 
-    let textoLimpio = nombreAcordeRaw.trim().replace(/[\s-\-❚❙]/g, '');        
+    const analisis = analizarNombreAcorde(nombreAcordeRaw);
+    const { textoLimpio, raiz, alteraciones, notaBajo } = analisis;
     const nombreFormateado = convertirAcordeASistema(textoLimpio.replace('_', '/'), sistema);
-
-    let partesBajo = textoLimpio.split('_');
-    let acordeEstructura = partesBajo[0];
-    let notaBajoRaw = partesBajo[1] || null;
-    let notaBajo = null;
-
-    let raiz = "";
-    let alteraciones = "";
-    let acordeEstructuraUpper = acordeEstructura.toUpperCase();
-
-    for (const notaLatina of Object.keys(traductorAcordes)) {
-        if (acordeEstructuraUpper.startsWith(notaLatina)) {
-            raiz = traductorAcordes[notaLatina]; 
-            alteraciones = acordeEstructura.substring(notaLatina.length); 
-            break;
-        }
-    }
-
-    if (!raiz) {
-        raiz = acordeEstructura.substring(0, 1).toUpperCase();
-        alteraciones = acordeEstructura.substring(1);
-    }
-
-    if (alteraciones.startsWith('#') || alteraciones.startsWith('b')) {
-        raiz += alteraciones.substring(0, 1);
-        alteraciones = alteraciones.substring(1);
-    }
-
-    if (notaBajoRaw) {
-        let notaBajoUpper = notaBajoRaw.toUpperCase();
-        for (const notaLatina of Object.keys(traductorAcordes)) {
-            if (notaBajoUpper.startsWith(notaLatina)) {
-                let altBajo = notaBajoUpper.substring(notaLatina.length);
-                notaBajo = traductorAcordes[notaLatina] + altBajo;
-                break;
-            }
-        }
-        if (!notaBajo) notaBajo = notaBajoUpper; 
-    }
 
     let sufijoJson = alteraciones;
     if (alteraciones.toLowerCase() === "min" || alteraciones.toLowerCase() === "m") {
@@ -257,31 +587,6 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
         sufijoJson = "m7";
     } else if (alteraciones.toLowerCase() === "maj") {
         sufijoJson = "";
-    }
-
-    const coincideParentesis = alteraciones.match(/^([^()]*)(\(.+\))?\$/);
-    let sufijoBase = coincideParentesis ? coincideParentesis[1] : alteraciones;
-    let textoAlteracion = coincideParentesis ? coincideParentesis[2] : null;
-
-    const matchSusAlt = sufijoBase.match(/^(sus[24]?)([#b]\d+)\$/i);
-    if (matchSusAlt) {
-        sufijoBase = matchSusAlt[1];
-        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${matchSusAlt[2]})`) : `(${matchSusAlt[2]})`;
-    }
-
-    const matchAddDirecto = sufijoBase.match(/^(.*)(add\d+)\$/i);
-    if (matchAddDirecto) {
-        sufijoBase = matchAddDirecto[1];
-        const tokenAdd = matchAddDirecto[2];
-        textoAlteracion = textoAlteracion ? textoAlteracion.replace(')', `, ${tokenAdd})`) : `(${tokenAdd})`;
-    }
-
-    if (sufijoBase.toLowerCase() === "min" || sufijoBase.toLowerCase() === "m") {
-        sufijoBase = "m";
-    } else if (sufijoBase.toLowerCase() === "min7" || sufijoBase.toLowerCase() === "m7") {
-        sufijoBase = "m7";
-    } else if (sufijoBase.toLowerCase() === "maj") {
-        sufijoBase = "";
     }
 
     const llaveDirectaConBajo = nombreAcordeRaw; 
@@ -320,71 +625,16 @@ function abrirCajaAcorde(nombreAcordeRaw, evento, caja, sistema = 'ANGLOSAJON') 
     if (datosManuales) {
         dibujarAcordeCanvasExpandido(wrapperRender, datosManuales);
     } else {
+        let automatica = null;
         try {
-            let notaRaizNormalizada = EQUIVALENCIAS_BEMOLES[raiz] || raiz;
-            let semitonoRaiz = NOMBRES_NOTAS.indexOf(notaRaizNormalizada);
-            if (semitonoRaiz === -1) semitonoRaiz = 0;
-
-            let formulaBase = FORMULAS_TEORICAS[sufijoBase] || FORMULAS_TEORICAS[""];
-            let formula = aplicarAlteraciones(formulaBase, textoAlteracion);
-            let notasAcorde = formula.map(intervalo => (semitonoRaiz + intervalo) % 12);
-
-            let semitonoBajo = null;
-            if (notaBajo) {
-                let bajoNormalizado = EQUIVALENCIAS_BEMOLES[notaBajo] || notaBajo;
-                semitonoBajo = NOMBRES_NOTAS.indexOf(bajoNormalizado);
-            }
-
-            let permitirAlAire = (sufijoBase === "" || sufijoBase === "m") && !textoAlteracion && !notaBajo;
-            let trasteMinimoBusqueda = permitirAlAire ? 0 : 1;
-
-            let trastesCalculados = [];
-            let trasteMinimo = 24, trasteMaximo = 0;
-
-            for (let i = 0; i < 6; i++) {
-                let notaCuerdaAlAire = AFINACION_GUITARRA[i];
-                let trasteOptimo = "X";
-
-                for (let traste = trasteMinimoBusqueda; traste <= 12; traste++) {
-                    let notaEnTraste = (notaCuerdaAlAire + traste) % 12;
-                    
-                    if (i === 0 && semitonoBajo !== null) {
-                        if (notaEnTraste === semitonoBajo) {
-                            trasteOptimo = traste;
-                            break;
-                        }
-                    } else {
-                        if (notasAcorde.includes(notaEnTraste)) {
-                            trasteOptimo = traste;
-                            break;
-                        }
-                    }
-                }
-
-                if (trasteOptimo !== "X" && trasteOptimo > 0) {
-                    if (trasteOptimo < trasteMinimo) trasteMinimo = trasteOptimo;
-                    if (trasteOptimo > trasteMaximo) trasteMaximo = trasteOptimo;
-                }
-                trastesCalculados.push(trasteOptimo);
-            }
-
-            let requiereCejilla = false;
-            let trasteInicioDibujo = 1;
-            if (trasteMaximo - trasteMinimo <= 3 && trasteMinimo !== 24 && trasteMinimo > 2) {
-                trasteInicioDibujo = trasteMinimo;
-                requiereCejilla = true;
-            }
-
-            const objetoAcordeDinamico = {
-                strings: trastesCalculados.join(" "),
-                cejilla: requiereCejilla,
-                trasteInicio: trasteInicioDibujo,
-                cuerdasCejilla: requiereCejilla ? [1, 6] : null
-            };
-
-            dibujarAcordeCanvasExpandido(wrapperRender, objetoAcordeDinamico);
-
+            automatica = digitacionAutomatica(analisis);
         } catch (error) {
+            automatica = null;
+        }
+
+        if (automatica) {
+            dibujarAcordeCanvasExpandido(wrapperRender, automatica);
+        } else {
             wrapperRender.innerHTML = `<div style="font-size:11px; color:#ff3333;">Error de auto-cálculo</div>`;
             wrapperRender.dataset.strings = "";
         }
