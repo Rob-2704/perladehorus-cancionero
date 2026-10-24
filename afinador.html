@@ -166,6 +166,14 @@
         }
         .select-ajuste option { background-color: var(--card-bg); color: var(--text-main); }
 
+        .valor-la {
+            min-width: 64px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            user-select: none;
+        }
+
         .stepper {
             display: inline-flex;
             align-items: center;
@@ -186,32 +194,6 @@
             touch-action: manipulation;
         }
         .stepper button:active { background: rgba(255, 255, 255, 0.2); }
-
-        .valor-la {
-            min-width: 75px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
-            user-select: none;
-        }
-        .valor-la small { display: block; font-size: 9px; color: var(--text-sec); }
-
-        .chips-ref { display: inline-flex; gap: 4px; }
-        .chip {
-            border: 1.5px solid var(--accent);
-            background: var(--bg-color);
-            color: var(--text-main);
-            border-radius: 50px;
-            padding: 4px 10px;
-            font-family: 'Sono', monospace;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        .chip:active { transform: scale(0.95); }
-        .chip.activa { background: var(--accent); color: var(--bg-color); }
 
         .btn-cifrado {
             border: 1.5px solid var(--accent);
@@ -298,54 +280,9 @@
             transition: color 0.2s ease;
         }
 
-        .barra-nivel { margin: 10px auto 0 auto; width: 50%; max-width: 200px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
-        .barra-nivel div { height: 100%; width: 0%; background: var(--accent); border-radius: 4px; transition: width 0.08s linear; }
-
-        /* Capa de arranque */
-        .capa-inicio {
-            position: absolute;
-            inset: 0;
-            background: rgba(30, 30, 36, 0.94);
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px;
-            z-index: 5;
-            transition: opacity 0.25s ease;
-        }
-        .capa-inicio.oculta { opacity: 0; pointer-events: none; }
-        .capa-inicio p { margin: 0; max-width: 280px; font-size: 12px; line-height: 1.4; color: var(--text-sec); }
-
-        .btn-grande {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--accent); color: var(--bg-color);
-            border: none; border-radius: 50px;
-            padding: 12px 22px;
-            font-family: 'Sono', sans-serif; font-size: 14px; font-weight: 700;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            animation: pulsoDorado 1.8s ease-out infinite;
-        }
-        @keyframes pulsoDorado { 0% { box-shadow: 0 0 0 0 rgba(188, 151, 49, 0.55); } 100% { box-shadow: 0 0 0 18px rgba(188, 151, 49, 0); } }
-        .btn-grande:active { transform: scale(0.96); }
-
         /* ───── Cuerdas ───── */
-        .zona-cuerdas { margin-top: 14px; opacity: 0; animation: deslizarTexto 0.3s 0.15s forwards; }
+        .zona-cuerdas { margin-top: 16px; opacity: 0; animation: deslizarTexto 0.3s 0.15s forwards; }
         .zona-cuerdas[hidden] { display: none; }
-
-        .titulo-cuerdas {
-            display: flex; align-items: center; justify-content: space-between; gap: 8px;
-            margin: 0 2px 8px 2px;
-            font-size: 11px; color: var(--text-sec);
-        }
-        .titulo-cuerdas .acciones { display: inline-flex; gap: 6px; }
-        .chip.icono { display: inline-flex; align-items: center; gap: 2px; padding: 3px 8px; }
-        .chip.icono .material-symbols-outlined { font-size: 14px; }
 
         .fila-cuerdas { display: flex; justify-content: center; flex-wrap: nowrap; gap: 6px; }
 
@@ -384,54 +321,28 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        .ayuda-cuerdas { margin: 10px 2px 0 2px; text-align: center; font-size: 10px; line-height: 1.4; color: var(--text-sec); }
+        .ayuda-cuerdas { margin: 12px 8px 0 8px; text-align: center; font-size: 10px; line-height: 1.5; color: var(--text-sec); }
 
         /* ───── Panel flotante inferior ───── */
         #panel-flotante-wrapper { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 999; }
-        .fila-inferior { display: flex; align-items: center; gap: 10px; width: calc(100vw - 32px); max-width: 360px; }
-
-        .panel-flotante { background: var(--card-bg); border-radius: 50px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); }
-
-        #panel-estado {
-            flex: 1; min-width: 0;
-            display: flex; align-items: center; justify-content: space-between; gap: 8px;
-            padding: 10px 12px 10px 16px;
-            opacity: 0;
-            animation: deslizarElementoInferior 0.28s 0.1s forwards;
-        }
-        #texto-estado { font-size: 11px; font-weight: 600; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #texto-estado.activo { color: var(--ok); }
-
-        .btn-vibrar {
-            width: 34px; height: 34px; flex-shrink: 0;
-            border-radius: 50%; border: none;
-            background: rgba(255, 255, 255, 0.07);
-            color: var(--text-sec);
-            display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        .btn-vibrar .material-symbols-outlined { font-size: 18px; }
-        .btn-vibrar.activo { background: var(--accent); color: var(--bg-color); }
-        .btn-vibrar:active { transform: scale(1.08); }
-        .btn-vibrar[hidden] { display: none; }
-
         .btn-mic {
-            width: 54px; height: 54px; flex-shrink: 0;
-            border-radius: 50px; border: 2px solid var(--card-bg);
-            background: var(--card-bg); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            padding: 0; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            height: 54px; padding: 0 26px; white-space: nowrap;
+            border-radius: 50px;
+            border: 2px solid var(--accent);
+            background: var(--accent); color: var(--bg-color);
+            font-family: 'Sono', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
             opacity: 0;
-            animation: deslizarElementoInferior 0.28s 0.15s forwards;
+            animation: deslizarElementoInferior 0.28s 0.1s forwards, pulsoDorado 1.8s ease-out 0.6s infinite;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-        .btn-mic .material-symbols-outlined { font-size: 24px; }
-        .btn-mic.activo { border-color: var(--ok); color: var(--ok); }
-        .btn-mic:active { transform: scale(1.08); }
+        .btn-mic .material-symbols-outlined { font-size: 22px; }
+        .btn-mic.activo { background: var(--card-bg); border-color: var(--ok); color: var(--ok); opacity: 1; animation: none; }
+        .btn-mic:active { transform: scale(0.96); }
+        @keyframes pulsoDorado { 0% { box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 0 0 rgba(188, 151, 49, 0.55); } 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 0 18px rgba(188, 151, 49, 0); } }
 
         /* ───── Toast ───── */
         .toast {
@@ -451,19 +362,18 @@
             body { padding: 14px 12px 110px 12px; }
             .contenedor-ajustes {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr auto auto;
                 align-items: center;
                 gap: 8px;
                 padding: 10px 12px;
             }
             .grupo-ajuste { width: 100%; justify-content: space-between; }
-            .grupo-ajuste:nth-child(1) { grid-column: span 2; }
             .select-ajuste { width: 100%; }
             .tarjeta-afinador { padding: 12px 8px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .btn-grande { animation: none; }
+            .btn-mic { animation: none; opacity: 1; }
             .aguja { transition: none; }
         }
     </style>
@@ -479,24 +389,18 @@
 
         <div class="contenedor-ajustes">
             <label class="grupo-ajuste" title="Instrumento">
-                <span class="material-symbols-outlined icono-ajuste">music_note</span>
                 <select id="select-instrumento" class="select-ajuste">
                     <option value="guitarra">Guitarra</option>
                     <option value="bajo">Bajo</option>
-                    <option value="cromatico">Cromático (cualquier nota)</option>
+                    <option value="cromatico">Cromático</option>
                 </select>
             </label>
 
             <div class="grupo-ajuste" title="Frecuencia de referencia del LA">
-                <span class="material-symbols-outlined icono-ajuste">graphic_eq</span>
                 <div class="stepper">
                     <button id="btn-la-menos" type="button" aria-label="Bajar referencia 1 Hz">−</button>
-                    <div class="valor-la"><span id="valor-la">440</span> Hz<small id="nombre-la">LA4</small></div>
+                    <div class="valor-la"><span id="valor-la">440</span> Hz</div>
                     <button id="btn-la-mas" type="button" aria-label="Subir referencia 1 Hz">+</button>
-                </div>
-                <div class="chips-ref">
-                    <button class="chip" type="button" data-la="432">432</button>
-                    <button class="chip" type="button" data-la="440">440</button>
                 </div>
             </div>
 
@@ -515,46 +419,23 @@
                     <div class="dato"><b id="dato-cents">—</b> cents</div>
                 </div>
                 <div id="mensaje" class="mensaje">Toca una cuerda</div>
-                <div class="barra-nivel" aria-hidden="true"><div id="nivel"></div></div>
             </div>
 
-            <div id="capa-inicio" class="capa-inicio">
-                <button id="btn-activar" class="btn-grande" type="button">
-                    <span class="material-symbols-outlined">mic</span> Activar micrófono
-                </button>
-                <p>El audio se analiza en tu dispositivo, no se graba ni se envía a ningún lado.</p>
-            </div>
         </section>
 
         <section id="zona-cuerdas" class="zona-cuerdas">
-            <div class="titulo-cuerdas">
-                <span id="texto-modo">Detección automática de cuerda</span>
-                <span class="acciones">
-                    <button id="btn-auto" class="chip activa" type="button">Auto</button>
-                    <button id="btn-reiniciar" class="chip icono" type="button" title="Quitar las marcas de cuerdas afinadas">
-                        <span class="material-symbols-outlined">restart_alt</span> Reiniciar
-                    </button>
-                </span>
-            </div>
             <div id="fila-cuerdas" class="fila-cuerdas"></div>
-            <p class="ayuda-cuerdas">Toca una cuerda para oír su nota de referencia y fijarla como objetivo. Toca de nuevo (o “Auto”) para que el afinador detecte la cuerda solo.</p>
+            <p class="ayuda-cuerdas">Toca una cuerda para oír su nota y fijarla; tócala otra vez para volver a la detección automática. El audio se analiza en tu dispositivo y no se graba.</p>
         </section>
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <div id="panel-flotante-wrapper">
-        <div class="fila-inferior">
-            <div id="panel-estado" class="panel-flotante">
-                <span id="texto-estado">Micrófono apagado</span>
-                <button id="btn-vibrar" class="btn-vibrar activo" type="button" title="Vibrar al estar afinado" aria-pressed="true">
-                    <span class="material-symbols-outlined">vibration</span>
-                </button>
-            </div>
-            <button id="btn-mic" class="btn-mic" type="button" title="Activar / apagar micrófono" aria-pressed="false">
-                <span id="icono-mic" class="material-symbols-outlined">mic</span>
-            </button>
-        </div>
+        <button id="btn-mic" class="btn-mic" type="button" aria-pressed="false">
+            <span id="icono-mic" class="material-symbols-outlined">mic</span>
+            <span id="texto-mic">Activar micrófono</span>
+        </button>
     </div>
 
     <script type="module">
@@ -568,14 +449,13 @@
         const $ = (id) => document.getElementById(id);
         const tarjeta = $('tarjeta'), medidor = $('medidor');
         const notaGrande = $('nota-grande'), datoHz = $('dato-hz'), datoCents = $('dato-cents');
-        const mensaje = $('mensaje'), nivel = $('nivel'), capaInicio = $('capa-inicio');
+        const mensaje = $('mensaje');
         const selectInstrumento = $('select-instrumento');
-        const valorLa = $('valor-la'), nombreLa = $('nombre-la');
+        const valorLa = $('valor-la');
         const btnCifrado = $('btn-cifrado');
-        const zonaCuerdas = $('zona-cuerdas'), filaCuerdas = $('fila-cuerdas'), textoModo = $('texto-modo');
-        const btnAuto = $('btn-auto'), btnReiniciar = $('btn-reiniciar');
-        const btnMic = $('btn-mic'), iconoMic = $('icono-mic'), textoEstado = $('texto-estado');
-        const btnVibrar = $('btn-vibrar'), toast = $('toast');
+        const zonaCuerdas = $('zona-cuerdas'), filaCuerdas = $('fila-cuerdas');
+        const btnMic = $('btn-mic'), iconoMic = $('icono-mic'), textoMic = $('texto-mic');
+        const toast = $('toast');
 
         // ───────── Constantes ─────────
         const TOLERANCIA_OK = 4;        // ±cents que cuentan como "afinada"
@@ -591,7 +471,6 @@
         if (!INSTRUMENTOS[instrumento]) instrumento = 'guitarra';
         let la4 = parseFloat(leer('afinador_la', '440'));
         if (!(la4 >= 400 && la4 <= 480)) la4 = 440;
-        let vibrar = leer('afinador_vibrar', '1') !== '0';
 
         let notaFijada = null;                 // MIDI forzado por el usuario
         const afinadas = new Set();            // cuerdas ya afinadas en esta sesión
@@ -706,10 +585,6 @@
                 b.classList.toggle('hecha', afinadas.has(m));
                 b.classList.toggle('cercana', notaFijada === null && cercana === m);
             });
-            btnAuto.classList.toggle('activa', notaFijada === null);
-            textoModo.textContent = notaFijada === null
-                ? 'Detección automática'
-                : `Afinando: ${etiquetaNota(notaFijada, true)}`;
         }
 
         function alTocarCuerda(midi) {
@@ -722,9 +597,6 @@
             reiniciarLectura();
             refrescarCuerdas(null);
         }
-
-        btnAuto.addEventListener('click', () => { notaFijada = null; reiniciarLectura(); refrescarCuerdas(null); });
-        btnReiniciar.addEventListener('click', () => { afinadas.clear(); refrescarCuerdas(null); });
 
         // ───────── Sonido de referencia ─────────
         function asegurarContexto() {
@@ -746,8 +618,6 @@
         // ───────── Referencia LA ─────────
         function actualizarLa() {
             valorLa.textContent = Number.isInteger(la4) ? la4 : la4.toFixed(1);
-            nombreLa.textContent = sistema === 'LATINO' ? 'LA4' : 'A4';
-            document.querySelectorAll('.chip[data-la]').forEach(c => c.classList.toggle('activa', Number(c.dataset.la) === la4));
             guardar('afinador_la', String(la4));
         }
         function cambiarLa(nuevo) {
@@ -757,7 +627,6 @@
         }
         $('btn-la-menos').addEventListener('click', () => cambiarLa(la4 - 1));
         $('btn-la-mas').addEventListener('click', () => cambiarLa(la4 + 1));
-        document.querySelectorAll('.chip[data-la]').forEach(c => c.addEventListener('click', () => cambiarLa(Number(c.dataset.la))));
 
         [['btn-la-menos', -1], ['btn-la-mas', 1]].forEach(([id, paso]) => {
             const b = $(id);
@@ -791,28 +660,6 @@
             construirCuerdas();
             reiniciarLectura();
         });
-
-        // ───────── Vibración háptica ─────────
-        const hayVibracion = typeof navigator.vibrate === 'function';
-        function pintarBtnVibrar() {
-            btnVibrar.classList.toggle('activo', vibrar);
-            btnVibrar.setAttribute('aria-pressed', String(vibrar));
-            btnVibrar.title = vibrar ? 'Vibrará al estar afinado' : 'Vibración desactivada';
-        }
-        if (!hayVibracion) {
-            btnVibrar.hidden = true;
-        } else {
-            pintarBtnVibrar();
-            btnVibrar.addEventListener('click', () => {
-                vibrar = !vibrar;
-                guardar('afinador_vibrar', vibrar ? '1' : '0');
-                pintarBtnVibrar();
-                if (vibrar) navigator.vibrate(30);
-            });
-        }
-        function vibrarAfinada() {
-            if (hayVibracion && vibrar) { try { navigator.vibrate([45, 60, 45]); } catch (_) {} }
-        }
 
         // ───────── Micrófono ─────────
         async function activarMicrofono() {
@@ -869,14 +716,11 @@
         function pintarEstadoMic() {
             btnMic.classList.toggle('activo', escuchando);
             btnMic.setAttribute('aria-pressed', String(escuchando));
-            iconoMic.textContent = escuchando ? 'mic' : 'mic_off';
+            iconoMic.textContent = escuchando ? 'mic_off' : 'mic';
+            textoMic.textContent = escuchando ? 'Apagar' : 'Activar micrófono';
             tarjeta.classList.toggle('escuchando', escuchando);
-            capaInicio.classList.toggle('oculta', escuchando);
-            textoEstado.classList.toggle('activo', escuchando);
-            textoEstado.textContent = escuchando ? 'Escuchando…' : 'Micrófono apagado';
         }
 
-        $('btn-activar').addEventListener('click', activarMicrofono);
         btnMic.addEventListener('click', () => { escuchando ? apagarMicrofono() : activarMicrofono(); });
 
         document.addEventListener('visibilitychange', () => {
@@ -919,7 +763,6 @@
             datoHz.textContent = '—';
             datoCents.textContent = '—';
             moverAguja(0);
-            nivel.style.width = '0%';
             mensaje.textContent = escuchando
                 ? (notaFijada !== null ? `Toca la cuerda ${etiquetaNota(notaFijada)}` : 'Toca una cuerda')
                 : 'Activa el micrófono para empezar';
@@ -934,8 +777,6 @@
 
             analizador.getFloatTimeDomainData(buffer);
             const r = detectarTono(buffer, ctx.sampleRate);
-
-            nivel.style.width = Math.min(100, Math.sqrt(r.volumen / 0.12) * 100) + '%';
 
             if (ahora < silencioHasta) return;
 
@@ -988,7 +829,6 @@
                 if (!enAfinadoDesde) enAfinadoDesde = ahora;
                 if (!bloqueada && ahora - enAfinadoDesde > 380) {
                     bloqueada = true;
-                    vibrarAfinada();
                     if (cuerdasActuales() && cuerdasActuales().includes(info.midi)) {
                         afinadas.add(info.midi);
                         if (afinadas.size === cuerdasActuales().length) {
@@ -999,6 +839,7 @@
             } else {
                 enAfinadoDesde = 0;
                 if (abs > 12) bloqueada = false;
+                if (abs > TOLERANCIA_CERCA) afinadas.delete(info.midi);   // se desafinó: pierde la marca
             }
 
             tarjeta.classList.toggle('nota-ok', estado === 'ok');
