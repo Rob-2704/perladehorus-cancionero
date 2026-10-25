@@ -1200,7 +1200,8 @@
             coincidencias.forEach(cancion => {
                 const div = document.createElement('div');
                 div.className = 'item-sugerencia';
-                div.innerHTML = `<span>${cancion.nombreC}</span><span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}:${cancion.arreglos}` : ''}</span>`;
+                // CORRECCIÓN: Se agregó un espacio después de los dos puntos (: )
+                div.innerHTML = `<span>${cancion.nombreC}</span><span class="sugerencia-meta">${cancion.arreglos ? `${etiquetaMeta}: ${cancion.arreglos}` : ''}</span>`;
                 div.onclick = (e) => { e.stopPropagation(); window.location.href = `visor.html?idC=${encodeURIComponent(cancion.idC)}`; };
                 listaSugerencias.appendChild(div);
             });
