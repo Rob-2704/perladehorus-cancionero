@@ -225,26 +225,6 @@
         .tarjeta-afinador.nota-cerca { --color-estado: var(--warn); }
         .tarjeta-afinador.nota-lejos { --color-estado: var(--mal); }
 
-        /* Cabecera de la tarjeta con selector de Modo (Aguja / Estrobo) */
-        .tarjeta-header-opciones {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-            font-size: 11px;
-        }
-        .btn-modo {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--accent);
-            color: var(--text-main);
-            border-radius: 12px;
-            padding: 3px 10px;
-            cursor: pointer;
-            font-family: 'Sono', monospace;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
         .medidor { width: 100%; max-width: 360px; max-height: 32vh; height: auto; display: block; margin: 0 auto; overflow: visible; }
         .medidor .pista { fill: none; stroke: #2a2a33; stroke-width: 10; stroke-linecap: round; }
         .medidor .zona-ok { fill: none; stroke: var(--ok); stroke-width: 10; opacity: 0.35; transition: opacity 0.2s ease; }
@@ -262,18 +242,6 @@
         .tarjeta-afinador.escuchando .aguja { opacity: 1; }
         .aguja line { stroke: var(--color-estado); stroke-width: 3; stroke-linecap: round; transition: stroke 0.2s ease; }
         .aguja circle { fill: var(--color-estado); transition: fill 0.2s ease; }
-
-        /* Canvas del Modo Estroboscópico */
-        #canvas-estrobo {
-            width: 100%;
-            max-width: 320px;
-            height: 70px;
-            margin: 10px auto 0 auto;
-            display: none;
-            border-radius: 12px;
-            background: #121216;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
 
         /* Visualizador de Onda en Tiempo Real */
         .contenedor-onda {
@@ -343,7 +311,7 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-        .cuerda small { font-size: 8px; font-weight: 400; color: var(--text-sec); }
+        .cuerda small { font-size: 9px; font-weight: 400; color: var(--text-sec); }
         .cuerda:active { transform: scale(1.08); }
         .cuerda.cercana { border-color: var(--text-main); }
         .cuerda.fijada { background: var(--accent); color: var(--bg-color); }
@@ -468,16 +436,8 @@
         </div>
 
         <section id="tarjeta" class="tarjeta-afinador">
-            <div class="tarjeta-header-opciones">
-                <span></span>
-                <button id="btn-modo" class="btn-modo" type="button">Modo: <b>Aguja</b></button>
-            </div>
-
             <!-- Medidor de Aguja SVG -->
             <svg id="medidor" class="medidor" viewBox="0 0 320 175" role="img" aria-label="Medidor de afinación"></svg>
-
-            <!-- Modo Estroboscópico (Oculto por defecto) -->
-            <canvas id="canvas-estrobo" width="320" height="70"></canvas>
 
             <!-- Visualizador de Onda en Tiempo Real -->
             <div class="contenedor-onda">
@@ -496,7 +456,7 @@
 
         <section id="zona-cuerdas" class="zona-cuerdas">
             <div id="fila-cuerdas" class="fila-cuerdas"></div>
-            <p class="ayuda-cuerdas">Toca una cuerda para oír su nota y fijarla; tócala otra vez para volver a la detección automática.</p>
+            <p class="ayuda-cuerdas">Toca una cuerda para oír su nota y fijarla; tócala otra vez para volver a la detección automática</p>
         </section>
     </div>
 
@@ -506,8 +466,8 @@
             <h3>¿Necesitas ayuda con el micrófono?</h3>
             <p>Para afinar tu instrumento, el navegador requiere tu autorización. Si el permiso fue bloqueado o no aparece:</p>
             <ul>
-                <li><b>iOS (Safari / Chrome):</b> Toca el ícono <b>aA</b> o los controles de sitio en la barra de direcciones superior > Configuración del sitio web > Micrófono > Permitir.</li>
-                <li><b>Android (Chrome):</b> Toca el ícono de candado 🔒 o ajustes junto a la dirección web > Permisos > Micrófono > Permitir.</li>
+                <li><b>iOS (Safari / Chrome):</b> Toca el ícono <b>aA</b> o los controles de sitio en la barra de direcciones superior > Configuración del sitio web > Micrófono > Permitir</li>
+                <li><b>Android (Chrome):</b> Toca el ícono de candado 🔒 o ajustes junto a la dirección web > Permisos > Micrófono > Permitir</li>
             </ul>
             <button id="btn-cerrar-modal" class="btn-cerrar-modal" type="button">Entendido</button>
         </div>
@@ -541,7 +501,6 @@
         const btnMic = $('btn-mic'), iconoMic = $('icono-mic'), textoMic = $('texto-mic');
         const toast = $('toast');
         const modalPermisos = $('modal-permisos'), btnCerrarModal = $('btn-cerrar-modal');
-        const btnModo = $('btn-modo'), canvasEstrobo = $('canvas-estrobo'), ctxEstrobo = canvasEstrobo.getContext('2d');
         const canvasOnda = $('canvas-onda'), ctxOnda = canvasOnda.getContext('2d');
 
         // ───────── Constantes ─────────
@@ -561,7 +520,6 @@
 
         let notaFijada = null;
         let afinadas = new Set();
-        let modoVisual = 'aguja'; // 'aguja' o 'estrobo'
 
         let ctx = null, flujo = null, fuente = null, analizador = null;
         let escuchando = false, rafId = 0, ultimoCuadro = 0;
@@ -574,7 +532,6 @@
         let centsSuave = 0, midiPrevio = null;
         let enAfinadoDesde = 0, bloqueada = false;
         let silencioHasta = 0;
-        let faseEstrobo = 0;
 
         function leer(clave, def) { try { return localStorage.getItem(clave) ?? def; } catch (_) { return def; } }
         function guardar(clave, valor) { try { localStorage.setItem(clave, valor); } catch (_) {} }
@@ -592,15 +549,7 @@
         // Modal de permisos amigable
         btnCerrarModal.addEventListener('click', () => modalPermisos.classList.remove('activo'));
 
-        // Cambio de Modo (Aguja / Estroboscópico)
-        btnModo.addEventListener('click', () => {
-            modoVisual = modoVisual === 'aguja' ? 'estrobo' : 'aguja';
-            btnModo.innerHTML = `Modo: <b>${modoVisual === 'aguja' ? 'Aguja' : 'Estrobo'}</b>`;
-            medidor.style.display = modoVisual === 'aguja' ? 'block' : 'none';
-            canvasEstrobo.style.display = modoVisual === 'estrobo' ? 'block' : 'none';
-        });
-
-        // ───────── Medidor (SVG)[cite: 3] ─────────
+        // ───────── Medidor (SVG) ─────────
         function punto(angulo, radio) {
             const a = angulo * Math.PI / 180;
             return [CX + radio * Math.sin(a), CY - radio * Math.cos(a)];
@@ -649,24 +598,6 @@
             aguja.style.transform = `rotate(${(c / RANGO_AGUJA) * ANGULO_MAX}deg)`;
         }
 
-        // Renderizado del Modo Estroboscópico
-        function renderizarEstrobo(cents) {
-            ctxEstrobo.clearRect(0, 0, canvasEstrobo.width, canvasEstrobo.height);
-            if (!escuchando) return;
-
-            faseEstrobo -= cents * 0.15; // Velocidad y dirección según desviación en cents
-            const numBarras = 16;
-            const anchoBarra = canvasEstrobo.width / numBarras;
-
-            ctxEstrobo.fillStyle = Math.abs(cents) <= TOLERANCIA_OK ? '#2ec4b6' : (cents < 0 ? '#f5c518' : '#e71d36');
-            
-            for (let i = 0; i < numBarras; i++) {
-                const x = (i * anchoBarra + faseEstrobo) % canvasEstrobo.width;
-                const xReal = x < 0 ? x + canvasEstrobo.width : x;
-                ctxEstrobo.fillRect(xReal, 10, anchoBarra * 0.5, canvasEstrobo.height - 20);
-            }
-        }
-
         // ───────── Visualizador de Onda en Tiempo Real ─────────
         function dibujarOnda() {
             if (!analizador || !escuchando) {
@@ -711,7 +642,7 @@
                 b.type = 'button';
                 b.className = 'cuerda';
                 b.dataset.midi = midi;
-                b.innerHTML = `${etiquetaNota(midi)}<small>${cuerdas.length - i}ª · ${octavaDeMidi(midi)}</small>`;
+                b.innerHTML = `${etiquetaNota(midi)}<small>${cuerdas.length - i}ª</small>`;
                 b.title = `Cuerda ${cuerdas.length - i}: ${etiquetaNota(midi, true)}`;
                 b.addEventListener('click', () => alTocarCuerda(midi));
                 filaCuerdas.appendChild(b);
@@ -806,7 +737,6 @@
                     video: false
                 });
             } catch (err) {
-                // Muestra modal de ayuda amigable si deniega el permiso
                 modalPermisos.classList.add('activo');
                 return;
             }
@@ -883,7 +813,6 @@
             datoHz.textContent = '—';
             datoCents.textContent = '—';
             moverAguja(0);
-            renderizarEstrobo(0);
             mensaje.textContent = escuchando
                 ? (notaFijada !== null ? `Toca la cuerda ${etiquetaNota(notaFijada)}` : 'Toca una cuerda')
                 : 'Activa el micrófono para empezar';
@@ -895,7 +824,7 @@
             if (!escuchando) return;
             rafId = requestAnimationFrame(ciclo);
             
-            dibujarOnda(); // Renderiza visualizador de onda
+            dibujarOnda();
 
             if (ahora - ultimoCuadro < 28) return;
             ultimoCuadro = ahora;
@@ -939,12 +868,10 @@
         function pintarLectura(freq, ahora) {
             const info = analizarNota(freq, la4, cuerdasActuales(), notaFijada);
 
-            // Suavizado dinámico: si la nota es estable y cambia poco, aplicamos un factor más inercial (más suave).
-            // Si hay un cambio brusco de nota, reaccionamos más rápido para agilizar la detección.
             let factorSuavizado = 0.45;
             if (midiPrevio === info.midi) {
                 const variacionCents = Math.abs(info.cents - centsSuave);
-                if (variacionCents < 5) factorSuavizado = 0.18; // Estabilidad alta: aguja muy firme
+                if (variacionCents < 5) factorSuavizado = 0.18;
                 else if (variacionCents < 15) factorSuavizado = 0.30;
             }
 
@@ -987,9 +914,7 @@
             const c = centsSuave;
             datoCents.textContent = (c > 0 ? '+' : (c < 0 ? '−' : '')) + Math.abs(c).toFixed(0);
             
-            // Actualizar vistas visuales según modo activo
             moverAguja(centsSuave);
-            renderizarEstrobo(centsSuave);
 
             if (bloqueada || estado === 'ok') mensaje.textContent = '¡Afinada!';
             else if (centsSuave < 0) mensaje.textContent = estado === 'cerca' ? 'Un poco grave — sube un poco' : 'Muy grave — sube el tono';
@@ -1003,7 +928,7 @@
         actualizarLa();
         construirCuerdas();
         pintarEstadoMic();
-        mostrarSinSanal();
+        mostrarSinSenal();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
