@@ -93,6 +93,7 @@
             opacity: 0;
             animation: deslizarTexto 0.25s forwards;
         }
+
         .subtitulo {
             margin: 4px 0 12px 0;
             font-size: 12px;
@@ -133,30 +134,6 @@
         .msg-busqueda { min-height: 0; margin: 4px 4px 0 4px; font-size: 11px; color: var(--mal); }
         .msg-busqueda:empty { display: none; }
 
-        /* ───── Raíces ───── */
-        .fila-raices { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
-        @media (min-width: 700px) { .fila-raices { grid-template-columns: repeat(12, 1fr); } }
-
-        .raiz {
-            aspect-ratio: 1 / 1;
-            border-radius: 50%;
-            border: 2px solid var(--accent);
-            background: var(--card-bg);
-            color: var(--text-main);
-            font-family: 'Sono', sans-serif;
-            font-size: 13px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
-            padding: 0; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            animation: popControl 0.2s forwards;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
-        }
-        .raiz:active { transform: scale(1.08); }
-        .raiz.activa { background: var(--accent); color: var(--bg-color); }
-
         /* ───── Ajustes ───── */
         .contenedor-ajustes {
             background: var(--card-bg);
@@ -165,12 +142,14 @@
             margin-bottom: 14px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
         }
-        .contenedor-ajustes .select-ajuste { flex: 1 1 150px; min-width: 0; }
-        .contenedor-ajustes[hidden] { display: none; }
+        .fila-ajustes { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .fila-ajustes .select-ajuste { flex: 1 1 0; min-width: 0; }
+        .fila-ajustes #select-raiz { flex: 0 0 92px; font-weight: 700; }
+        .fila-ajustes .btn-ajuste { flex: 0 0 auto; }
+        .select-ajuste[hidden] { display: none; }
 
         .select-ajuste {
             background-color: var(--bg-color);
@@ -214,14 +193,23 @@
         .tarjeta-info {
             background: var(--card-bg);
             border-radius: 24px;
-            padding: 16px;
+            padding: 12px 12px 14px 12px;
             margin-bottom: 14px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
             opacity: 0;
             animation: extenderContenedor 0.35s 0.1s forwards;
         }
-        .info-nombre { font-size: clamp(34px, 11vw, 54px); font-weight: 700; line-height: 1.05; letter-spacing: -1px; }
+        .nombre-fila { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .info-nombre { flex: 1; min-width: 0; font-size: clamp(34px, 11vw, 54px); font-weight: 700; line-height: 1.05; letter-spacing: -1px; }
+        .btn-flecha {
+            flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+            border: 1.5px solid var(--accent); background: var(--bg-color); color: var(--accent);
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+        }
+        .btn-flecha:active { transform: scale(0.92); background: var(--accent); color: var(--bg-color); }
+        .btn-flecha .material-symbols-outlined { font-size: 22px; }
         .info-tipo { margin-top: 4px; font-size: 13px; color: var(--text-sec); }
         .info-notas { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .nota-chip {
@@ -324,7 +312,7 @@
         .opcion-modo.activa { background: var(--accent); color: var(--bg-color); }
 
         @media (max-width: 600px) { body { padding: 14px 12px 110px 12px; } }
-        @media (prefers-reduced-motion: reduce) { .tarjeta-acorde, .raiz { animation: none; opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) { .tarjeta-acorde { animation: none; opacity: 1; } }
     </style>
 </head>
 <body>
@@ -344,17 +332,24 @@
             <div id="msg-busqueda" class="msg-busqueda"></div>
         </div>
 
-        <div id="fila-raices" class="fila-raices"></div>
-
         <div class="contenedor-ajustes">
-            <select id="select-tipo" class="select-ajuste" aria-label="Tipo de acorde"></select>
-            <select id="select-bajo" class="select-ajuste" aria-label="Nota del bajo"></select>
-            <button id="btn-alteracion" class="btn-ajuste" type="button" title="Mostrar sostenidos o bemoles"></button>
-            <button id="btn-cifrado" class="btn-ajuste" type="button" title="Nombres de las notas"></button>
+            <div class="fila-ajustes">
+                <select id="select-raiz" class="select-ajuste" aria-label="Nota raíz"></select>
+                <select id="select-tipo" class="select-ajuste" aria-label="Tipo de acorde"></select>
+            </div>
+            <div class="fila-ajustes">
+                <select id="select-bajo" class="select-ajuste" aria-label="Nota del bajo"></select>
+                <button id="btn-alteracion" class="btn-ajuste" type="button" title="Mostrar sostenidos o bemoles"></button>
+                <button id="btn-cifrado" class="btn-ajuste" type="button" title="Nombres de las notas"></button>
+            </div>
         </div>
 
         <section class="tarjeta-info">
-            <div id="info-nombre" class="info-nombre"></div>
+            <div class="nombre-fila">
+                <button id="btn-raiz-ant" class="btn-flecha" type="button" aria-label="Nota anterior"><span class="material-symbols-outlined">chevron_left</span></button>
+                <div id="info-nombre" class="info-nombre"></div>
+                <button id="btn-raiz-sig" class="btn-flecha" type="button" aria-label="Nota siguiente"><span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
             <div id="info-tipo" class="info-tipo"></div>
             <div id="info-notas" class="info-notas"></div>
             <div id="info-cuenta" class="info-cuenta"></div>
@@ -387,13 +382,12 @@
         import { reproducirAcorde, precargarAcorde } from './js/modulo-audio-acorde.js';
 
         const $ = (id) => document.getElementById(id);
-        const filaRaices = $('fila-raices'), selectTipo = $('select-tipo'), selectBajo = $('select-bajo');
+        const selectRaiz = $('select-raiz'), selectTipo = $('select-tipo'), selectBajo = $('select-bajo');
         const btnAlteracion = $('btn-alteracion'), btnCifrado = $('btn-cifrado');
         const cuadricula = $('cuadricula');
         const inputBusqueda = $('input-busqueda'), btnLimpiar = $('btn-limpiar'), msgBusqueda = $('msg-busqueda');
         const btnPosiciones = $('btn-vista-posiciones'), btnFamilia = $('btn-vista-familia');
-        const contenedorAjustes = document.querySelector('.contenedor-ajustes');
-
+        
         function leer(clave, def) { try { return localStorage.getItem(clave) ?? def; } catch (_) { return def; } }
         function guardar(clave, valor) { try { localStorage.setItem(clave, valor); } catch (_) {} }
 
@@ -422,17 +416,24 @@
 
         // ───────── Controles ─────────
         function construirRaices() {
-            filaRaices.innerHTML = '';
+            selectRaiz.innerHTML = '';
             for (let pc = 0; pc < 12; pc++) {
-                const b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'raiz' + (pc === estado.raiz ? ' activa' : '');
-                b.textContent = nombreNota(pc);
-                b.style.animationDelay = (pc * 0.015) + 's';
-                b.addEventListener('click', () => { estado.raiz = pc; guardar('acordes_raiz', pc); refrescar(); });
-                filaRaices.appendChild(b);
+                const o = document.createElement('option');
+                o.value = String(pc);
+                o.textContent = nombreNota(pc);
+                selectRaiz.appendChild(o);
             }
+            selectRaiz.value = String(estado.raiz);
         }
+
+        function cambiarRaiz(pc) {
+            estado.raiz = ((pc % 12) + 12) % 12;
+            guardar('acordes_raiz', estado.raiz);
+            refrescar();
+        }
+        selectRaiz.addEventListener('change', () => cambiarRaiz(Number(selectRaiz.value)));
+        $('btn-raiz-ant').addEventListener('click', () => cambiarRaiz(estado.raiz - 1));
+        $('btn-raiz-sig').addEventListener('click', () => cambiarRaiz(estado.raiz + 1));
 
         function construirTipos() {
             selectTipo.innerHTML = '';
@@ -615,7 +616,7 @@
 
         function refrescar() {
             pintarBotones();
-            [...filaRaices.children].forEach((b, i) => b.classList.toggle('activa', i === estado.raiz));
+            selectRaiz.value = String(estado.raiz);
             selectTipo.value = estado.tipo;
             selectBajo.value = estado.bajo === null ? '' : String(estado.bajo);
 
