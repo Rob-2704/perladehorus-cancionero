@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
 
+    <link href="style.css" rel="stylesheet">
     <title>Afinador</title>
     <style>
         :root {
@@ -29,17 +30,18 @@
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
+            max-width: 80%;
             font-family: 'Sono', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 20px 16px 120px 16px;
-            margin: 0;
+            margin: 0 auto;
+            padding-bottom: 120px;
             position: relative;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 720px; margin: 0 auto; min-width: 0; }
+        .container { margin: 0 auto; min-width: 0; }
 
         .material-symbols-outlined {
             user-select: none;
@@ -390,7 +392,6 @@
 
         /* Adaptabilidad Celulares */
         @media (max-width: 600px) {
-            body { padding: 14px 12px 110px 12px; }
             .contenedor-ajustes {
                 display: grid;
                 grid-template-columns: 1fr auto auto;
