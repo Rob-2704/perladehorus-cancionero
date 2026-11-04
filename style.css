@@ -1,0 +1,125 @@
+:root {
+    --bg-color: #0d0d0d;
+    --card-bg: #1E1E24;
+    --text-main: #ffffff;
+    --text-sec: #999999;
+    --accent: #BC9731;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+}
+
+html {
+    font-family: 'Sono', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    position: relative;
+    padding: 40px 0;
+    margin: 0 auto;
+    max-width: 80%;
+}
+
+.titulo {
+    font-size: 40px;
+    margin-bottom: -10px;
+    font-weight: 450;
+}
+
+.subtitulo {
+    font-size: 15px;
+    color: var(--text-sec);
+    padding-bottom: 15px;
+    border-bottom: var(--accent) solid 2px;
+    font-weight: 500;
+}
+
+.encabezado {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.buscador {
+    width: 100%;
+}
+
+.controles {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"], select {
+    font-family: 'Sono', sans-serif;
+    background-color: var(--card-bg);
+    border: var(--accent) solid 2px;
+    border-radius: 15px;
+    color: var(--text-main);
+    padding: 8px 16px;
+}
+
+select, .tarjeta {
+    cursor: pointer;
+}
+
+select {
+    /* flecha */
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23bc9731' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.lista-canciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.tarjeta {
+    background-color: var(--card-bg);
+    border-radius: 25px;
+    padding: 5px 25px;
+}
+
+.titulo-tarjeta {
+    display: flex;
+    align-items: center;
+    border-bottom: var(--accent) solid 2px;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.iconos {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.estado {
+    display: inline-block;
+    background-color: aquamarine;
+    border-radius: 100%;
+    width: 16px;
+    height: 16px;
+}
+
+.grabacion {
+    color: var(--accent);
+    font-size: 20px;
+}
+
+.subtitulo-tarjeta {
+    color: var(--text-sec);
+    margin-top: -5px;
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Fuente -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200..800&display=swap" rel="stylesheet">
+
+    <!-- Symbolos -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Icono -->
+    <link rel="icon" type="image/x-icon" href="img/icono.png">
+
+    <!-- Estilo -->
+    <link href="style.css" rel="stylesheet">
+
+    <title>Cancionero</title>
+</head>
+<body>
+    <h1 class="titulo">Cancionero</h1>
+    <h3 class="subtitulo">Rondalla Perla De Horus</h3>
+
+    <div class="elementos">
+        <header class="encabezado">
+            <span class="material-symbols-outlined">queue_music</span>
+            Canciones
+        </header>
+        <div class="controles">
+            <select>
+                <option value="rondalla">Rondalla</option>
+                <option value="general">General</option>
+            </select>
+            <input type="text" placeholder="Buscar canción..." class="buscador">
+        </div>
+        <div class="lista-canciones">
+            <div class="tarjeta">
+                <h3 class="titulo-tarjeta">
+                    Amor Mio
+                    <span class="iconos">
+                        <span class="material-symbols-outlined grabacion">play_circle</span>
+                        <span class="estado"></span>
+                    </span>
+                </h3>
+                <h4 class="subtitulo-tarjeta">Autor: Álvaro Carrillo<br>Tonalidad: LA</h4>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
